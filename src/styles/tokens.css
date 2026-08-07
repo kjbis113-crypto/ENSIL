@@ -1,0 +1,25 @@
+/* plan.md §10 — 모노톤 토큰. 컴포넌트 CSS에서 리터럴 색상값 금지. */
+:root {
+  --bg:        #ffffff;
+  --surface:   #f2f2f2;
+  --line:      #cccccc;
+  --line-2:    #888888;
+  --ink:       #111111;
+  --ink-mute:  #777777;
+  --accent:    #111111; /* 지금은 검정. 나중에 여기만 바꾼다 */
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 16px; --sp-4: 24px; --sp-5: 40px;
+  --radius: 0; /* 로우파이 = 모서리 각짐 */
+  --font: system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', monospace;
+
+  /* 24" iMac(2240×1260) 기준, 노트북에서 자동 축소 */
+  --fs-base: clamp(13px, 0.75vw, 17px);
+  --fs-small: clamp(10px, 0.55vw, 12px);
+  --fs-title: clamp(18px, 1.3vw, 30px);
+
+  --h-sysbar: 32px;
+  --h-strip: clamp(96px, 9.5vh, 132px);
+  --h-modebar: 48px;
+  --panel-w: clamp(230px, 17vw, 360px);
+}

@@ -1,0 +1,46 @@
+/** 화면 문구는 전부 여기 (plan.md §10 — 하드코딩 금지) */
+export const COPY = {
+  siteTitle: 'ENSIL — 전자생물 아카이브',
+  systemTitle: '전자생물 아카이브',
+  physicalWaiting: '◍ 물리연동 대기',
+  physicalConnected: '◍ 물리연동 연결됨',
+  physicalLost: '◍ 물리연동 끊김',
+  syncLocal: '데이터: 로컬본',
+  modeSpecimen: '표본',
+  modeSim: '시뮬레이션',
+  about: '소개',
+  aboutTitle: '탄생 메커니즘',
+  aboutClose: '닫기',
+  overviewTitle: '표본을 선택하세요',
+  overviewHint: '상단 목차를 클릭하거나 ← → 키로 이동',
+  taxonPanel: '▸ 계통',
+  taxonRoot: '전자생물',
+  purposePanel: '▸ 최초의 목적',
+  notesPanel: '▸ 관찰 기록',
+  traitCharge: '전하',
+  traitStimulus: '자극',
+  traitBond: '결속',
+  simStatePrefix: '상태',
+  simPurposePrefix: '목적',
+  simGotoSpecimen: '표본 보기 ›',
+  simCount: '개체',
+  simEngineNote: '시뮬레이션 엔진 미구현 (M6) — 레이아웃 와이어프레임',
+  registered: '등재',
+  statusLabel: '상태',
+  visualPlaceholder: '[ 표본 비주얼 ]',
+  diagramPlaceholder: '[ 메커니즘 다이어그램 ]',
+} as const;
+
+export const TAXON_NAME: Record<string, string> = {
+  A: '계통 A',
+  B: '계통 B',
+  C: '계통 C',
+};
+
+export const SIM_STATE_NAME: Record<string, string> = {
+  idle: '대기',
+  seek: '탐색',
+  consume: '섭취',
+  rest: '휴식',
+  interact: '접촉',
+};
