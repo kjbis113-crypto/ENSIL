@@ -70,6 +70,19 @@ body {
 /* ── 대형 뷰 공통 ───────────────────────────────────────────── */
 .bigview { position: relative; overflow: hidden; }
 
+/* 배경 로고 클라우드 — 콘텐츠 아래, 흐리게 */
+.logo-cloud {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.45;
+  filter: blur(1px);
+}
+.logo-cloud canvas { width: 100%; height: 100%; display: block; }
+.specimen, .sim { z-index: 1; }
+.overview { position: relative; z-index: 1; }
+
 /* 개괄(미선택) */
 .overview {
   height: 100%;

@@ -26,14 +26,16 @@ export function SpecimenView({ creature }: { creature: Creature }) {
       {/* 중앙 비주얼 */}
       <div className="visual-wrap" ref={visualRef}>
         <div className="visual">{COPY.visualPlaceholder}</div>
-        {!narrow && (
-          <AnnotationLayer
-            annotations={creature.annotations}
-            containerRef={containerRef}
-            visualRef={visualRef}
-          />
-        )}
       </div>
+
+      {/* 주석 — 컨테이너 좌표계로 그리므로 반드시 .specimen 직속 (visual-wrap 안이면 transform에 밀림) */}
+      {!narrow && (
+        <AnnotationLayer
+          annotations={creature.annotations}
+          containerRef={containerRef}
+          visualRef={visualRef}
+        />
+      )}
 
       {/* 1280px 미만 폴백: 주석을 세로 목록으로 */}
       {narrow && (

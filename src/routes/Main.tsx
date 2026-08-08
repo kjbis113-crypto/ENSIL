@@ -6,6 +6,7 @@ import { SystemBar } from '../components/shell/SystemBar';
 import { ModeBar } from '../components/shell/ModeBar';
 import { AboutOverlay } from '../components/shell/AboutOverlay';
 import { IndexStrip } from '../components/index/IndexStrip';
+import { LogoCloud } from '../components/logo/LogoCloud';
 import { SpecimenView } from '../components/specimen/SpecimenView';
 import { SimView } from '../components/simulation/SimView';
 
@@ -19,6 +20,7 @@ export function Main() {
       <SystemBar />
       <IndexStrip creatures={creatures} selectedId={view.selectedId} onSelect={view.select} />
       <main className="bigview">
+        <LogoCloud />
         {view.mode === 'sim' ? (
           <SimView creatures={creatures} view={view} />
         ) : view.selected ? (
