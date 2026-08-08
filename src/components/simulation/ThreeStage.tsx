@@ -212,8 +212,9 @@ export function ThreeStage({
       const tilt = tiltPropRef.current?.current;
       if (tilt) {
         const clamp = (v: number) => Math.max(-0.45, Math.min(0.45, v));
-        worldGroup.rotation.x += (clamp(tilt.pitch) - worldGroup.rotation.x) * 0.12;
-        worldGroup.rotation.z += (clamp(-tilt.roll) - worldGroup.rotation.z) * 0.12;
+        // 부호는 실보드 기준으로 보정 (2026-08-08: 좌우·앞뒤 반전 피드백 반영)
+        worldGroup.rotation.x += (clamp(-tilt.pitch) - worldGroup.rotation.x) * 0.12;
+        worldGroup.rotation.z += (clamp(tilt.roll) - worldGroup.rotation.z) * 0.12;
       }
 
       controls.update();
