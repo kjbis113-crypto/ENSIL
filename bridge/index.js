@@ -58,6 +58,11 @@ if (DEMO) {
 const { SerialPort, ReadlineParser } = require('serialport');
 let serial = null;
 
+// 원값 폴백용 스무딩 상태 (펌웨어가 JSON을 직접 보내면 사용되지 않음)
+const SMOOTH = 0.15;
+const tiltEma = { pitch: 0, roll: 0 };
+let lastTiltSend = 0;
+
 async function findPort() {
   if (portArg) return portArg;
   const ports = await SerialPort.list();
@@ -85,11 +90,34 @@ async function openSerial() {
   serial.on('error', (e) => log(`시리얼 오류: ${e.message}`));
 
   parser.on('data', (line) => {
+    const s = line.trim();
+    // 1) 정식 프로토콜: JSON 한 줄 (firmware/imu_tilt)
     try {
-      broadcast(JSON.parse(line.trim())); // 검증 후 그대로 중계
+      broadcast(JSON.parse(s));
+      return;
     } catch {
-      // JSON 아닌 라인(부트 메시지 등)은 무시
+      /* JSON 아님 — 아래 폴백 시도 */
     }
+    // 2) 폴백: IMU 라이브러리 예제(SimpleAccelerometer)의 "ax\tay\taz" 원값도 수용.
+    //    기울기 계산을 브릿지가 대신 한다 — 보드 스케치를 안 바꿔도 동작.
+    const m = s.split(/[\t,\s]+/).map(Number);
+    if (m.length === 3 && m.every((v) => Number.isFinite(v))) {
+      const [ax, ay, az] = m;
+      const p = Math.atan2(-ax, Math.sqrt(ay * ay + az * az));
+      const r = Math.atan2(ay, az);
+      tiltEma.pitch += SMOOTH * (p - tiltEma.pitch);
+      tiltEma.roll += SMOOTH * (r - tiltEma.roll);
+      const now = Date.now();
+      if (now - lastTiltSend >= 33) { // 30Hz 스로틀
+        lastTiltSend = now;
+        broadcast({
+          type: 'tilt',
+          pitch: +tiltEma.pitch.toFixed(4),
+          roll: +tiltEma.roll.toFixed(4),
+        });
+      }
+    }
+    // 그 외 라인(부트 메시지 등)은 무시
   });
 }
 
