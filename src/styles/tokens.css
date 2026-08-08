@@ -8,6 +8,10 @@
   --ink-mute:  #777777;
   --accent:    #111111; /* 지금은 검정. 나중에 여기만 바꾼다 */
 
+  /* 커서 블롭 — 모노톤 예외 없이 회색 계열만. 본 디자인 때 여기만 교체 */
+  --cursor-blob: rgba(136, 136, 136, 0.35);
+  --cursor-blob-size: 72px;
+
   --sp-1: 4px; --sp-2: 8px; --sp-3: 16px; --sp-4: 24px; --sp-5: 40px;
   --radius: 0; /* 로우파이 = 모서리 각짐 */
   --font: system-ui, sans-serif;

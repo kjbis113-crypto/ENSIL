@@ -568,11 +568,14 @@ Wireframe/
 │  │  ├─ types.ts / MockInput.ts / WsInput.ts / useInputSource.ts
 │  ├─ sim/                     ← 순수 로직 (React 금지)
 │  │  ├─ engine.ts / rules.ts / world.ts / types.ts
+│  ├─ cursor/
+│  │  └─ useCursorTrail.ts     ← 포인터 샘플링·수명 관리 (표현과 분리)
 │  ├─ routes/
 │  │  ├─ Main.tsx              ← 시스템바 + 목차 + 대형뷰 + 모드바
 │  │  └─ About.tsx
 │  ├─ components/
 │  │  ├─ shell/     (SystemBar, ModeBar, StatusDot)
+│  │  ├─ cursor/    (CursorTrail — 와이어프레임: 회색 블롭. 본 디자인 때 이 파일만 교체)
 │  │  ├─ index/     (IndexStrip, IndexSlot)
 │  │  ├─ specimen/  (SpecimenView, AnnotationLayer, Callout,
 │  │  │              InfoPanel, PurposePanel, TraitGauge, NotesPanel)

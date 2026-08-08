@@ -289,6 +289,22 @@ body {
 .modebar .spacer { flex: 1; }
 .modebar .pos { color: var(--ink-mute); }
 
+/* ── 커서 궤적 (와이어프레임: 회색 그라디언트 블롭) ─────────────── */
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20; /* 소개 오버레이(10) 위에서도 보임 */
+}
+.cursor-blob {
+  position: absolute;
+  width: var(--cursor-blob-size);
+  height: var(--cursor-blob-size);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cursor-blob) 0%, transparent 70%);
+  will-change: transform, opacity;
+}
+
 /* ── 소개 오버레이 ──────────────────────────────────────────── */
 .about-backdrop {
   position: fixed;
