@@ -212,9 +212,9 @@ export function ThreeStage({
       const tilt = tiltPropRef.current?.current;
       if (tilt) {
         const clamp = (v: number) => Math.max(-0.45, Math.min(0.45, v));
-        // 부호는 실보드 기준으로 보정 (2026-08-08: 좌우·앞뒤 반전 피드백 반영)
-        worldGroup.rotation.x += (clamp(-tilt.pitch) - worldGroup.rotation.x) * 0.12;
-        worldGroup.rotation.z += (clamp(tilt.roll) - worldGroup.rotation.z) * 0.12;
+        // 실보드 기준 보정: 부호 반전 + 보드 장착 방향이 화면과 90° 틀어져 있어 축 교차 매핑
+        worldGroup.rotation.x += (clamp(-tilt.roll) - worldGroup.rotation.x) * 0.12;
+        worldGroup.rotation.z += (clamp(-tilt.pitch) - worldGroup.rotation.z) * 0.12;
       }
 
       controls.update();
