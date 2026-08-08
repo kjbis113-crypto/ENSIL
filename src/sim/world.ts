@@ -22,10 +22,12 @@ export function createWorld(creatures: Creature[], seed = 20260808): World {
     code: c.code,
     shape: c.visual.shape,
     taxon: c.taxon,
+    species: c.species,
     purpose: c.purpose.kind,
     traits: c.traits,
     pos: { x: 10 + rng() * 80, y: 10 + rng() * 80 },
     vel: { x: 0, y: 0 },
+    heading: rng() * Math.PI * 2,
     state: 'idle',
     // 시작 니즈를 흩뿌려서 처음부터 행동이 갈리게 한다
     needs: {
@@ -33,7 +35,8 @@ export function createWorld(creatures: Creature[], seed = 20260808): World {
       arousal: 0.4 + rng() * 0.5,
       bonding: 0.4 + rng() * 0.5,
     },
-    target: null,
+    action: null,
+    movePhase: 0,
     trail: [],
   }));
 

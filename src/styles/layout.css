@@ -196,6 +196,7 @@ body {
 .sim-stage-col { display: grid; grid-template-rows: 1fr auto; min-width: 0; }
 .sim-stage-wrap { position: relative; overflow: hidden; }
 .sim-stage { position: absolute; inset: 0; }
+.sim-stage canvas { display: block; }
 .sim-stage.grid-on {
   background-image:
     repeating-linear-gradient(0deg, var(--surface) 0 1px, transparent 1px 5%),

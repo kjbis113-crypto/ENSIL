@@ -7,24 +7,71 @@
     "taxon": "A",
     "registeredAt": "2026-01-01",
     "status": "관찰 중",
-    "visual": { "main": "", "thumb": "", "shape": "circle" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "circle"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.32, "y": 0.22 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.72, "y": 0.45 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
-      { "id": "a3", "anchor": { "x": 0.45, "y": 0.78 }, "side": "left", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.32,
+          "y": 0.22
+        },
+        "side": "left",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.72,
+          "y": 0.45
+        },
+        "side": "right",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a3",
+        "anchor": {
+          "x": 0.45,
+          "y": 0.78
+        },
+        "side": "left",
+        "label": "라벨 3",
+        "body": "주석 본문 3. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "seek_energy", "statement": "목적 문장 1" },
-    "traits": { "charge": 6, "stimulus": 3, "bond": 8 },
+    "purpose": {
+      "kind": "seek_energy",
+      "statement": "목적 문장 1"
+    },
+    "traits": {
+      "charge": 6,
+      "stimulus": 3,
+      "bond": 8
+    },
     "notes": [
-      { "date": "2026-01-01", "text": "관찰 기록 1" },
-      { "date": "2026-01-02", "text": "관찰 기록 2" }
+      {
+        "date": "2026-01-01",
+        "text": "관찰 기록 1"
+      },
+      {
+        "date": "2026-01-02",
+        "text": "관찰 기록 2"
+      }
     ],
-    "physical": { "slot": 1 }
+    "physical": {
+      "slot": 1
+    },
+    "species": "mcu"
   },
   {
     "id": "eo-002",
@@ -34,21 +81,67 @@
     "taxon": "A",
     "registeredAt": "2026-01-01",
     "status": "관찰 중",
-    "visual": { "main": "", "thumb": "", "shape": "circle" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "circle"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.18 }, "side": "right", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.28, "y": 0.55 }, "side": "left", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
-      { "id": "a3", "anchor": { "x": 0.68, "y": 0.72 }, "side": "right", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.18
+        },
+        "side": "right",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.28,
+          "y": 0.55
+        },
+        "side": "left",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a3",
+        "anchor": {
+          "x": 0.68,
+          "y": 0.72
+        },
+        "side": "right",
+        "label": "라벨 3",
+        "body": "주석 본문 3. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "avoid_light", "statement": "목적 문장 2" },
-    "traits": { "charge": 4, "stimulus": 7, "bond": 2 },
-    "notes": [{ "date": "2026-01-03", "text": "관찰 기록 1" }],
-    "physical": { "slot": 2 }
+    "purpose": {
+      "kind": "avoid_light",
+      "statement": "목적 문장 2"
+    },
+    "traits": {
+      "charge": 4,
+      "stimulus": 7,
+      "bond": 2
+    },
+    "notes": [
+      {
+        "date": "2026-01-03",
+        "text": "관찰 기록 1"
+      }
+    ],
+    "physical": {
+      "slot": 2
+    },
+    "species": "led"
   },
   {
     "id": "eo-003",
@@ -58,24 +151,71 @@
     "taxon": "B",
     "registeredAt": "2026-01-05",
     "status": "관찰 중",
-    "visual": { "main": "", "thumb": "", "shape": "square" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "square"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.25, "y": 0.3 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.75, "y": 0.35 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
-      { "id": "a3", "anchor": { "x": 0.5, "y": 0.8 }, "side": "right", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.25,
+          "y": 0.3
+        },
+        "side": "left",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.75,
+          "y": 0.35
+        },
+        "side": "right",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a3",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.8
+        },
+        "side": "right",
+        "label": "라벨 3",
+        "body": "주석 본문 3. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "expand", "statement": "목적 문장 3" },
-    "traits": { "charge": 7, "stimulus": 4, "bond": 9 },
+    "purpose": {
+      "kind": "expand",
+      "statement": "목적 문장 3"
+    },
+    "traits": {
+      "charge": 7,
+      "stimulus": 4,
+      "bond": 9
+    },
     "notes": [
-      { "date": "2026-01-05", "text": "관찰 기록 1" },
-      { "date": "2026-01-06", "text": "관찰 기록 2" }
+      {
+        "date": "2026-01-05",
+        "text": "관찰 기록 1"
+      },
+      {
+        "date": "2026-01-06",
+        "text": "관찰 기록 2"
+      }
     ],
-    "physical": { "slot": 3 }
+    "physical": {
+      "slot": 3
+    },
+    "species": "transistor"
   },
   {
     "id": "eo-004",
@@ -85,20 +225,57 @@
     "taxon": "B",
     "registeredAt": "2026-01-05",
     "status": "휴면",
-    "visual": { "main": "", "thumb": "", "shape": "square" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "square"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.25 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.6, "y": 0.6 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.25
+        },
+        "side": "left",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.6,
+          "y": 0.6
+        },
+        "side": "right",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "persist", "statement": "목적 문장 4" },
-    "traits": { "charge": 2, "stimulus": 1, "bond": 3 },
-    "notes": [{ "date": "2026-01-07", "text": "관찰 기록 1" }],
-    "physical": { "slot": 4 }
+    "purpose": {
+      "kind": "persist",
+      "statement": "목적 문장 4"
+    },
+    "traits": {
+      "charge": 2,
+      "stimulus": 1,
+      "bond": 3
+    },
+    "notes": [
+      {
+        "date": "2026-01-07",
+        "text": "관찰 기록 1"
+      }
+    ],
+    "physical": {
+      "slot": 4
+    },
+    "species": "capacitor"
   },
   {
     "id": "eo-005",
@@ -108,21 +285,67 @@
     "taxon": "C",
     "registeredAt": "2026-01-10",
     "status": "관찰 중",
-    "visual": { "main": "", "thumb": "", "shape": "triangle" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "triangle"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.35, "y": 0.2 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.7, "y": 0.5 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
-      { "id": "a3", "anchor": { "x": 0.4, "y": 0.75 }, "side": "left", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.35,
+          "y": 0.2
+        },
+        "side": "left",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.7,
+          "y": 0.5
+        },
+        "side": "right",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a3",
+        "anchor": {
+          "x": 0.4,
+          "y": 0.75
+        },
+        "side": "left",
+        "label": "라벨 3",
+        "body": "주석 본문 3. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "seek_kin", "statement": "목적 문장 5" },
-    "traits": { "charge": 5, "stimulus": 8, "bond": 10 },
-    "notes": [{ "date": "2026-01-10", "text": "관찰 기록 1" }],
-    "physical": { "slot": 5 }
+    "purpose": {
+      "kind": "seek_kin",
+      "statement": "목적 문장 5"
+    },
+    "traits": {
+      "charge": 5,
+      "stimulus": 8,
+      "bond": 10
+    },
+    "notes": [
+      {
+        "date": "2026-01-10",
+        "text": "관찰 기록 1"
+      }
+    ],
+    "physical": {
+      "slot": 5
+    },
+    "species": "switch"
   },
   {
     "id": "eo-006",
@@ -132,20 +355,57 @@
     "taxon": "C",
     "registeredAt": "2026-01-12",
     "status": "관찰 중",
-    "visual": { "main": "", "thumb": "", "shape": "triangle" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "triangle"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.15 }, "side": "right", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.3, "y": 0.6 }, "side": "left", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.15
+        },
+        "side": "right",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.3,
+          "y": 0.6
+        },
+        "side": "left",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "seek_energy", "statement": "목적 문장 6" },
-    "traits": { "charge": 8, "stimulus": 5, "bond": 1 },
-    "notes": [{ "date": "2026-01-12", "text": "관찰 기록 1" }],
-    "physical": { "slot": 6 }
+    "purpose": {
+      "kind": "seek_energy",
+      "statement": "목적 문장 6"
+    },
+    "traits": {
+      "charge": 8,
+      "stimulus": 5,
+      "bond": 1
+    },
+    "notes": [
+      {
+        "date": "2026-01-12",
+        "text": "관찰 기록 1"
+      }
+    ],
+    "physical": {
+      "slot": 6
+    },
+    "species": "resistor"
   },
   {
     "id": "eo-007",
@@ -155,20 +415,57 @@
     "taxon": "A",
     "registeredAt": "2026-01-15",
     "status": "소실",
-    "visual": { "main": "", "thumb": "", "shape": "circle" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "circle"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.45, "y": 0.35 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.65, "y": 0.65 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.45,
+          "y": 0.35
+        },
+        "side": "left",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.65,
+          "y": 0.65
+        },
+        "side": "right",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "expand", "statement": "목적 문장 7" },
-    "traits": { "charge": 3, "stimulus": 9, "bond": 4 },
-    "notes": [{ "date": "2026-01-15", "text": "관찰 기록 1" }],
-    "physical": { "slot": 7 }
+    "purpose": {
+      "kind": "expand",
+      "statement": "목적 문장 7"
+    },
+    "traits": {
+      "charge": 3,
+      "stimulus": 9,
+      "bond": 4
+    },
+    "notes": [
+      {
+        "date": "2026-01-15",
+        "text": "관찰 기록 1"
+      }
+    ],
+    "physical": {
+      "slot": 7
+    },
+    "species": "led"
   },
   {
     "id": "eo-008",
@@ -178,20 +475,66 @@
     "taxon": "B",
     "registeredAt": "2026-01-20",
     "status": "관찰 중",
-    "visual": { "main": "", "thumb": "", "shape": "square" },
+    "visual": {
+      "main": "",
+      "thumb": "",
+      "shape": "square"
+    },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.2 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.75, "y": 0.55 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
-      { "id": "a3", "anchor": { "x": 0.35, "y": 0.8 }, "side": "left", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
+      {
+        "id": "a1",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.2
+        },
+        "side": "left",
+        "label": "라벨 1",
+        "body": "주석 본문 1. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a2",
+        "anchor": {
+          "x": 0.75,
+          "y": 0.55
+        },
+        "side": "right",
+        "label": "라벨 2",
+        "body": "주석 본문 2. 텍스트가 들어갈 자리."
+      },
+      {
+        "id": "a3",
+        "anchor": {
+          "x": 0.35,
+          "y": 0.8
+        },
+        "side": "left",
+        "label": "라벨 3",
+        "body": "주석 본문 3. 텍스트가 들어갈 자리."
+      }
     ],
     "ecology": {
       "habitat": "서식 환경 텍스트 자리.",
       "metabolism": "대사 텍스트 자리.",
       "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "persist", "statement": "목적 문장 8" },
-    "traits": { "charge": 6, "stimulus": 2, "bond": 6 },
-    "notes": [{ "date": "2026-01-20", "text": "관찰 기록 1" }],
-    "physical": { "slot": 8 }
+    "purpose": {
+      "kind": "persist",
+      "statement": "목적 문장 8"
+    },
+    "traits": {
+      "charge": 6,
+      "stimulus": 2,
+      "bond": 6
+    },
+    "notes": [
+      {
+        "date": "2026-01-20",
+        "text": "관찰 기록 1"
+      }
+    ],
+    "physical": {
+      "slot": 8
+    },
+    "species": "mcu"
   }
 ]

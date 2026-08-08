@@ -5,8 +5,8 @@ import type { World } from '../../sim/types';
 import { createWorld } from '../../sim/world';
 import { tick } from '../../sim/engine';
 import { COPY } from '../../copy';
-import { DomRenderer, type OverlayFlags } from './DomRenderer';
-import { TransportBar, type SimSpeed } from './TransportBar';
+import { ThreeStage } from './ThreeStage';
+import { TransportBar, type OverlayFlags, type SimSpeed } from './TransportBar';
 import { ObserverPanel } from './ObserverPanel';
 
 const STEP = 1 / 30; // 고정 timestep 30tick/s, 렌더는 rAF (plan.md §8-3)
@@ -55,7 +55,7 @@ export function SimView({ creatures, view }: { creatures: Creature[]; view: View
     <div className="sim">
       <div className="sim-stage-col">
         <div className="sim-stage-wrap">
-          <DomRenderer
+          <ThreeStage
             world={world}
             selectedId={view.selectedId}
             overlays={overlays}

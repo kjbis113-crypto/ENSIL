@@ -1,5 +1,11 @@
 import { COPY } from '../../copy';
-import type { OverlayFlags } from './DomRenderer';
+
+export interface OverlayFlags {
+  trails: boolean;
+  labels: boolean;
+  nodes: boolean;
+  grid: boolean;
+}
 
 export type SimSpeed = 0.5 | 1 | 2 | 4;
 const SPEEDS: SimSpeed[] = [0.5, 1, 2, 4];

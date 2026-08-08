@@ -1,6 +1,9 @@
 export type Taxon = 'A' | 'B' | 'C';
 export type Shape = 'circle' | 'square' | 'triangle';
 export type DriveKind = 'seek_energy' | 'seek_kin' | 'avoid_light' | 'expand' | 'persist';
+
+/** 종 = 생태계-생명체화된 전자부품. 3D 목업 형태와 이동 메커니즘을 결정한다. */
+export type Species = 'mcu' | 'led' | 'transistor' | 'resistor' | 'capacitor' | 'switch';
 export type CreatureStatus = '관찰 중' | '휴면' | '소실';
 
 export interface Annotation {
@@ -19,6 +22,7 @@ export interface Creature {
   name: string;
   latin?: string;
   taxon: Taxon;
+  species: Species;
   registeredAt: string;
   status: CreatureStatus;
   visual: {
