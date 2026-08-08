@@ -2,198 +2,196 @@
   {
     "id": "eo-001",
     "code": "EO-001",
-    "name": "미명체",
-    "latin": "Electrovita prima",
+    "name": "개체 1",
+    "latin": "Specimen 01",
     "taxon": "A",
-    "registeredAt": "2026-06-29",
+    "registeredAt": "2026-01-01",
     "status": "관찰 중",
     "visual": { "main": "", "thumb": "", "shape": "circle" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.32, "y": 0.22 }, "side": "left", "label": "수용부", "body": "미세 전위 변화를 감지하는 표층 조직. 서식 환경 서술이 들어갈 자리." },
-      { "id": "a2", "anchor": { "x": 0.72, "y": 0.45 }, "side": "right", "label": "에너지원", "body": "잉여 전하를 흡수해 대사한다. 대사 방식 서술이 들어갈 자리." },
-      { "id": "a3", "anchor": { "x": 0.45, "y": 0.78 }, "side": "left", "label": "증식부", "body": "일정 전하량 초과 시 분열한다. 증식 방식 서술이 들어갈 자리." }
+      { "id": "a1", "anchor": { "x": 0.32, "y": 0.22 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.72, "y": 0.45 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
+      { "id": "a3", "anchor": { "x": 0.45, "y": 0.78 }, "side": "left", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "저전압 대기층. 서식 환경에 대한 더미 서술.",
-      "metabolism": "잉여 전하 흡수. 대사에 대한 더미 서술.",
-      "reproduction": "임계 전하 도달 시 이분열. 더미 서술."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "seek_energy", "statement": "전위차가 큰 곳을 향해 이동한다" },
+    "purpose": { "kind": "seek_energy", "statement": "목적 문장 1" },
     "traits": { "charge": 6, "stimulus": 3, "bond": 8 },
     "notes": [
-      { "date": "2026-06-29", "text": "최초 등재. 더미 관찰 기록." },
-      { "date": "2026-07-12", "text": "군집 형성 경향 확인. 더미 기록." }
+      { "date": "2026-01-01", "text": "관찰 기록 1" },
+      { "date": "2026-01-02", "text": "관찰 기록 2" }
     ],
     "physical": { "slot": 1 }
   },
   {
     "id": "eo-002",
     "code": "EO-002",
-    "name": "잔광충",
-    "latin": "Lumivora residua",
+    "name": "개체 2",
+    "latin": "Specimen 02",
     "taxon": "A",
-    "registeredAt": "2026-06-29",
+    "registeredAt": "2026-01-01",
     "status": "관찰 중",
     "visual": { "main": "", "thumb": "", "shape": "circle" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.18 }, "side": "right", "label": "감광막", "body": "빛의 잔상을 에너지로 변환하는 막. 더미 서술." },
-      { "id": "a2", "anchor": { "x": 0.28, "y": 0.55 }, "side": "left", "label": "서식 환경", "body": "꺼진 디스플레이 표면 부근에 서식. 더미 서술." },
-      { "id": "a3", "anchor": { "x": 0.68, "y": 0.72 }, "side": "right", "label": "이동 기관", "body": "정전기 반발로 부유 이동. 더미 서술." }
+      { "id": "a1", "anchor": { "x": 0.5, "y": 0.18 }, "side": "right", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.28, "y": 0.55 }, "side": "left", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
+      { "id": "a3", "anchor": { "x": 0.68, "y": 0.72 }, "side": "right", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "꺼진 화면 표면. 더미 서술.",
-      "metabolism": "잔광 흡수. 더미 서술.",
-      "reproduction": "포자형 방전. 더미 서술."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "avoid_light", "statement": "강한 빛을 피해 어두운 곳으로 이동한다" },
+    "purpose": { "kind": "avoid_light", "statement": "목적 문장 2" },
     "traits": { "charge": 4, "stimulus": 7, "bond": 2 },
-    "notes": [{ "date": "2026-07-01", "text": "더미 관찰 기록." }],
+    "notes": [{ "date": "2026-01-03", "text": "관찰 기록 1" }],
     "physical": { "slot": 2 }
   },
   {
     "id": "eo-003",
     "code": "EO-003",
-    "name": "격자균",
-    "latin": "Reticulum vagans",
+    "name": "개체 3",
+    "latin": "Specimen 03",
     "taxon": "B",
-    "registeredAt": "2026-07-12",
+    "registeredAt": "2026-01-05",
     "status": "관찰 중",
     "visual": { "main": "", "thumb": "", "shape": "square" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.25, "y": 0.3 }, "side": "left", "label": "격자 골격", "body": "규칙적 격자 구조로 몸을 확장한다. 더미 서술." },
-      { "id": "a2", "anchor": { "x": 0.75, "y": 0.35 }, "side": "right", "label": "에너지원", "body": "네트워크 유휴 신호를 먹는다. 더미 서술." },
-      { "id": "a3", "anchor": { "x": 0.5, "y": 0.8 }, "side": "right", "label": "결속점", "body": "동종 개체와 격자를 공유한다. 더미 서술." }
+      { "id": "a1", "anchor": { "x": 0.25, "y": 0.3 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.75, "y": 0.35 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
+      { "id": "a3", "anchor": { "x": 0.5, "y": 0.8 }, "side": "right", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "유휴 네트워크 구간. 더미 서술.",
-      "metabolism": "신호 포식. 더미 서술.",
-      "reproduction": "격자 단위 복제. 더미 서술."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "expand", "statement": "닿을 수 있는 모든 방향으로 몸을 넓힌다" },
+    "purpose": { "kind": "expand", "statement": "목적 문장 3" },
     "traits": { "charge": 7, "stimulus": 4, "bond": 9 },
     "notes": [
-      { "date": "2026-07-12", "text": "등재. 더미 기록." },
-      { "date": "2026-07-20", "text": "격자 2단 확장 관찰. 더미 기록." }
+      { "date": "2026-01-05", "text": "관찰 기록 1" },
+      { "date": "2026-01-06", "text": "관찰 기록 2" }
     ],
     "physical": { "slot": 3 }
   },
   {
     "id": "eo-004",
     "code": "EO-004",
-    "name": "부동점",
-    "latin": "Punctum immotum",
+    "name": "개체 4",
+    "latin": "Specimen 04",
     "taxon": "B",
-    "registeredAt": "2026-07-12",
+    "registeredAt": "2026-01-05",
     "status": "휴면",
     "visual": { "main": "", "thumb": "", "shape": "square" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.25 }, "side": "left", "label": "외피", "body": "외부 자극을 차단하는 절연 외피. 더미 서술." },
-      { "id": "a2", "anchor": { "x": 0.6, "y": 0.6 }, "side": "right", "label": "핵", "body": "최소한의 전하만 유지하는 핵. 더미 서술." }
+      { "id": "a1", "anchor": { "x": 0.5, "y": 0.25 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.6, "y": 0.6 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "전원이 끊긴 회로 내부. 더미 서술.",
-      "metabolism": "극소 전하 유지. 더미 서술.",
-      "reproduction": "관찰된 바 없음."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "persist", "statement": "가능한 한 오래, 같은 자리에 존재한다" },
+    "purpose": { "kind": "persist", "statement": "목적 문장 4" },
     "traits": { "charge": 2, "stimulus": 1, "bond": 3 },
-    "notes": [{ "date": "2026-07-13", "text": "휴면 상태 진입. 더미 기록." }],
+    "notes": [{ "date": "2026-01-07", "text": "관찰 기록 1" }],
     "physical": { "slot": 4 }
   },
   {
     "id": "eo-005",
     "code": "EO-005",
-    "name": "동조체",
-    "latin": "Resonantia socialis",
+    "name": "개체 5",
+    "latin": "Specimen 05",
     "taxon": "C",
-    "registeredAt": "2026-07-18",
+    "registeredAt": "2026-01-10",
     "status": "관찰 중",
     "visual": { "main": "", "thumb": "", "shape": "triangle" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.35, "y": 0.2 }, "side": "left", "label": "동조 안테나", "body": "동종의 진동수를 감지한다. 더미 서술." },
-      { "id": "a2", "anchor": { "x": 0.7, "y": 0.5 }, "side": "right", "label": "공명강", "body": "무리와 진동을 맞추는 기관. 더미 서술." },
-      { "id": "a3", "anchor": { "x": 0.4, "y": 0.75 }, "side": "left", "label": "서식 환경", "body": "스피커 주변 자기장. 더미 서술." }
+      { "id": "a1", "anchor": { "x": 0.35, "y": 0.2 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.7, "y": 0.5 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
+      { "id": "a3", "anchor": { "x": 0.4, "y": 0.75 }, "side": "left", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "저주파 자기장 주변. 더미 서술.",
-      "metabolism": "진동 에너지 흡수. 더미 서술.",
-      "reproduction": "공명 임계 시 분화. 더미 서술."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "seek_kin", "statement": "같은 진동수를 가진 개체를 찾아 모인다" },
+    "purpose": { "kind": "seek_kin", "statement": "목적 문장 5" },
     "traits": { "charge": 5, "stimulus": 8, "bond": 10 },
-    "notes": [{ "date": "2026-07-18", "text": "3개체 동시 등재. 더미 기록." }],
+    "notes": [{ "date": "2026-01-10", "text": "관찰 기록 1" }],
     "physical": { "slot": 5 }
   },
   {
     "id": "eo-006",
     "code": "EO-006",
-    "name": "천공자",
-    "latin": "Perforans lentus",
+    "name": "개체 6",
+    "latin": "Specimen 06",
     "taxon": "C",
-    "registeredAt": "2026-07-21",
+    "registeredAt": "2026-01-12",
     "status": "관찰 중",
     "visual": { "main": "", "thumb": "", "shape": "triangle" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.15 }, "side": "right", "label": "천공기", "body": "절연층에 미세 구멍을 낸다. 더미 서술." },
-      { "id": "a2", "anchor": { "x": 0.3, "y": 0.6 }, "side": "left", "label": "에너지원", "body": "누설 전류를 마신다. 더미 서술." }
+      { "id": "a1", "anchor": { "x": 0.5, "y": 0.15 }, "side": "right", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.3, "y": 0.6 }, "side": "left", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "절연 피복 틈. 더미 서술.",
-      "metabolism": "누설 전류 흡수. 더미 서술.",
-      "reproduction": "구멍마다 알을 남긴다. 더미 서술."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "seek_energy", "statement": "가장 가까운 누설 지점을 향해 판다" },
+    "purpose": { "kind": "seek_energy", "statement": "목적 문장 6" },
     "traits": { "charge": 8, "stimulus": 5, "bond": 1 },
-    "notes": [{ "date": "2026-07-21", "text": "더미 관찰 기록." }],
+    "notes": [{ "date": "2026-01-12", "text": "관찰 기록 1" }],
     "physical": { "slot": 6 }
   },
   {
     "id": "eo-007",
     "code": "EO-007",
-    "name": "흔적류",
-    "latin": "Vestigium fluens",
+    "name": "개체 7",
+    "latin": "Specimen 07",
     "taxon": "A",
-    "registeredAt": "2026-07-30",
+    "registeredAt": "2026-01-15",
     "status": "소실",
     "visual": { "main": "", "thumb": "", "shape": "circle" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.45, "y": 0.35 }, "side": "left", "label": "잔류막", "body": "지나간 자리에 전하 흔적을 남긴다. 더미 서술." },
-      { "id": "a2", "anchor": { "x": 0.65, "y": 0.65 }, "side": "right", "label": "소실 원인", "body": "관측 중 신호가 끊겼다. 더미 서술." }
+      { "id": "a1", "anchor": { "x": 0.45, "y": 0.35 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.65, "y": 0.65 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "이동 경로 불명. 더미 서술.",
-      "metabolism": "불명.",
-      "reproduction": "불명."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "expand", "statement": "머무르지 않고 계속 흐른다" },
+    "purpose": { "kind": "expand", "statement": "목적 문장 7" },
     "traits": { "charge": 3, "stimulus": 9, "bond": 4 },
-    "notes": [
-      { "date": "2026-07-30", "text": "등재 직후 소실. 더미 기록." }
-    ],
+    "notes": [{ "date": "2026-01-15", "text": "관찰 기록 1" }],
     "physical": { "slot": 7 }
   },
   {
     "id": "eo-008",
     "code": "EO-008",
-    "name": "적층체",
-    "latin": "Stratum cumulans",
+    "name": "개체 8",
+    "latin": "Specimen 08",
     "taxon": "B",
-    "registeredAt": "2026-08-02",
+    "registeredAt": "2026-01-20",
     "status": "관찰 중",
     "visual": { "main": "", "thumb": "", "shape": "square" },
     "annotations": [
-      { "id": "a1", "anchor": { "x": 0.5, "y": 0.2 }, "side": "left", "label": "적층부", "body": "죽은 신호를 층층이 쌓는다. 더미 서술." },
-      { "id": "a2", "anchor": { "x": 0.75, "y": 0.55 }, "side": "right", "label": "에너지원", "body": "축적층 사이의 전위차. 더미 서술." },
-      { "id": "a3", "anchor": { "x": 0.35, "y": 0.8 }, "side": "left", "label": "기저층", "body": "가장 오래된 층이 몸을 지탱한다. 더미 서술." }
+      { "id": "a1", "anchor": { "x": 0.5, "y": 0.2 }, "side": "left", "label": "라벨 1", "body": "주석 본문 1. 텍스트가 들어갈 자리." },
+      { "id": "a2", "anchor": { "x": 0.75, "y": 0.55 }, "side": "right", "label": "라벨 2", "body": "주석 본문 2. 텍스트가 들어갈 자리." },
+      { "id": "a3", "anchor": { "x": 0.35, "y": 0.8 }, "side": "left", "label": "라벨 3", "body": "주석 본문 3. 텍스트가 들어갈 자리." }
     ],
     "ecology": {
-      "habitat": "오래된 저장 매체 표면. 더미 서술.",
-      "metabolism": "층간 전위차 이용. 더미 서술.",
-      "reproduction": "층 분리로 증식. 더미 서술."
+      "habitat": "서식 환경 텍스트 자리.",
+      "metabolism": "대사 텍스트 자리.",
+      "reproduction": "증식 텍스트 자리."
     },
-    "purpose": { "kind": "persist", "statement": "쌓은 것을 잃지 않도록 층을 지킨다" },
+    "purpose": { "kind": "persist", "statement": "목적 문장 8" },
     "traits": { "charge": 6, "stimulus": 2, "bond": 6 },
-    "notes": [{ "date": "2026-08-02", "text": "더미 관찰 기록." }],
+    "notes": [{ "date": "2026-01-20", "text": "관찰 기록 1" }],
     "physical": { "slot": 8 }
   }
 ]

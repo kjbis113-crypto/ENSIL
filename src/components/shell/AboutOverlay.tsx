@@ -11,15 +11,9 @@ export function AboutOverlay({ onClose }: { onClose: () => void }) {
             × {COPY.aboutClose}
           </button>
         </header>
-        <p>
-          전자생물은 가상 생명체 탄생 메커니즘 컨셉에서 파생된 존재다. 이 자리에 탄생
-          메커니즘에 대한 실제 서술이 들어간다. 지금은 레이아웃 확인을 위한 더미 문단.
-        </p>
+        <p>본문 문단 1. 텍스트가 들어갈 자리.</p>
         <div className="diagram">{COPY.diagramPlaceholder}</div>
-        <p>
-          각 전자생물은 관측과 동시에 표본 번호를 부여받아 아카이브에 등재되며, 심즈의
-          야망처럼 단 하나의 최초 목적을 갖고 시뮬레이션 안에서 살아간다. 더미 문단.
-        </p>
+        <p>본문 문단 2. 텍스트가 들어갈 자리.</p>
       </div>
     </div>
   );

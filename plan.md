@@ -68,8 +68,9 @@
 
 | 항목 | 결정 | 사유 |
 |---|---|---|
-| 빌드 | **Vite** | 요구사항. 로컬 `preview` 로 오프라인 전시 대응이 쉬움 |
+| 빌드 | **Vite** (빌드는 Node 20/22 — Node 24 크래시, debug.md #1) | 요구사항. 로컬 `preview` 로 오프라인 전시 대응이 쉬움 |
 | 프레임워크 | **React + TypeScript** | 목차/뷰/시뮬/물리입력이 하나의 상태를 공유. 스키마를 타입으로 고정하면 이후 리팩토링 안전 |
+| 라우팅 | **자체 해시 훅** (`useHashRoute`, react-router 미사용) | 라우트가 2개뿐 — 상태의 주소일 뿐이라 훅 하나로 충분. 의존성 제거 |
 | 시뮬 렌더 | **DOM + CSS transform** | 디버깅과 개체 클릭 처리가 쉬움. 단, 아래 *경고* 참조 |
 | 주석 선 | **인라인 SVG 오버레이** | 좌표 기반 선/점을 그리기엔 SVG가 정답. 이미지 위에 절대배치 |
 | 데이터 | **로컬 JSON 우선 + Supabase 동기화** | 와이파이 없어도 100% 동작 보장 |
@@ -672,8 +673,8 @@ loadCreatures()
 | **M3** | 목차 + 상태 | IndexStrip 실데이터, `useViewState`, URL 동기화, ←/→ 키 | 클릭·키보드로 선택이 바뀌고 새로고침해도 유지 |
 | **M4** | **표본 모드** | 중앙 비주얼, 4개 정보 패널, AnnotationLayer(SVG 콜아웃) | 8개 개체 모두 주석선이 제 위치에 그려짐 |
 | **M5** | 반응형 폴백 | 1280px 미만 1단 세로 레이아웃 | 노트북에서 깨지지 않음 |
-| **M6** | 시뮬 엔진 | `sim/engine.ts` + 니즈/상태 머신 (UI 없이) | 콘솔에서 tick 돌려 좌표·상태가 변한다 |
-| **M7** | 시뮬 모드 | DomRenderer, 관찰 패널, 트랜스포트 바 | 재생/정지/속도/선택 동작, 목차와 선택 동기화 |
+| **M6** ✓ | 시뮬 엔진 | `sim/engine.ts` + 니즈/상태 머신 (UI 없이) | 콘솔에서 tick 돌려 좌표·상태가 변한다 |
+| **M7** ✓ | 시뮬 모드 | DomRenderer, 관찰 패널, 트랜스포트 바 | 재생/정지/속도/선택 동작, 목차와 선택 동기화 |
 | **M8** | **입력 추상화** | `input/` + MockInput(키보드) | 키보드만으로 물리 인터랙션 전부 재현 |
 | **M9** | 브릿지 | `bridge/index.js`, WsInput, 상태 표시, 재연결 | 브릿지 껐다 켜도 웹이 안 죽음 |
 | **M10** | Supabase | 테이블 생성, 동기화, 상태 표시 | 랜선 뽑고도 전 기능 동작 |
@@ -740,13 +741,11 @@ main       ← Vercel Production 자동 배포. 항상 동작하는 상태 유�
 ## 부록 A. 지금 바로 시작할 명령
 
 ```bash
-npm create vite@latest . -- --template react-ts
-npm install
-npm install react-router-dom @supabase/supabase-js
-# git은 이미 ENSIL(origin/main)에 연결됨 — 커밋만 하면 됨
-git add -A && git commit -m "M0: 프로젝트 셋업"
+npm install        # 의존성: react, react-dom 뿐 (+ M10에서 @supabase/supabase-js)
+npm run dev        # 개발 서버 — Node 24 OK
+npm run build      # 빌드 — Node 20/22 전용 (debug.md #1)
 ```
 
-의존성은 위 3개까지만. **UI 라이브러리·CSS 프레임워크·상태관리 라이브러리는 넣지 않는다.**
+**UI 라이브러리·CSS 프레임워크·상태관리·라우팅 라이브러리는 넣지 않는다.**
 로우파이 와이어프레임에 필요 없고, 나중에 디자인 방향을 제약한다.
 (브릿지용 `ws` / `serialport`는 M9에서 `bridge/` 안에 따로 설치)
