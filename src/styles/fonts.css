@@ -1,0 +1,21 @@
+/* KoPub World 돋움 Pro — 빌드에 번들되어 오프라인 전시에서도 동작.
+   웨이트는 Medium(500)·Bold(700)만 사용 (Light는 등록만, 필요 시까지 미사용). */
+
+@font-face {
+  font-family: 'KoPub World Dotum';
+  src: url('../assets/fonts/KoPubWorldDotum-Light.otf') format('opentype');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'KoPub World Dotum';
+  src: url('../assets/fonts/KoPubWorldDotum-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'KoPub World Dotum';
+  src: url('../assets/fonts/KoPubWorldDotum-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}

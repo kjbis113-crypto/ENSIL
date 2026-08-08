@@ -3,6 +3,9 @@ body {
   color: var(--ink);
   font-family: var(--font);
   font-size: var(--fs-base);
+  font-weight: var(--fw-md);
+  line-height: var(--lh-base);
+  letter-spacing: var(--ls-base);
   overflow: hidden; /* 노 스크롤 원칙 — 유일한 예외는 소개 오버레이 내부 */
 }
 
@@ -23,7 +26,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-small);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  line-height: var(--lh-tight);
 }
 .sysbar .status { color: var(--ink-mute); display: flex; gap: var(--sp-4); }
 
@@ -61,7 +64,7 @@ body {
   color: var(--ink-mute);
 }
 .slot.selected .thumb { border: 3px solid var(--accent); }
-.slot.selected .code { color: var(--ink); font-weight: 700; }
+.slot.selected .code { color: var(--ink); font-weight: var(--fw-bd); }
 .strip .more { color: var(--ink-mute); margin-left: var(--sp-2); }
 
 /* ── 대형 뷰 공통 ───────────────────────────────────────────── */
@@ -76,7 +79,7 @@ body {
   gap: var(--sp-2);
   color: var(--ink-mute);
 }
-.overview h2 { font-size: var(--fs-title); color: var(--ink); font-weight: 500; }
+.overview h2 { font-size: var(--fs-title); color: var(--ink); font-weight: var(--fw-bd); }
 
 /* ── 표본 모드 ─────────────────────────────────────────────── */
 .specimen { position: absolute; inset: 0; }
@@ -115,12 +118,12 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-small);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  line-height: var(--lh-tight);
   border-bottom: 1px solid var(--line);
   padding-bottom: var(--sp-1);
   margin-bottom: var(--sp-1);
 }
-.callout .body { font-size: var(--fs-small); color: var(--ink-mute); line-height: 1.5; }
+.callout .body { font-size: var(--fs-small); color: var(--ink-mute); line-height: var(--lh-base); }
 
 /* 모서리 정보 패널 */
 .panel {
@@ -133,9 +136,10 @@ body {
 .panel h3 {
   font-family: var(--font-mono);
   font-size: var(--fs-small);
-  font-weight: 400;
+  font-weight: var(--fw-md);
+  color: var(--ink-mute); /* 위계는 회색/검정으로 */
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  line-height: var(--lh-tight);
   margin-bottom: var(--sp-2);
 }
 .panel-tl { top: var(--sp-4); left: var(--sp-4); }
@@ -144,21 +148,21 @@ body {
 .panel-br { bottom: var(--sp-4); right: var(--sp-4); }
 
 .panel-title .code { font-family: var(--font-mono); font-size: var(--fs-small); color: var(--ink-mute); }
-.panel-title .name { font-size: var(--fs-title); font-weight: 600; margin: var(--sp-1) 0; }
+.panel-title .name { font-size: var(--fs-title); font-weight: var(--fw-bd); line-height: var(--lh-tight); margin: var(--sp-1) 0; }
 .panel-title .latin { font-style: italic; color: var(--ink-mute); margin-bottom: var(--sp-2); }
 .panel-title dl { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-1) var(--sp-3); font-size: var(--fs-small); }
 .panel-title dt { color: var(--ink-mute); }
 
-.taxon-tree { font-family: var(--font-mono); font-size: var(--fs-small); line-height: 1.8; }
+.taxon-tree { font-family: var(--font-mono); font-size: var(--fs-small); line-height: var(--lh-loose); }
 .taxon-tree .lv1 { padding-left: var(--sp-3); }
-.taxon-tree .lv2 { padding-left: calc(var(--sp-3) * 2); font-weight: 700; }
+.taxon-tree .lv2 { padding-left: calc(var(--sp-3) * 2); font-weight: var(--fw-bd); }
 
 .purpose .statement {
   border: 1px solid var(--line);
   background: var(--surface);
   padding: var(--sp-2) var(--sp-3);
   margin-bottom: var(--sp-3);
-  line-height: 1.5;
+  line-height: var(--lh-base);
 }
 .gauge { display: grid; grid-template-columns: 3em 1fr 1.5em; align-items: center; gap: var(--sp-2); font-size: var(--fs-small); margin-bottom: var(--sp-1); }
 .gauge .bar { display: flex; gap: 2px; }
@@ -166,7 +170,7 @@ body {
 .gauge .cell.on { background: var(--accent); }
 .gauge .num { text-align: right; font-family: var(--font-mono); color: var(--ink-mute); }
 
-.notes li { display: flex; gap: var(--sp-2); font-size: var(--fs-small); line-height: 1.8; }
+.notes li { display: flex; gap: var(--sp-2); font-size: var(--fs-small); line-height: var(--lh-loose); }
 .notes .date { font-family: var(--font-mono); color: var(--ink-mute); flex: 0 0 auto; }
 
 /* ── 시뮬레이션 모드 ─────────────────────────────────────────── */
@@ -282,7 +286,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-small);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  line-height: var(--lh-tight);
 }
 .modebar button { border: 1px solid var(--line-2); padding: var(--sp-1) var(--sp-3); }
 .modebar button.active { background: var(--accent); color: var(--bg); }
@@ -324,9 +328,9 @@ body {
   padding: var(--sp-5);
 }
 .about-box header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--sp-4); }
-.about-box h2 { font-size: var(--fs-title); font-weight: 600; }
+.about-box h2 { font-size: var(--fs-title); font-weight: var(--fw-bd); }
 .about-box .close { border: 1px solid var(--line-2); padding: var(--sp-1) var(--sp-2); font-family: var(--font-mono); }
-.about-box p { line-height: 1.8; color: var(--ink-mute); margin-bottom: var(--sp-3); max-width: 62ch; }
+.about-box p { line-height: var(--lh-loose); color: var(--ink-mute); margin-bottom: var(--sp-3); max-width: 62ch; }
 .about-box .diagram {
   border: 1px solid var(--line-2);
   background: var(--surface);

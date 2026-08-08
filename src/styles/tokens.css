@@ -14,8 +14,16 @@
 
   --sp-1: 4px; --sp-2: 8px; --sp-3: 16px; --sp-4: 24px; --sp-5: 40px;
   --radius: 0; /* 로우파이 = 모서리 각짐 */
-  --font: system-ui, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Mono', monospace;
+
+  /* 타이포 — KoPub World 돋움. 웨이트는 500/700만, 위계는 회색/검정으로 (§10) */
+  --font: 'KoPub World Dotum', system-ui, sans-serif;
+  --font-mono: 'KoPub World Dotum', system-ui, sans-serif; /* 코드·라벨도 동일 패밀리 */
+  --fw-md: 500;
+  --fw-bd: 700;
+  --lh-tight: 1.4;  /* 라벨·한 줄 요소 */
+  --lh-base: 1.6;   /* 본문 기본 */
+  --lh-loose: 1.8;  /* 긴 서술·목록 */
+  --ls-base: -0.025em; /* 자간 -25/1000em */
 
   /* 24" iMac(2240×1260) 기준, 노트북에서 자동 축소 */
   --fs-base: clamp(13px, 0.75vw, 17px);
