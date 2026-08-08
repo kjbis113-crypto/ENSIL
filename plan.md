@@ -410,12 +410,19 @@ interface Creature {
 
 **하드웨어 → 웹**
 ```jsonc
+{ "type": "tilt",    "pitch": 0.12, "roll": -0.34 }        // ★구현됨: 나노 보드 IMU 기울기(rad)
+                                                           //   → 시뮬 바닥이 보드를 따라 기운다
 { "type": "select",  "slot": 3 }                          // 3번 자리 표본을 집었다/눌렀다
 { "type": "release", "slot": 3 }                          // 놓았다 → 개괄 상태로 복귀(옵션)
 { "type": "step",    "dir": -1 }                          // 다이얼/버튼: 목차 이전
 { "type": "sensor",  "channel": "voltage", "value": 0.62 } // 0~1 정규화. 시뮬 파라미터로 주입
 { "type": "trigger", "action": "pulse", "intensity": 0.8 } // 순간 이벤트
 ```
+
+**틸트 구현 현황 (2026-08-08)** — Nano 33 BLE Rev2 내장 IMU(BMI270) 기준 전 구간 완료:
+`firmware/imu_tilt/`(스케치, 30Hz EMA) → `bridge/`(자동 탐지·재연결, `--demo` 모드) →
+`WsInput`(3초 재연결) → ThreeStage 월드 그룹 회전(±0.45rad 클램프, lerp 추종).
+하드웨어 없이는 `cd bridge && npm run demo` 또는 `Shift+방향키`로 재현.
 
 **웹 → 하드웨어** (LED·모터 피드백용, 양방향)
 ```jsonc
@@ -697,8 +704,8 @@ loadCreatures()
 | **M5** | 반응형 폴백 | 1280px 미만 1단 세로 레이아웃 | 노트북에서 깨지지 않음 |
 | **M6** ✓ | 시뮬 엔진 | `sim/engine.ts` + 니즈/상태 머신 (UI 없이) | 콘솔에서 tick 돌려 좌표·상태가 변한다 |
 | **M7** ✓ | 시뮬 모드 | DomRenderer, 관찰 패널, 트랜스포트 바 | 재생/정지/속도/선택 동작, 목차와 선택 동기화 |
-| **M8** | **입력 추상화** | `input/` + MockInput(키보드) | 키보드만으로 물리 인터랙션 전부 재현 |
-| **M9** | 브릿지 | `bridge/index.js`, WsInput, 상태 표시, 재연결 | 브릿지 껐다 켜도 웹이 안 죽음 |
+| **M8** ✓ | **입력 추상화** | `input/` + MockInput(키보드) | 키보드만으로 물리 인터랙션 전부 재현 |
+| **M9** ✓ | 브릿지 | `bridge/index.js`, WsInput, 상태 표시, 재연결 | 브릿지 껐다 켜도 웹이 안 죽음 (틸트 구현, slot·sensor는 목업 확정 대기) |
 | **M10** | Supabase | 테이블 생성, 동기화, 상태 표시 | 랜선 뽑고도 전 기능 동작 |
 | **M11** | 전시 모드 | 로컬 실행 스크립트, 프리셋, 커서 숨김 | 전시용 PC에서 더블클릭 실행 |
 

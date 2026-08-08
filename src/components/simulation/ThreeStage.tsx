@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import type { Tilt } from '../../input/types';
 import type { World } from '../../sim/types';
 import { SIM_STATE_NAME } from '../../copy';
 import {
@@ -33,11 +34,14 @@ export function ThreeStage({
   selectedId,
   overlays,
   onSelect,
+  tiltRef,
 }: {
   world: World;
   selectedId: string | null;
   overlays: OverlayFlags;
   onSelect: (id: string) => void;
+  /** 물리 보드(IMU) 기울기 — 월드 그룹이 이 각도를 따라간다 (plan.md §7) */
+  tiltRef?: React.RefObject<Tilt>;
 }) {
   const mountRef = useRef<HTMLDivElement>(null);
   // 최신 props를 rAF 루프에서 읽기 위한 ref
@@ -45,6 +49,8 @@ export function ThreeStage({
   stateRef.current = { world, selectedId, overlays };
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
+  const tiltPropRef = useRef(tiltRef);
+  tiltPropRef.current = tiltRef;
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -74,16 +80,20 @@ export function ThreeStage({
     sun.position.set(40, 80, 30);
     scene.add(sun);
 
+    // 월드 그룹 — 물리 보드(IMU)가 이 그룹의 기울기를 조종한다. "나노 보드 = 시뮬 바닥"
+    const worldGroup = new THREE.Group();
+    scene.add(worldGroup);
+
     // 바닥
     const grid = new THREE.GridHelper(100, 20, 0xbbbbbb, 0xe5e5e5);
-    scene.add(grid);
+    worldGroup.add(grid);
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(100, 100),
       new THREE.MeshBasicMaterial({ color: 0xfafafa }),
     );
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.05;
-    scene.add(ground);
+    worldGroup.add(ground);
 
     // ── 월드 오브젝트 ─────────────────────────
     const w = stateRef.current.world;
@@ -94,7 +104,7 @@ export function ThreeStage({
       m.position.set(W2S(n.pos.x), 0, W2S(n.pos.y));
       nodeGroup.add(m);
     }
-    scene.add(nodeGroup);
+    worldGroup.add(nodeGroup);
 
     const visuals = new Map<string, OrgVisual>();
     const pickables: THREE.Object3D[] = [];
@@ -103,7 +113,7 @@ export function ThreeStage({
       const baseScale = 0.8 + (o.traits.charge / 10) * 0.7;
       group.scale.setScalar(baseScale);
       group.userData.orgId = o.id;
-      scene.add(group);
+      worldGroup.add(group);
       pickables.push(group);
 
       const label = makeLabelSprite();
@@ -115,14 +125,14 @@ export function ThreeStage({
         trailGeo,
         new THREE.LineBasicMaterial({ color: 0xcccccc }),
       );
-      scene.add(trail);
+      worldGroup.add(trail);
 
       visuals.set(o.id, { group, label, trail, trailGeo, baseScale });
     }
 
     const selectRing = buildSelectRing();
     selectRing.visible = false;
-    scene.add(selectRing);
+    worldGroup.add(selectRing);
 
     // ── 리사이즈 ─────────────────────────────
     const resize = () => {
@@ -197,6 +207,14 @@ export function ThreeStage({
         }
       }
       if (sel === null) selectRing.visible = false;
+
+      // 물리 보드 기울기 → 월드 그룹 (부드럽게 추종)
+      const tilt = tiltPropRef.current?.current;
+      if (tilt) {
+        const clamp = (v: number) => Math.max(-0.45, Math.min(0.45, v));
+        worldGroup.rotation.x += (clamp(tilt.pitch) - worldGroup.rotation.x) * 0.12;
+        worldGroup.rotation.z += (clamp(-tilt.roll) - worldGroup.rotation.z) * 0.12;
+      }
 
       controls.update();
       renderer.render(scene, camera);

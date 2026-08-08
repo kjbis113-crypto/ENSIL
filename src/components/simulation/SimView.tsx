@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import type { Creature } from '../../types/creature';
 import type { ViewState } from '../../state/useViewState';
+import type { Tilt } from '../../input/types';
 import type { World } from '../../sim/types';
 import { createWorld } from '../../sim/world';
 import { tick } from '../../sim/engine';
@@ -12,7 +13,15 @@ import { ObserverPanel } from './ObserverPanel';
 const STEP = 1 / 30; // 고정 timestep 30tick/s, 렌더는 rAF (plan.md §8-3)
 
 /** 시뮬레이션 모드 — 엔진 루프 + 렌더러 연결 (plan.md §4-4) */
-export function SimView({ creatures, view }: { creatures: Creature[]; view: ViewState }) {
+export function SimView({
+  creatures,
+  view,
+  tiltRef,
+}: {
+  creatures: Creature[];
+  view: ViewState;
+  tiltRef?: React.RefObject<Tilt>;
+}) {
   const worldRef = useRef<World | null>(null);
   if (worldRef.current === null) worldRef.current = createWorld(creatures);
 
@@ -60,6 +69,7 @@ export function SimView({ creatures, view }: { creatures: Creature[]; view: View
             selectedId={view.selectedId}
             overlays={overlays}
             onSelect={view.select}
+            tiltRef={tiltRef}
           />
           {!running && <span className="sim-note">{COPY.simPaused}</span>}
         </div>
