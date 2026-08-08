@@ -717,6 +717,9 @@ M6~M7이 시뮬레이션 덩어리, M8~M9가 물리 연동 덩어리로 독립�
 ## 13. Git / 배포 워크플로
 
 원격 저장소: **https://github.com/ystmk1/ENSIL.git** (연결 완료 — `origin/main` 추적 중)
+프로덕션 배포: **https://ensil.vercel.app** (Vercel 프로젝트 `ensil`, CLI `npx vercel deploy --prod`).
+git push 자동 배포를 원하면 Vercel 대시보드에서 Git 저장소 연결.
+⚠️ 배포본에서는 물리 브릿지 연결이 안 된다 (https→ws 혼합 콘텐츠, debug.md #9) — 하드웨어 데모는 로컬 실행.
 
 ```
 main       ← Vercel Production 자동 배포. 항상 동작하는 상태 유지
