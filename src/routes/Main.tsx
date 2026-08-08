@@ -20,7 +20,7 @@ export function Main() {
       <SystemBar />
       <IndexStrip creatures={creatures} selectedId={view.selectedId} onSelect={view.select} />
       <main className="bigview">
-        <LogoCloud />
+        {view.mode !== 'sim' && <LogoCloud />}
         {view.mode === 'sim' ? (
           <SimView creatures={creatures} view={view} />
         ) : view.selected ? (

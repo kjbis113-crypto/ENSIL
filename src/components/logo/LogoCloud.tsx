@@ -17,7 +17,7 @@ import {
  */
 
 const LOGO_FIT = 0.62;   // 캔버스 대비 로고 최대 비율
-const DOT = 7;           // 파티클 지름(px, CSS 기준)
+const DOT = 5;           // 파티클 지름(px, CSS 기준) — 촘촘하게 겹쳐 면을 이룬다
 
 function makeSprite(size: number, color: string): HTMLCanvasElement {
   const c = document.createElement('canvas');

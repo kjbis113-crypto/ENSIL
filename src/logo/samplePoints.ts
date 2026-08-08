@@ -17,13 +17,13 @@ export interface SampleResult {
   aspect: number;
 }
 
-const SAMPLE_WIDTH = 300;   // 크롭 영역을 이 폭으로 축소해 샘플링
+const SAMPLE_WIDTH = 400;   // 크롭 영역을 이 폭으로 축소해 샘플링
 const DARK_LUM = 128;       // 이보다 어두우면 로고 픽셀
 const MIN_ALPHA = 128;
 
 export async function sampleLogoPoints(
   src: string,
-  { cropRight = 0.4, maxPoints = 1500 } = {},
+  { cropRight = 0.4, maxPoints = 7000 } = {},
 ): Promise<SampleResult> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const el = new Image();
@@ -76,7 +76,7 @@ export async function sampleLogoPoints(
     const v = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
     return (v - Math.floor(v) - 0.5) * 2; // -1 ~ 1
   };
-  const J = 1.2; // 샘플 픽셀 단위 지터 폭
+  const J = 0.8; // 샘플 픽셀 단위 지터 폭 (밀도가 높아 약하게만)
 
   return {
     points: picked.map((p, i) => ({
