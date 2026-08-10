@@ -14,7 +14,16 @@ let cached: Promise<THREE.Group> | null = null;
 export function loadCreatureModel(): Promise<THREE.Group> {
   if (!cached) {
     const url = `${import.meta.env.BASE_URL}models/creature.glb`;
-    cached = new GLTFLoader().loadAsync(url).then((gltf) => {
+    // meshopt 디코더는 public/에서 런타임 로드 — 번들에 넣거나 import() 구문을 쓰면
+    // wasm-rollup이 네이티브 크래시한다 (debug.md #1 계열). new Function으로 rollup 눈을 피한다.
+    const decoderUrl = `${import.meta.env.BASE_URL}decoders/meshopt_decoder.module.js`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dynImport = new Function('u', 'return import(u)') as (u: string) => Promise<{ MeshoptDecoder: any }>;
+    cached = dynImport(decoderUrl).then(({ MeshoptDecoder }) => {
+      const loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder); // EXT_meshopt_compression (압축 GLB)
+      return loader.loadAsync(url);
+    }).then((gltf) => {
       const root = gltf.scene;
       const box = new THREE.Box3().setFromObject(root);
       const size = box.getSize(new THREE.Vector3());
