@@ -7,10 +7,10 @@ import { SIM_STATE_NAME } from '../../copy';
 import {
   buildNodeMesh,
   buildSelectRing,
-  buildSpeciesMesh,
   makeLabelSprite,
   setGroupOpacity,
 } from '../../sim3d/meshes';
+import { cloneCreature, loadCreatureModel } from '../../sim3d/creatureModel';
 import type { OverlayFlags } from './TransportBar';
 
 /**
@@ -109,7 +109,7 @@ export function ThreeStage({
     const visuals = new Map<string, OrgVisual>();
     const pickables: THREE.Object3D[] = [];
     for (const o of w.organisms) {
-      const group = buildSpeciesMesh(o.species);
+      const group = new THREE.Group(); // GLB 로드 완료 시 모델이 채워진다
       const baseScale = 0.8 + (o.traits.charge / 10) * 0.7;
       group.scale.setScalar(baseScale);
       group.userData.orgId = o.id;
@@ -133,6 +133,15 @@ export function ThreeStage({
     const selectRing = buildSelectRing();
     selectRing.visible = false;
     worldGroup.add(selectRing);
+
+    // ── 생물 모델 로드 (비동기) — 도착하면 각 개체 그룹에 꽂는다 ──
+    let unmounted = false;
+    loadCreatureModel().then((model) => {
+      if (unmounted) return;
+      for (const v of visuals.values()) {
+        v.group.add(cloneCreature(model, 4.5));
+      }
+    });
 
     // ── 리사이즈 ─────────────────────────────
     const resize = () => {
@@ -224,6 +233,7 @@ export function ThreeStage({
     raf = requestAnimationFrame(frame);
 
     return () => {
+      unmounted = true;
       cancelAnimationFrame(raf);
       ro.disconnect();
       renderer.domElement.removeEventListener('pointerdown', onDown);
@@ -233,7 +243,8 @@ export function ThreeStage({
       mount.removeChild(renderer.domElement);
       scene.traverse((obj) => {
         const m = obj as THREE.Mesh;
-        if (m.geometry) m.geometry.dispose();
+        // GLB 클론의 지오메트리는 캐시 원본과 공유 — dispose하면 다음 마운트가 깨진다
+        if (m.geometry && !m.userData.sharedGeo) m.geometry.dispose();
         const mat = m.material as THREE.Material | THREE.Material[] | undefined;
         if (Array.isArray(mat)) mat.forEach((x) => x.dispose());
         else mat?.dispose();
