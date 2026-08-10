@@ -1,37 +1,60 @@
-/* plan.md §10 — 모노톤 토큰. 컴포넌트 CSS에서 리터럴 색상값 금지. */
+/* Electronic Ensilage design system — extracted from the live ENSIL experience. */
 :root {
-  --bg:        #ffffff;
-  --surface:   #f2f2f2;
-  --line:      #cccccc;
-  --line-2:    #888888;
-  --ink:       #111111;
-  --ink-mute:  #777777;
-  --accent:    #111111; /* 지금은 검정. 나중에 여기만 바꾼다 */
+  color-scheme: light;
 
-  /* 커서 블롭 — 모노톤 예외 없이 회색 계열만. 본 디자인 때 여기만 교체 */
-  --cursor-blob: rgba(136, 136, 136, 0.35);
-  --cursor-blob-size: 72px;
+  /* Core surfaces */
+  --paper: #edf0ef;
+  --paper-bright: #f7f8f5;
+  --bg: var(--paper-bright);
+  --surface: var(--paper);
+  --ink: #111312;
+  --ink-mute: #777c79;
+  --ink-soft: #4e5350;
+  --line: rgba(17, 19, 18, 0.2);
+  --line-2: rgba(17, 19, 18, 0.52);
+  --line-strong: #111312;
 
-  --sp-1: 4px; --sp-2: 8px; --sp-3: 16px; --sp-4: 24px; --sp-5: 40px;
-  --radius: 0; /* 로우파이 = 모서리 각짐 */
+  /* Living signal palette */
+  --lime: #b8ff28;
+  --blue: #2457ff;
+  --cyan: #21d9ff;
+  --magenta: #ff2f91;
+  --violet: #7d52ff;
+  --accent: var(--blue);
+  --sensor: var(--blue);
 
-  /* 타이포 — KoPub World 돋움. 웨이트는 500/700만, 위계는 회색/검정으로 (§10) */
-  --font: 'KoPub World Dotum', system-ui, sans-serif;
-  --font-mono: 'KoPub World Dotum', system-ui, sans-serif; /* 코드·라벨도 동일 패밀리 */
-  --fw-md: 500;
+  /* Ambient interaction */
+  --cursor-blob: rgba(36, 87, 255, 0.18);
+  --cursor-blob-size: 82px;
+
+  /* Spacing */
+  --sp-1: 5px;
+  --sp-2: 10px;
+  --sp-3: 18px;
+  --sp-4: 28px;
+  --sp-5: 44px;
+
+  /* Square, technical geometry */
+  --radius: 0;
+
+  /* Typography: Arial defines the Latin voice; KoPub keeps Korean legible. */
+  --font: Arial, Helvetica, 'KoPub World Dotum', sans-serif;
+  --font-mono: Arial, Helvetica, 'KoPub World Dotum', sans-serif;
+  --fw-md: 400;
   --fw-bd: 700;
-  --lh-tight: 1.4;  /* 라벨·한 줄 요소 */
-  --lh-base: 1.6;   /* 본문 기본 */
-  --lh-loose: 1.8;  /* 긴 서술·목록 */
-  --ls-base: 0.02em; /* 자간 +2% */
+  --lh-tight: 0.93;
+  --lh-base: 1.35;
+  --lh-loose: 1.62;
+  --ls-base: 0;
+  --ls-label: 0.14em;
 
-  /* 24" iMac(2240×1260) 기준, 노트북에서 자동 축소 */
-  --fs-base: clamp(13px, 0.75vw, 17px);
-  --fs-small: clamp(10px, 0.55vw, 12px);
-  --fs-title: clamp(18px, 1.3vw, 30px);
+  --fs-base: clamp(12px, 0.72vw, 16px);
+  --fs-small: clamp(9px, 0.52vw, 12px);
+  --fs-title: clamp(25px, 2.35vw, 52px);
+  --fs-display: clamp(64px, 9vw, 196px);
 
-  --h-sysbar: 32px;
-  --h-strip: clamp(96px, 9.5vh, 132px);
-  --h-modebar: 48px;
-  --panel-w: clamp(230px, 17vw, 360px);
+  --h-sysbar: clamp(66px, 7.2vh, 88px);
+  --h-strip: clamp(102px, 11vh, 146px);
+  --h-modebar: clamp(48px, 5vh, 62px);
+  --panel-w: clamp(250px, 18vw, 390px);
 }

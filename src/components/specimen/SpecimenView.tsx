@@ -22,7 +22,7 @@ export function SpecimenView({ creature }: { creature: Creature }) {
   const narrow = useNarrow();
 
   return (
-    <div className="specimen" ref={containerRef}>
+    <div className="specimen" data-species={creature.species} ref={containerRef}>
       {/* 중앙 비주얼 */}
       <div className="visual-wrap" ref={visualRef}>
         <div className="visual">{COPY.visualPlaceholder}</div>
