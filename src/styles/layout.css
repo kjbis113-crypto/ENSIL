@@ -630,6 +630,77 @@ button { transition: color 160ms ease, background-color 160ms ease, border-color
   .about-box { padding: var(--sp-4); }
 }
 
+/* ── Gallery — 메인(전시 대기) 화면, #/gallery ─────────────── */
+.app-gallery { grid-template-rows: var(--h-sysbar) 1fr; }
+.gallery-wrap {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--paper-bright);
+}
+.gallery { position: absolute; inset: 0; }
+.gallery-stage { position: absolute; inset: 0; }
+.gallery-stage canvas { display: block; }
+.gallery-head {
+  position: absolute;
+  top: 5.5%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
+  pointer-events: none;
+}
+.gallery-head h1 {
+  font-size: clamp(34px, 3.8vw, 72px);
+  font-weight: var(--fw-bd);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+}
+.gallery-head p {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-small);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.g-num {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: var(--fs-small);
+  letter-spacing: var(--ls-label);
+  color: var(--ink-soft);
+}
+.g-num:hover { color: var(--accent); }
+.gallery-legend {
+  position: absolute;
+  bottom: 3.5%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2) var(--sp-4);
+  padding: 0 var(--sp-4);
+}
+.gallery-legend button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: var(--fs-small);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.gallery-legend button:hover { color: var(--accent); }
+.gallery-legend .n { color: var(--ink-mute); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
   .cursor-trail { display: none; }

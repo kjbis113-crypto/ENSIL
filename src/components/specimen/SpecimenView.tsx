@@ -27,7 +27,7 @@ export function SpecimenView({ creature }: { creature: Creature }) {
       {/* 중앙 비주얼 — creature.glb 3D 뷰어 */}
       <div className="visual-wrap" ref={visualRef}>
         <div className="visual">
-          <SpecimenModel />
+          <SpecimenModel creature={creature} />
         </div>
       </div>
 

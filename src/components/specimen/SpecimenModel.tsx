@@ -1,15 +1,17 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { cloneCreature, loadCreatureModel } from '../../sim3d/creatureModel';
+import type { Creature } from '../../types/creature';
+import { cloneCreature, creatureModelUrl, loadCreatureModel } from '../../sim3d/creatureModel';
 
 /**
- * 표본 모드 중앙 비주얼 — creature.glb 단독 뷰어.
+ * 표본 모드 중앙 비주얼 — 개체 GLB 단독 뷰어 (개체별 에셋 없으면 공용 모델).
  * 배경 투명(alpha)이라 .visual의 CSS 글로우 링이 뒤에 비친다.
  * 자동 회전 + 드래그 궤도. 지오메트리는 캐시 원본과 공유(sharedGeo)라 dispose하지 않는다.
  */
-export function SpecimenModel() {
+export function SpecimenModel({ creature }: { creature?: Creature }) {
   const mountRef = useRef<HTMLDivElement>(null);
+  const modelUrl = creatureModelUrl(creature);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -42,7 +44,7 @@ export function SpecimenModel() {
     scene.add(fill);
 
     let unmounted = false;
-    loadCreatureModel().then((model) => {
+    loadCreatureModel(modelUrl).then((model) => {
       if (unmounted) return;
       scene.add(cloneCreature(model, 1));
     });
@@ -80,7 +82,7 @@ export function SpecimenModel() {
         else mat?.dispose();
       });
     };
-  }, []);
+  }, [modelUrl]);
 
   return <div className="visual-model" ref={mountRef} />;
 }

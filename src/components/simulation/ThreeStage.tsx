@@ -10,7 +10,7 @@ import {
   makeLabelSprite,
   setGroupOpacity,
 } from '../../sim3d/meshes';
-import { cloneCreature, loadCreatureModel } from '../../sim3d/creatureModel';
+import { cloneCreature, creatureModelUrl, loadCreatureModel } from '../../sim3d/creatureModel';
 import type { OverlayFlags } from './TransportBar';
 
 /**
@@ -35,6 +35,7 @@ export function ThreeStage({
   overlays,
   onSelect,
   tiltRef,
+  modelUrls,
 }: {
   world: World;
   selectedId: string | null;
@@ -42,6 +43,8 @@ export function ThreeStage({
   onSelect: (id: string) => void;
   /** 물리 보드(IMU) 기울기 — 월드 그룹이 이 각도를 따라간다 (plan.md §7) */
   tiltRef?: React.RefObject<Tilt>;
+  /** 개체 id → GLB 경로 (개체별 에셋, 없으면 공용 모델) */
+  modelUrls?: Record<string, string>;
 }) {
   const mountRef = useRef<HTMLDivElement>(null);
   // 최신 props를 rAF 루프에서 읽기 위한 ref
@@ -134,14 +137,15 @@ export function ThreeStage({
     selectRing.visible = false;
     worldGroup.add(selectRing);
 
-    // ── 생물 모델 로드 (비동기) — 도착하면 각 개체 그룹에 꽂는다 ──
+    // ── 생물 모델 로드 (비동기) — 도착하면 각 개체 그룹에 꽂는다.
+    //    URL별 캐시라 공용 모델이면 실제 로드는 1회 ──
     let unmounted = false;
-    loadCreatureModel().then((model) => {
-      if (unmounted) return;
-      for (const v of visuals.values()) {
+    for (const [id, v] of visuals) {
+      loadCreatureModel(modelUrls?.[id] ?? creatureModelUrl()).then((model) => {
+        if (unmounted) return;
         v.group.add(cloneCreature(model, 4.5));
-      }
-    });
+      });
+    }
 
     // ── 리사이즈 ─────────────────────────────
     const resize = () => {
