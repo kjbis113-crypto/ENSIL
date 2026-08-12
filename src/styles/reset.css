@@ -1,9 +1,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #root { height: 100%; }
 html { background: var(--paper-bright); }
+body { min-width: 320px; overflow-x: hidden; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 button:focus-visible,
-input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+input:focus-visible { outline: 1px solid var(--cyan); outline-offset: 3px; }
 ul, ol { list-style: none; }
 img { max-width: 100%; display: block; }
-::selection { color: var(--paper-bright); background: var(--blue); }
+a { color: inherit; text-decoration: none; }
+::selection { color: var(--paper-bright); background: var(--cyan); }

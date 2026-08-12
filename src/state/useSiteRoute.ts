@@ -1,0 +1,37 @@
+import { useCallback, useEffect, useState } from 'react';
+
+export type SiteRoute =
+  | { name: 'landing' }
+  | { name: 'field' }
+  | { name: 'archive' }
+  | { name: 'habitat'; id: string }
+  | { name: 'creature'; id: string };
+
+function parseHash(): SiteRoute {
+  const path = window.location.hash.replace(/^#/, '') || '/';
+  if (path === '/' || path === '/index') return { name: 'landing' };
+  if (path === '/field') return { name: 'field' };
+  if (path === '/archive') return { name: 'archive' };
+  const creature = /^\/creature\/([^/?]+)/.exec(path);
+  if (creature) return { name: 'creature', id: decodeURIComponent(creature[1]) };
+  const habitat = /^\/habitat\/([^/?]+)/.exec(path);
+  if (habitat) return { name: 'habitat', id: decodeURIComponent(habitat[1]) };
+  return { name: 'landing' };
+}
+
+export function useSiteRoute() {
+  const [route, setRoute] = useState<SiteRoute>(parseHash);
+
+  useEffect(() => {
+    if (!window.location.hash) window.history.replaceState(null, '', '#/');
+    const onHashChange = () => setRoute(parseHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  const navigate = useCallback((path: string) => {
+    window.location.hash = path.startsWith('/') ? path : `/${path}`;
+  }, []);
+
+  return { route, navigate };
+}
