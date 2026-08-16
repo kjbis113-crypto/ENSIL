@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { getGLTFLoader } from '../../sim3d/gltf';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CREATURE_RECORDS } from '../../data/creatureRecords';
 import {
@@ -395,14 +395,13 @@ export function EcosystemCanvas({ selectedId, observation, paused, onSelect, onE
     pointerRipples.visible = false;
     scene.add(pointerRipples);
 
-    const loader = new GLTFLoader();
     let completedModels = 0;
     const completeModel = () => {
       completedModels += 1;
       setLoadedModels(completedModels);
     };
 
-    CREATURE_RECORDS.forEach((record, index) => {
+    getGLTFLoader().then((loader) => CREATURE_RECORDS.forEach((record, index) => {
       if (!record.modelUrl) return;
       loader.load(
         record.modelUrl,
@@ -433,7 +432,7 @@ export function EcosystemCanvas({ selectedId, observation, paused, onSelect, onE
         undefined,
         completeModel,
       );
-    });
+    }));
 
     const selectionRing = new THREE.Mesh(
       new THREE.RingGeometry(2.8, 2.86, 64),

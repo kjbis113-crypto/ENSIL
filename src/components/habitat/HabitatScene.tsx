@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { getGLTFLoader } from '../../sim3d/gltf';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CREATURE_RECORDS, type CreatureRecord } from '../../data/creatureRecords';
 
@@ -16,6 +16,7 @@ export function HabitatScene({ record }: { record: CreatureRecord }) {
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount || !record.modelUrl) return;
+    const modelUrl = record.modelUrl; // 콜백 안에서도 string으로 유지
     let cancelled = false;
     const speciesIndex = Math.max(0, CREATURE_RECORDS.findIndex((item) => item.id === record.id));
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -98,8 +99,8 @@ export function HabitatScene({ record }: { record: CreatureRecord }) {
     const pivot = new THREE.Group();
     scene.add(pivot);
     let model: THREE.Object3D | null = null;
-    new GLTFLoader().load(
-      record.modelUrl,
+    getGLTFLoader().then((loader) => loader.load(
+      modelUrl,
       (gltf) => {
         if (cancelled) return;
         model = gltf.scene;
@@ -118,7 +119,7 @@ export function HabitatScene({ record }: { record: CreatureRecord }) {
       },
       undefined,
       () => setLoading(false),
-    );
+    ));
 
     const pointer = new THREE.Vector2();
     let pointerActive = false;

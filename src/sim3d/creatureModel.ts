@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { Creature } from '../types/creature';
+import { getGLTFLoader } from './gltf';
 
 /**
  * 생물 GLB 공용 로더 — 시뮬레이터(ThreeStage)·표본 뷰(SpecimenModel)·갤러리(GalleryView) 공용.
@@ -13,7 +13,6 @@ import type { Creature } from '../types/creature';
 
 const DEFAULT_MODEL = 'models/creature.glb';
 const cache = new Map<string, Promise<THREE.Group>>();
-let decoderPromise: Promise<unknown> | null = null;
 
 /** 개체별 모델 경로 — visual.main이 .glb면 그것, 아니면 공용 모델 */
 export function creatureModelUrl(creature?: Pick<Creature, 'visual'> | null): string {
@@ -21,28 +20,11 @@ export function creatureModelUrl(creature?: Pick<Creature, 'visual'> | null): st
   return main && main.endsWith('.glb') ? main : DEFAULT_MODEL;
 }
 
-function loadDecoder(): Promise<unknown> {
-  if (!decoderPromise) {
-    // meshopt 디코더는 public/에서 런타임 로드 — 번들에 넣거나 import() 구문을 쓰면
-    // wasm-rollup이 네이티브 크래시한다 (debug.md #1 계열). new Function으로 rollup 눈을 피한다.
-    const decoderUrl = `${import.meta.env.BASE_URL}decoders/meshopt_decoder.module.js`;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const dynImport = new Function('u', 'return import(u)') as (u: string) => Promise<{ MeshoptDecoder: any }>;
-    decoderPromise = dynImport(decoderUrl).then(({ MeshoptDecoder }) => MeshoptDecoder);
-  }
-  return decoderPromise;
-}
-
 /** 정규화된 원본: 최대 변 1유닛, 바닥(y=0)에 안착, XZ 중심 원점 */
 export function loadCreatureModel(rel: string = DEFAULT_MODEL): Promise<THREE.Group> {
   let entry = cache.get(rel);
   if (!entry) {
-    entry = loadDecoder().then((decoder) => {
-      const loader = new GLTFLoader();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      loader.setMeshoptDecoder(decoder as any); // EXT_meshopt_compression (압축 GLB)
-      return loader.loadAsync(`${import.meta.env.BASE_URL}${rel}`);
-    }).then((gltf) => {
+    entry = getGLTFLoader().then((loader) => loader.loadAsync(`${import.meta.env.BASE_URL}${rel}`)).then((gltf) => {
       const root = gltf.scene;
       const box = new THREE.Box3().setFromObject(root);
       const size = box.getSize(new THREE.Vector3());
