@@ -61,14 +61,17 @@ export function ThreeStage({
 
     // ── 씬 기본 ──────────────────────────────
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf7f8f5);
-    scene.fog = new THREE.Fog(0xf7f8f5, 120, 220);
+    scene.background = new THREE.Color(0x020403);
+    scene.fog = new THREE.Fog(0x020403, 105, 215);
 
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 500);
     camera.position.set(0, 62, 74);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
     mount.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -78,21 +81,24 @@ export function ThreeStage({
     controls.maxDistance = 160;
     controls.enableDamping = true;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.92));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.18);
+    scene.add(new THREE.AmbientLight(0xb7d4ca, 0.58));
+    const sun = new THREE.DirectionalLight(0xb8fff0, 1.28);
     sun.position.set(40, 80, 30);
     scene.add(sun);
+    const rim = new THREE.DirectionalLight(0xff83b7, 0.58);
+    rim.position.set(-45, 28, -36);
+    scene.add(rim);
 
     // 월드 그룹 — 물리 보드(IMU)가 이 그룹의 기울기를 조종한다. "나노 보드 = 시뮬 바닥"
     const worldGroup = new THREE.Group();
     scene.add(worldGroup);
 
     // 바닥
-    const grid = new THREE.GridHelper(100, 20, 0x777c79, 0xd9dddb);
+    const grid = new THREE.GridHelper(100, 20, 0x48ffe1, 0x10241f);
     worldGroup.add(grid);
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(100, 100),
-      new THREE.MeshBasicMaterial({ color: 0xedf0ef }),
+      new THREE.MeshStandardMaterial({ color: 0x030706, roughness: 0.94, metalness: 0.08 }),
     );
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.05;
@@ -126,7 +132,7 @@ export function ThreeStage({
       const trailGeo = new THREE.BufferGeometry();
       const trail = new THREE.Line(
         trailGeo,
-        new THREE.LineBasicMaterial({ color: 0x9da4a0 }),
+        new THREE.LineBasicMaterial({ color: 0x48ffe1, transparent: true, opacity: 0.38 }),
       );
       worldGroup.add(trail);
 
@@ -202,7 +208,7 @@ export function ThreeStage({
         }
 
         const dim = sel !== null && o.id !== sel;
-        setGroupOpacity(v.group, dim ? 0.22 : 1);
+        setGroupOpacity(v.group, dim ? 0.42 : 1);
 
         v.label.sprite.visible = ov.labels && !dim;
         v.label.setText(`${o.code} · ${SIM_STATE_NAME[o.state]}`);

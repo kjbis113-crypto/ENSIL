@@ -1,31 +1,32 @@
-/* Electronic Ensilage design system — extracted from the live ENSIL experience. */
+/* ENSIL editorial system — paper, carbon and restrained material colour. */
 :root {
   color-scheme: light;
 
-  /* Core surfaces */
-  --paper: #edf0ef;
-  --paper-bright: #f7f8f5;
+  /* Deep-culture surfaces */
+  --paper: #f3f3ef;
+  --paper-bright: #ffffff;
   --bg: var(--paper-bright);
   --surface: var(--paper);
-  --ink: #111312;
-  --ink-mute: #777c79;
-  --ink-soft: #4e5350;
-  --line: rgba(17, 19, 18, 0.2);
-  --line-2: rgba(17, 19, 18, 0.52);
-  --line-strong: #111312;
+  --ink: #111111;
+  --ink-mute: #74746f;
+  --ink-soft: #353532;
+  --line: rgba(17, 17, 17, 0.1);
+  --line-2: rgba(17, 17, 17, 0.28);
+  --line-strong: rgba(17, 17, 17, 0.66);
 
-  /* Living signal palette */
-  --lime: #b8ff28;
-  --blue: #2457ff;
-  --cyan: #21d9ff;
-  --magenta: #ff2f91;
-  --violet: #7d52ff;
-  --accent: var(--blue);
-  --sensor: var(--blue);
+  /* Biotechnical signal palette */
+  --lime: #5d6a41;
+  --blue: #425372;
+  --cyan: #111111;
+  --magenta: #75515b;
+  --violet: #59566b;
+  --amber: #80633b;
+  --accent: #111111;
+  --sensor: #111111;
 
-  /* Ambient interaction */
-  --cursor-blob: rgba(36, 87, 255, 0.18);
-  --cursor-blob-size: 82px;
+  /* Ambient interaction field */
+  --cursor-blob: rgba(17, 17, 17, 0.12);
+  --cursor-blob-size: 96px;
 
   /* Spacing */
   --sp-1: 5px;
@@ -37,21 +38,21 @@
   /* Square, technical geometry */
   --radius: 0;
 
-  /* Typography: Arial defines the Latin voice; KoPub keeps Korean legible. */
-  --font: Arial, Helvetica, 'KoPub World Dotum', sans-serif;
-  --font-mono: Arial, Helvetica, 'KoPub World Dotum', sans-serif;
+  --font: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: Helvetica, 'Helvetica Neue', Arial, sans-serif;
   --fw-md: 400;
   --fw-bd: 700;
   --lh-tight: 0.93;
   --lh-base: 1.35;
   --lh-loose: 1.62;
   --ls-base: 0;
-  --ls-label: 0.14em;
+  --ls-label: 0.16em;
 
   --fs-base: clamp(12px, 0.72vw, 16px);
   --fs-small: clamp(9px, 0.52vw, 12px);
-  --fs-title: clamp(25px, 2.35vw, 52px);
-  --fs-display: clamp(64px, 9vw, 196px);
+  --fs-title: clamp(25px, 2.6vw, 58px);
+  --fs-display: clamp(68px, 9.6vw, 210px);
 
   --h-sysbar: clamp(66px, 7.2vh, 88px);
   --h-strip: clamp(102px, 11vh, 146px);

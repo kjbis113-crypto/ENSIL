@@ -1,0 +1,304 @@
+.field-page {
+  --field-primary: #2457ff;
+  --field-secondary: #ff5d32;
+  --field-accent: #ffc4d8;
+  --field-paper: #f4f9ff;
+  --field-ink: #101019;
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  background: #f4f4ef;
+  transition: background-color 400ms ease;
+}
+
+.ecosystem-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.ecosystem-canvas::after {
+  content: '';
+  position: absolute;
+  inset: 48px 18px 18px;
+  pointer-events: none;
+  border: 1px solid rgba(17, 17, 17, 0.09);
+}
+
+.ecosystem-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.ecosystem-loading {
+  position: absolute;
+  top: 62px;
+  left: 28px;
+  z-index: 5;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+
+.field-index {
+  position: absolute;
+  top: 62px;
+  left: 30px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 8px;
+  letter-spacing: 0.09em;
+  pointer-events: none;
+}
+
+.field-index span:last-child { color: var(--ink-mute); }
+
+.field-intro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  transform: translate(-50%, -50%);
+  color: var(--paper-bright);
+  background: var(--ink);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  animation: fieldIntro 4.2s ease both;
+  pointer-events: none;
+}
+
+.field-controls {
+  position: absolute;
+  right: 30px;
+  bottom: 30px;
+  z-index: 12;
+  display: flex;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: rgba(244, 244, 239, 0.88);
+}
+
+.field-controls button {
+  padding: 9px 12px;
+  border-right: 1px solid var(--hairline, rgba(17, 17, 17, 0.14));
+  color: var(--ink-mute);
+  font-size: 8px;
+  letter-spacing: 0.07em;
+}
+
+.field-controls button:last-child { border-right: 0; }
+.field-controls button:hover,
+.field-controls button[aria-pressed='true'] { color: var(--paper-bright); background: var(--ink); }
+
+.field-environment {
+  position: absolute;
+  right: 30px;
+  top: 62px;
+  z-index: 7;
+  display: flex;
+  gap: 18px;
+  color: var(--ink-mute);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.field-species-rail {
+  position: absolute;
+  top: 102px;
+  left: 30px;
+  z-index: 13;
+  width: 244px;
+  background: rgba(244, 244, 239, .72);
+  backdrop-filter: blur(8px);
+  font-size: 8px;
+  letter-spacing: .06em;
+}
+.field-species-rail header,
+.field-species-rail button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 14px 1fr 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(17,17,17,.16);
+  text-align: left;
+  text-transform: uppercase;
+}
+.field-species-rail header { grid-template-columns: 14px 1fr 1fr; border-top: 1px solid var(--ink); color: var(--ink-mute); }
+.field-species-rail header span:first-child { grid-column: 2; }
+.field-species-rail i { width: 8px; height: 8px; border-radius: 50%; }
+.field-species-rail button span:last-child { color: var(--ink-mute); }
+.field-species-rail button:hover,
+.field-species-rail button.is-active { padding-right: 6px; padding-left: 6px; color: var(--paper-bright); background: var(--ink); }
+.field-species-rail button:hover span:last-child,
+.field-species-rail button.is-active span:last-child { color: inherit; }
+
+.field-ticker {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 16;
+  height: 20px;
+  overflow: hidden;
+  color: var(--field-paper);
+  background: var(--field-ink);
+  font-size: 7px;
+  letter-spacing: .09em;
+  line-height: 20px;
+  white-space: nowrap;
+}
+.field-ticker div { display: inline-flex; gap: 70px; min-width: max-content; padding-left: 100%; animation: fieldTicker 27s linear infinite; }
+.field-ticker span::before { content: '✦'; margin-right: 10px; color: var(--field-accent); }
+
+.encounter-card {
+  position: absolute;
+  right: 30px;
+  bottom: 82px;
+  z-index: 15;
+  width: min(330px, calc(100vw - 40px));
+  padding: 14px 0 0;
+  border-top: 1px solid var(--ink);
+  box-shadow: 7px 7px 0 var(--field-primary);
+  background: color-mix(in srgb, var(--field-paper) 94%, transparent);
+  animation: encounterIn 220ms ease both;
+}
+
+.encounter-card__close {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  font-size: 17px;
+}
+
+.encounter-card > span {
+  color: var(--ink-mute);
+  font-size: 8px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.encounter-card h1 {
+  margin: 20px 0 28px;
+  font-size: clamp(31px, 3.1vw, 56px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+}
+
+.encounter-card dl { border-top: 1px solid var(--hairline, rgba(17, 17, 17, 0.14)); }
+.encounter-card dl div {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline, rgba(17, 17, 17, 0.14));
+  font-size: 9px;
+}
+.encounter-card dt { color: var(--ink-mute); }
+.encounter-card dd { line-height: 1.2; text-align: right; }
+.encounter-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 18px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.encounter-card__actions a {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 9px;
+  border-right: 1px solid var(--ink);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+}
+.encounter-card__actions a:last-child { border-right: 0; }
+.encounter-card__actions a:first-child,
+.encounter-card__actions a:hover { color: var(--paper-bright); background: var(--ink); }
+
+.encounter-card--proximity {
+  border-top-style: dashed;
+}
+
+.encounter-card__signal {
+  margin-top: 8px;
+  color: var(--ink-mute);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+.observation-layer {
+  position: absolute;
+  top: 98px;
+  left: 30px;
+  z-index: 14;
+  width: 300px;
+  background: rgba(244, 244, 239, 0.92);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+}
+
+.observation-layer header,
+.observation-layer button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1.2fr 1fr 44px;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--hairline, rgba(17, 17, 17, 0.14));
+  text-align: left;
+  text-transform: uppercase;
+}
+.observation-layer header { border-top: 1px solid var(--ink); color: var(--ink-mute); }
+.observation-layer button:hover { background: var(--ink); color: var(--paper-bright); }
+
+@keyframes fieldIntro {
+  0% { opacity: 0; transform: translate(-50%, -45%); }
+  12%, 72% { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -55%); }
+}
+
+@keyframes encounterIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fieldTicker {
+  to { transform: translateX(-100%); }
+}
+
+@media (max-width: 760px) {
+  .ecosystem-canvas::after { inset: 44px 10px 10px; }
+  .field-index { top: 58px; left: 18px; }
+  .field-environment { top: 58px; right: 18px; }
+  .field-environment span:not(:first-child) { display: none; }
+  .field-controls {
+    right: 10px;
+    bottom: 30px;
+    left: 10px;
+    overflow-x: auto;
+  }
+  .field-controls button { flex: 1 0 auto; padding: 9px 8px; font-size: 7px; }
+  .encounter-card { right: 10px; bottom: 75px; left: 10px; width: auto; }
+  .encounter-card h1 { margin: 14px 0 18px; }
+  .observation-layer { top: 85px; left: 18px; width: min(280px, calc(100vw - 36px)); }
+  .field-species-rail { top: auto; right: 10px; bottom: 68px; left: auto; width: 176px; }
+  .field-species-rail header { display: none; }
+  .field-species-rail button { grid-template-columns: 12px 1fr; padding: 5px 0; }
+  .field-species-rail button span:last-child { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-ticker div { animation: none; }
+}

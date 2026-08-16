@@ -1,15 +1,27 @@
-import { Main } from './routes/Main';
-import { CursorTrail } from './components/cursor/CursorTrail';
+import { useEffect } from 'react';
+import { Archive } from './routes/Archive';
+import { CreatureRecordPage } from './routes/CreatureRecord';
+import { Field } from './routes/Field';
+import { Habitat } from './routes/Habitat';
+import { Landing } from './routes/Landing';
+import { SiteNavigation } from './components/navigation/SiteNavigation';
+import { useSiteRoute } from './state/useSiteRoute';
 
-/**
- * 라우팅은 useHashRoute가 담당 (자체 해시 라우팅 — debug.md #1).
- * URL이 곧 화면 상태: #/c/:id, ?mode=sim, ?about=1
- */
 export default function App() {
+  const { route } = useSiteRoute();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [route]);
+
   return (
-    <>
-      <Main />
-      <CursorTrail />
-    </>
+    <div className={`site-shell site-shell--${route.name}`}>
+      <SiteNavigation route={route} />
+      {route.name === 'landing' && <Landing />}
+      {route.name === 'field' && <Field />}
+      {route.name === 'habitat' && <Habitat id={route.id} />}
+      {route.name === 'archive' && <Archive />}
+      {route.name === 'creature' && <CreatureRecordPage id={route.id} />}
+    </div>
   );
 }
