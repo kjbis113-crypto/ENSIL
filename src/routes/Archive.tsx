@@ -24,10 +24,23 @@ export function Archive() {
 
   return (
     <main className="archive-page" style={paletteStyle}>
+      <section className="archive-ledger archive-ledger--top" aria-label="Complete collection ledger">
+        <header><span>ALL LIVING RECORDS</span><span>INDEX 01—04</span></header>
+        {CREATURE_RECORDS.map((record, index) => (
+          <a href={`#/creature/${record.id}`} key={record.id} onMouseEnter={() => setActiveIndex(index)}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <strong>{record.name}</strong>
+            <span>{record.sensor}</span>
+            <i style={{ backgroundColor: record.palette.primary }} />
+            <span>VIEW ↗</span>
+          </a>
+        ))}
+      </section>
+
       <header className="archive-masthead">
         <div className="archive-masthead__rail">
           <span>COLLECTION *E</span>
-          <span>05 ELECTRONIC ORGANISMS</span>
+          <span>04 ELECTRONIC ORGANISMS</span>
         </div>
         <h1 aria-label="Electronic Ecologies">
           <span className="archive-masthead__pixel">E</span>
@@ -40,7 +53,7 @@ export function Archive() {
 
       <section className="archive-prologue" aria-label="Archive introduction">
         <div className="archive-prologue__print" aria-hidden>
-          <SpecimenGlyph index={activeIndex} live palette={active.palette} />
+          <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} />
           <span className="archive-prologue__echo">SENSE<br />RESPOND<br />REMEMBER</span>
         </div>
         <div className="archive-prologue__ascii" aria-hidden>
@@ -52,7 +65,7 @@ export function Archive() {
           <p>      LIVING RECORD</p>
         </div>
         <p className="archive-prologue__statement">
-          Five bodies read the same world differently. This archive is not a cabinet—it is a live transmission.
+          Four bodies read the same world differently. This archive is not a cabinet—it is a live transmission.
         </p>
       </section>
 
@@ -69,7 +82,7 @@ export function Archive() {
                 onMouseEnter={() => setActiveIndex(index)}
                 key={record.id}
               >
-                <SpecimenGlyph index={index} live palette={record.palette} label={`Select ${record.name}`} />
+                <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} label={`Select ${record.name}`} />
                 <b>▣ {record.code.replace('EO–', 'E')}</b>
               </button>
             ))}
@@ -83,7 +96,7 @@ export function Archive() {
             <span>{active.shortName.toUpperCase()}</span>
           </header>
           <a className="collection-stage__art" href={`#/creature/${active.id}`} aria-label={`Open archive record for ${active.name}`}>
-            <SpecimenGlyph index={activeIndex} live palette={active.palette} label={active.name} />
+            <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} label={active.name} />
             <span className="collection-stage__enter">OPEN RECORD ↗</span>
           </a>
         </article>
@@ -103,19 +116,6 @@ export function Archive() {
           </div>
           <a href={`#/habitat/${active.id}`}>ENTER HABITAT →</a>
         </aside>
-      </section>
-
-      <section className="archive-ledger" aria-label="Complete collection ledger">
-        <header><span>ALL LIVING RECORDS</span><span>INDEX 01—05</span></header>
-        {CREATURE_RECORDS.map((record, index) => (
-          <a href={`#/creature/${record.id}`} key={record.id} onMouseEnter={() => setActiveIndex(index)}>
-            <span>0{index + 1}</span>
-            <strong>{record.name}</strong>
-            <span>{record.sensor}</span>
-            <i style={{ backgroundColor: record.palette.primary }} />
-            <span>VIEW ↗</span>
-          </a>
-        ))}
       </section>
 
       <footer className="archive-footer">

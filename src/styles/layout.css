@@ -40,15 +40,11 @@ body {
 
 .site-navigation__brand {
   justify-self: start;
-  font-size: 17px;
-  letter-spacing: -0.05em;
+  width: 62px;
+  color: var(--ink);
 }
 
-.site-navigation__brand sup {
-  margin-left: 3px;
-  font-size: 5px;
-  vertical-align: top;
-}
+.site-navigation__brand svg { display: block; width: 100%; height: auto; }
 
 .site-navigation nav {
   display: flex;

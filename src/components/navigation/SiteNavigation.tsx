@@ -1,10 +1,11 @@
 import type { SiteRoute } from '../../state/useSiteRoute';
+import { EnsilWordmark } from '../branding/LiquidEnsilLogo';
 
 export function SiteNavigation({ route }: { route: SiteRoute }) {
   return (
     <header className="site-navigation">
       <a className="site-navigation__brand" href="#/" aria-label="ENSIL home">
-        ENSIL<sup>®</sup>
+        <EnsilWordmark />
       </a>
       <nav aria-label="Primary">
         <a href="#/" aria-current={route.name === 'landing' ? 'page' : undefined}>INDEX</a>

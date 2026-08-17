@@ -58,14 +58,14 @@ export function Field() {
 
       <div className="field-index" aria-hidden>
         <span>FIELD 01</span>
-        <span>05 LIVING RECORDS</span>
+        <span>04 LIVING RECORDS</span>
       </div>
 
       {hintVisible && (
         <div className="field-intro" role="status">
           <p>MOVE TO DISTURB</p>
-          <p>CLICK TO ENTER HABITAT</p>
-          <p>HOLD TO ATTRACT</p>
+          <p>CLICK CREATURE TO ACTIVATE</p>
+          <p>USE ENCOUNTER CARD TO ENTER</p>
         </div>
       )}
 
@@ -83,7 +83,7 @@ export function Field() {
       <div className="field-environment">
         <span>INPUT / {sensorStatus}</span>
         <span>LIGHT 61%</span>
-        <span>DENSITY 05</span>
+        <span>DENSITY 04</span>
       </div>
 
       <aside className="field-species-rail" aria-label="Electronic organisms">
@@ -107,7 +107,6 @@ export function Field() {
 
       <div className="field-ticker" aria-hidden>
         <div>
-          <span>TACTILE / CONTACT PRESSURE / VIBRATION</span>
           <span>CAPACITANCE / DISTANCE / CONNECTION</span>
           <span>SOUND / RHYTHM / RESONANCE</span>
           <span>MOTION / GESTURE / LIGHT</span>

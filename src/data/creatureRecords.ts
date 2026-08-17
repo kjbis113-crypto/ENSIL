@@ -3,6 +3,7 @@ export type CreatureState = 'idle' | 'forage' | 'curious' | 'startled' | 'social
 export type CreatureRecord = {
   id: string;
   code: string;
+  glyphIndex: number;
   name: string;
   shortName: string;
   modelUrl?: string;
@@ -34,32 +35,9 @@ export type CreatureRecord = {
 
 export const CREATURE_RECORDS: CreatureRecord[] = [
   {
-    id: 'eo-001',
-    code: 'EO–001',
-    name: 'Tactile Burrower',
-    shortName: 'Burrower',
-    modelUrl: '/creature.glb',
-    sensor: 'Tactile switch / force',
-    input: 'Contact pressure',
-    response: 'Vibration, contraction, approach',
-    status: 'LIVE MODEL',
-    palette: { primary: '#2457ff', secondary: '#ff5d32', accent: '#ffc4d8', paper: '#f4f9ff', ink: '#101019' },
-    temperament: { speed: 0.52, curiosity: 0.76, fear: 0.42, sociality: 0.58 },
-    ecology: {
-      habitat: 'Low-light surfaces with intermittent human contact.',
-      metabolism: 'Converts repeated pressure into short kinetic pulses.',
-      reproduction: 'Leaves tactile memory at frequently touched coordinates.',
-      lifespan: 'Estimated 18,000 contact cycles.',
-    },
-    observations: [
-      { time: '17:42:08', state: 'curious', note: 'Approached a stationary hand field.' },
-      { time: '17:39:31', state: 'startled', note: 'Contracted after rapid pointer entry.' },
-      { time: '17:34:02', state: 'rest', note: 'Returned to low-energy breathing.' },
-    ],
-  },
-  {
     id: 'eo-002',
     code: 'EO–002',
+    glyphIndex: 1,
     name: 'Tendon Drifter',
     shortName: 'Drifter',
     modelUrl: '/models/eo-002-tendon-drifter.glb',
@@ -67,7 +45,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Distance / capacitance',
     response: 'Extension, orbit, connection',
     status: 'LIVE MODEL',
-    palette: { primary: '#6dff37', secondary: '#7446ff', accent: '#ffb47a', paper: '#f6fff0', ink: '#11100f' },
+    palette: { primary: '#D5FB4E', secondary: '#7F86F7', accent: '#111111', paper: '#7F86F7', ink: '#111111' },
     temperament: { speed: 0.34, curiosity: 0.91, fear: 0.18, sociality: 0.82 },
     ecology: {
       habitat: 'Open conductive fields between moving bodies.',
@@ -84,6 +62,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
   {
     id: 'eo-003',
     code: 'EO–003',
+    glyphIndex: 2,
     name: 'Echo Grazer',
     shortName: 'Grazer',
     modelUrl: '/models/eo-003-echo-grazer.glb',
@@ -91,7 +70,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Sound / voice / rhythm',
     response: 'Resonance and radial movement',
     status: 'LIVE MODEL',
-    palette: { primary: '#ff4438', secondary: '#45b8ff', accent: '#ffe341', paper: '#fff5eb', ink: '#121017' },
+    palette: { primary: '#7F86F7', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
     temperament: { speed: 0.44, curiosity: 0.68, fear: 0.3, sociality: 0.72 },
     ecology: {
       habitat: 'Quiet rooms punctuated by speech and mechanical rhythm.',
@@ -108,6 +87,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
   {
     id: 'eo-004',
     code: 'EO–004',
+    glyphIndex: 3,
     name: 'Lumen Moth',
     shortName: 'Moth',
     modelUrl: '/models/eo-004-lumen-moth.glb',
@@ -115,7 +95,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Motion and gesture',
     response: 'Tracking light and wing flare',
     status: 'LIVE MODEL',
-    palette: { primary: '#ff7b31', secondary: '#274cff', accent: '#f5ff57', paper: '#fff4dd', ink: '#121113' },
+    palette: { primary: '#D5FB4E', secondary: '#7F86F7', accent: '#111111', paper: '#7F86F7', ink: '#111111' },
     temperament: { speed: 0.88, curiosity: 0.86, fear: 0.64, sociality: 0.39 },
     ecology: {
       habitat: 'Edges of screens and illuminated thresholds.',
@@ -132,6 +112,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
   {
     id: 'eo-005',
     code: 'EO–005',
+    glyphIndex: 4,
     name: 'Optic Mimic',
     shortName: 'Mimic',
     modelUrl: '/models/eo-005-optic-mimic.glb',
@@ -139,7 +120,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Light / colour',
     response: 'Material sampling and display',
     status: 'LIVE MODEL',
-    palette: { primary: '#00c9bd', secondary: '#ff4f91', accent: '#b9c54a', paper: '#effffa', ink: '#111318' },
+    palette: { primary: '#7F86F7', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
     temperament: { speed: 0.28, curiosity: 0.57, fear: 0.21, sociality: 0.66 },
     ecology: {
       habitat: 'Chromatic gradients and reflected display light.',

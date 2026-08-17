@@ -1,13 +1,13 @@
 .field-page {
-  --field-primary: #2457ff;
-  --field-secondary: #ff5d32;
-  --field-accent: #ffc4d8;
-  --field-paper: #f4f9ff;
-  --field-ink: #101019;
+  --field-primary: #D5FB4E;
+  --field-secondary: #7F86F7;
+  --field-accent: #111111;
+  --field-paper: #7F86F7;
+  --field-ink: #111111;
   position: relative;
   height: 100dvh;
   overflow: hidden;
-  background: #f4f4ef;
+  background: #7F86F7;
   transition: background-color 400ms ease;
 }
 
@@ -35,10 +35,14 @@
 .ecosystem-loading {
   position: absolute;
   top: 62px;
-  left: 28px;
+  left: 132px;
   z-index: 5;
   font-size: 8px;
   letter-spacing: 0.1em;
+}
+
+@media (max-width: 760px) {
+  .ecosystem-loading { top: 76px; right: 18px; left: auto; }
 }
 
 .field-index {
