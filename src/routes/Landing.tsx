@@ -12,7 +12,7 @@ export function Landing() {
             data-label={`${record.code} / ${record.sensor.toUpperCase()}`}
             key={record.id}
           >
-            <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} />
+            <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} code={record.code} />
           </div>
         ))}
       </div>

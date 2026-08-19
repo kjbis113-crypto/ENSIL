@@ -31,10 +31,10 @@
 
 .landing-title {
   position: absolute;
-  top: 72.35%;
-  left: 3.49%;
+  bottom: -49%;
+  left: -3.2%;
   z-index: 5;
-  width: min(54.17vw, 1040px);
+  width: min(58vw, 1114px);
 }
 .landing-title__logo {
   display: block;
@@ -42,7 +42,8 @@
   height: auto;
   overflow: visible;
   color: #D5FB4E;
-  filter: blur(clamp(14px, 1.15vw, 22px));
+  filter: none;
+  will-change: filter;
 }
 .landing-title__sr-only {
   position: absolute;
@@ -92,7 +93,7 @@
   .landing-specimen--2 { top: 18%; right: -10%; left: auto; width: 35vw; }
   .landing-specimen--3 { top: auto; right: -18%; bottom: 14%; left: auto; width: 48vw; }
   .landing-specimen--4 { top: auto; bottom: -2%; left: -7%; width: 36vw; }
-  .landing-title { top: 47%; left: 4vw; width: 79vw; }
+  .landing-title { top: auto; bottom: -15%; left: -12vw; width: 92vw; }
   .landing-manifesto { top: 62px; right: 12px; width: 58vw; }
   .landing-manifesto p { margin-top: 14px; font-size: 17px; }
   .landing-portals { right: 12px; bottom: 42px; left: 12px; width: auto; background: color-mix(in srgb, #D5FB4E 90%, transparent); }
@@ -101,5 +102,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-title__logo { filter: blur(18px); }
+  .landing-title__logo { filter: none; }
 }

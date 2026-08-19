@@ -93,10 +93,10 @@ export function Field() {
 
       <div className="field-ticker" aria-hidden>
         <div>
-          <span>CAPACITANCE / DISTANCE / CONNECTION</span>
-          <span>SOUND / RHYTHM / RESONANCE</span>
-          <span>MOTION / GESTURE / LIGHT</span>
-          <span>OPTIC / COLOUR / MATERIAL MEMORY</span>
+          <span>CLICK / FORCE / DIRECTIONAL LIGHT</span>
+          <span>CURRENT / PROXIMITY / TAIL RECOIL</span>
+          <span>SOUND / COMPUTATION / RESPONSE</span>
+          <span>COLONY / CURRENT / SHARED LIGHT</span>
         </div>
       </div>
 
@@ -108,7 +108,7 @@ export function Field() {
           <dl>
             <div><dt>SENSES</dt><dd>{selected.input}</dd></div>
             <div><dt>RESPONDS</dt><dd>{selected.response}</dd></div>
-            <div><dt>HABITAT</dt><dd>{selected.ecology.habitat}</dd></div>
+            <div><dt>ORIGIN</dt><dd>{selected.archive.origin}</dd></div>
           </dl>
           <div className="encounter-card__actions">
             <a href={`#/habitat/${selected.id}`}>ENTER HABITAT <span>→</span></a>

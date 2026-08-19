@@ -53,7 +53,7 @@ export function Archive() {
 
       <section className="archive-prologue" aria-label="Archive introduction">
         <div className="archive-prologue__print" aria-hidden>
-          <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} />
+          <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} code={active.code} />
           <span className="archive-prologue__echo">SENSE<br />RESPOND<br />REMEMBER</span>
         </div>
         <div className="archive-prologue__ascii" aria-hidden>
@@ -82,8 +82,8 @@ export function Archive() {
                 onMouseEnter={() => setActiveIndex(index)}
                 key={record.id}
               >
-                <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} label={`Select ${record.name}`} />
-                <b>▣ {record.code.replace('EO–', 'E')}</b>
+                <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} label={`Select ${record.name}`} code={record.code} />
+                <b>▣ {record.code}</b>
               </button>
             ))}
           </div>
@@ -96,7 +96,7 @@ export function Archive() {
             <span>{active.shortName.toUpperCase()}</span>
           </header>
           <a className="collection-stage__art" href={`#/creature/${active.id}`} aria-label={`Open archive record for ${active.name}`}>
-            <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} label={active.name} />
+            <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} label={active.name} code={active.code} />
             <span className="collection-stage__enter">OPEN RECORD ↗</span>
           </a>
         </article>
@@ -106,8 +106,8 @@ export function Archive() {
           <dl>
             <div><dt>COLLECTION</dt><dd>E</dd></div>
             <div><dt>NAME</dt><dd>{active.name}</dd></div>
-            <div><dt>INPUT</dt><dd>{active.input}</dd></div>
-            <div><dt>OUTPUT</dt><dd>{active.response}</dd></div>
+            <div><dt>ORIGIN</dt><dd>{active.archive.origin}</dd></div>
+            <div><dt>MOTIF</dt><dd>{active.archive.motif}</dd></div>
           </dl>
           <div className="collection-swatches" aria-label="Specimen colour register">
             {Object.entries(active.palette).slice(0, 3).map(([name, color]) => (

@@ -13,6 +13,7 @@ type Props = {
   live?: boolean;
   palette?: Palette;
   label?: string;
+  code?: string;
 };
 
 function SpeciesShape({ index, className }: { index: number; className: string }) {
@@ -31,7 +32,7 @@ function SpeciesShape({ index, className }: { index: number; className: string }
   return <path className={className} d="m150 38 106 112-106 112L44 150 150 38Zm0 51-58 61 58 61 58-61-58-61Z" />;
 }
 
-export function SpecimenGlyph({ index, live = false, palette, label }: Props) {
+export function SpecimenGlyph({ index, live = false, palette, label, code }: Props) {
   const colors = palette ?? { primary: '#D5FB4E', secondary: '#7F86F7', accent: '#111111', paper: '#7F86F7', ink: '#111111' };
   const style = {
     '--riso-primary': colors.primary,
@@ -80,7 +81,7 @@ export function SpecimenGlyph({ index, live = false, palette, label }: Props) {
         <rect x="82" y="252" width="12" height="7" />
         <rect x="98" y="252" width="31" height="7" />
       </g>
-      <text className="riso-code" x="20" y="288">EO—00{index + 1} / LIVE SIGNAL</text>
+      <text className="riso-code" x="20" y="288">{code ?? `EO—00${index + 1}`} / LIVE SIGNAL</text>
     </svg>
   );
 }
