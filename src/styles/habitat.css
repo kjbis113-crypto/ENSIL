@@ -1,9 +1,9 @@
 .habitat-page {
-  --habitat-primary: #2457ff;
-  --habitat-secondary: #ff5d32;
-  --habitat-accent: #ffe341;
-  --habitat-paper: #f4f9ff;
-  --habitat-ink: #101019;
+  --habitat-primary: #D5FB4E;
+  --habitat-secondary: #7F86F7;
+  --habitat-accent: #111111;
+  --habitat-paper: #7F86F7;
+  --habitat-ink: #111111;
   position: relative;
   height: 100dvh;
   overflow: hidden;
@@ -11,45 +11,6 @@
   background:
     radial-gradient(circle at 72% 30%, color-mix(in srgb, var(--habitat-accent), transparent 20%) 0 4%, transparent 4.3%),
     linear-gradient(118deg, var(--habitat-paper) 0 54%, color-mix(in srgb, var(--habitat-primary), white 34%) 54% 100%);
-}
-
-.habitat-page::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  background-image:
-    radial-gradient(circle, color-mix(in srgb, var(--habitat-ink), transparent 63%) 0 1px, transparent 1.2px),
-    url('/textures/ensil-riso-density-v1.png');
-  background-position: 0 0, center;
-  background-size: 6px 6px, cover;
-  mix-blend-mode: multiply;
-  filter: contrast(1.14) saturate(1.08);
-  opacity: 0.24;
-  pointer-events: none;
-}
-
-.habitat-print {
-  position: absolute;
-  z-index: 1;
-  width: 54vw;
-  aspect-ratio: 1;
-  border-radius: 44% 56% 67% 33% / 37% 46% 54% 63%;
-  filter: saturate(1.16);
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
-.habitat-print--a {
-  top: -24vw;
-  left: -16vw;
-  background: var(--habitat-secondary);
-  animation: habitatBlobA 16s ease-in-out infinite alternate;
-}
-.habitat-print--b {
-  right: -20vw;
-  bottom: -28vw;
-  background: var(--habitat-primary);
-  animation: habitatBlobB 19s ease-in-out infinite alternate;
 }
 
 .habitat-scene { position: absolute; inset: 48px 0 0; z-index: 2; }
@@ -97,7 +58,7 @@
   font-weight: 400;
   letter-spacing: -0.08em;
   line-height: 0.72;
-  text-shadow: 5px 5px 0 var(--habitat-accent);
+  text-shadow: none;
 }
 
 .habitat-signal {
@@ -141,27 +102,17 @@
   letter-spacing: 0.08em;
 }
 
-.habitat-page--eo-001 .habitat-print { border-radius: 18% 82% 24% 76% / 71% 22% 78% 29%; }
-.habitat-page--eo-002 .habitat-print { border-radius: 50%; transform: scaleY(.24); }
-.habitat-page--eo-003::after { background-size: 4px 4px; }
-.habitat-page--eo-004 .habitat-print { clip-path: polygon(50% 0, 100% 100%, 50% 72%, 0 100%); border-radius: 0; }
-.habitat-page--eo-005 .habitat-print { border-radius: 0; transform: rotate(12deg); }
-
-@keyframes habitatBlobA { to { transform: translate(14vw, 8vw) rotate(35deg) scale(.78); } }
-@keyframes habitatBlobB { to { transform: translate(-12vw, -4vw) rotate(-28deg) scale(1.16); } }
-
 @media (max-width: 760px) {
   .habitat-meta { top: 57px; right: 12px; left: 12px; }
   .habitat-meta span:last-child { display: none; }
   .habitat-title { bottom: 118px; left: 12px; max-width: calc(100vw - 24px); }
-  .habitat-title h1 { font-size: clamp(64px, 19vw, 112px); text-shadow: 3px 3px 0 var(--habitat-accent); }
+  .habitat-title h1 { font-size: clamp(64px, 19vw, 112px); text-shadow: none; }
   .habitat-signal { top: 86px; right: 12px; width: min(228px, calc(100vw - 24px)); }
   .habitat-actions { right: 12px; bottom: 12px; left: 12px; }
   .habitat-actions a { flex: 1; text-align: center; }
   .habitat-instruction { right: 12px; bottom: 55px; }
-  .habitat-print { width: 110vw; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .habitat-print { animation: none; }
+  .habitat-scene canvas { scroll-behavior: auto; }
 }

@@ -8,3 +8,7 @@ dist
 plan.md
 .vercel
 .env*
+.vinext
+.wrangler
+outputs
+work

@@ -24,15 +24,25 @@ export function Archive() {
 
   return (
     <main className="archive-page" style={paletteStyle}>
+      <section className="archive-ledger archive-ledger--top" aria-label="Complete collection ledger">
+        <header><span>ALL LIVING RECORDS</span><span>INDEX 01—04</span></header>
+        {CREATURE_RECORDS.map((record, index) => (
+          <a href={`#/creature/${record.id}`} key={record.id} onMouseEnter={() => setActiveIndex(index)}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <strong>{record.name}</strong>
+            <span>{record.sensor}</span>
+            <i style={{ backgroundColor: record.palette.primary }} />
+            <span>VIEW ↗</span>
+          </a>
+        ))}
+      </section>
+
       <header className="archive-masthead">
         <div className="archive-masthead__rail">
           <span>COLLECTION *E</span>
-          <span>05 ELECTRONIC ORGANISMS</span>
+          <span>04 ELECTRONIC ORGANISMS</span>
         </div>
-        <h1 aria-label="Electronic Ecologies">
-          <span className="archive-masthead__pixel">E</span>
-          <span>cologies</span>
-        </h1>
+        <h1 aria-label="Electro-Fermentation">Electro-Fermentation</h1>
         <div className="archive-masthead__dots" aria-hidden>
           {CREATURE_RECORDS.map((record) => <i key={record.id} style={{ backgroundColor: record.palette.primary }} />)}
         </div>
@@ -40,19 +50,11 @@ export function Archive() {
 
       <section className="archive-prologue" aria-label="Archive introduction">
         <div className="archive-prologue__print" aria-hidden>
-          <SpecimenGlyph index={activeIndex} live palette={active.palette} />
+          <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} code={active.code} />
           <span className="archive-prologue__echo">SENSE<br />RESPOND<br />REMEMBER</span>
         </div>
-        <div className="archive-prologue__ascii" aria-hidden>
-          <p>┌───────────────────────┐</p>
-          <p>│  SIGNAL BECOMES BODY  │</p>
-          <p>│  BODY BECOMES MEMORY  │</p>
-          <p>└──────────┬────────────┘</p>
-          <p>           ↓</p>
-          <p>      LIVING RECORD</p>
-        </div>
         <p className="archive-prologue__statement">
-          Five bodies read the same world differently. This archive is not a cabinet—it is a live transmission.
+          Four bodies read the same world differently. This archive is not a cabinet—it is a live transmission.
         </p>
       </section>
 
@@ -69,8 +71,8 @@ export function Archive() {
                 onMouseEnter={() => setActiveIndex(index)}
                 key={record.id}
               >
-                <SpecimenGlyph index={index} live palette={record.palette} label={`Select ${record.name}`} />
-                <b>▣ {record.code.replace('EO–', 'E')}</b>
+                <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} label={`Select ${record.name}`} code={record.code} />
+                <b>▣ {record.code}</b>
               </button>
             ))}
           </div>
@@ -83,7 +85,7 @@ export function Archive() {
             <span>{active.shortName.toUpperCase()}</span>
           </header>
           <a className="collection-stage__art" href={`#/creature/${active.id}`} aria-label={`Open archive record for ${active.name}`}>
-            <SpecimenGlyph index={activeIndex} live palette={active.palette} label={active.name} />
+            <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} label={active.name} code={active.code} />
             <span className="collection-stage__enter">OPEN RECORD ↗</span>
           </a>
         </article>
@@ -93,8 +95,8 @@ export function Archive() {
           <dl>
             <div><dt>COLLECTION</dt><dd>E</dd></div>
             <div><dt>NAME</dt><dd>{active.name}</dd></div>
-            <div><dt>INPUT</dt><dd>{active.input}</dd></div>
-            <div><dt>OUTPUT</dt><dd>{active.response}</dd></div>
+            <div><dt>ORIGIN</dt><dd>{active.archive.origin}</dd></div>
+            <div><dt>MOTIF</dt><dd>{active.archive.motif}</dd></div>
           </dl>
           <div className="collection-swatches" aria-label="Specimen colour register">
             {Object.entries(active.palette).slice(0, 3).map(([name, color]) => (
@@ -105,21 +107,8 @@ export function Archive() {
         </aside>
       </section>
 
-      <section className="archive-ledger" aria-label="Complete collection ledger">
-        <header><span>ALL LIVING RECORDS</span><span>INDEX 01—05</span></header>
-        {CREATURE_RECORDS.map((record, index) => (
-          <a href={`#/creature/${record.id}`} key={record.id} onMouseEnter={() => setActiveIndex(index)}>
-            <span>0{index + 1}</span>
-            <strong>{record.name}</strong>
-            <span>{record.sensor}</span>
-            <i style={{ backgroundColor: record.palette.primary }} />
-            <span>VIEW ↗</span>
-          </a>
-        ))}
-      </section>
-
       <footer className="archive-footer">
-        <p>THE FIELD IS THE PRIMARY RECORD.<br />THIS INDEX KEEPS ITS AFTERIMAGE.</p>
+        <p>Researching Electro Fermentation. Archiving the life it creates.</p>
         <a href="#/field">RETURN TO FIELD →</a>
       </footer>
     </main>

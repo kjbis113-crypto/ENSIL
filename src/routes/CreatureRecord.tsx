@@ -36,11 +36,11 @@ export function CreatureRecordPage({ id }: { id: string }) {
 
       <section className="record-ecology">
         <header>
-          <p>ECOLOGY / 04 FIELDS</p>
+          <p>SPECIMEN PROFILE / 04 FIELDS</p>
           <h2>A BODY IS A WAY<br />OF PAYING ATTENTION.</h2>
         </header>
         <dl>
-          {Object.entries(record.ecology).map(([key, value], ecologyIndex) => (
+          {Object.entries(record.archive).map(([key, value], ecologyIndex) => (
             <div key={key}>
               <dt>0{ecologyIndex + 1} / {key}</dt>
               <dd>{value}</dd>
@@ -67,7 +67,7 @@ export function CreatureRecordPage({ id }: { id: string }) {
 
       <nav className="record-pagination" aria-label="Creature records">
         <a href={`#/creature/${previous.id}`}><span>← PREVIOUS</span><strong>{previous.name}</strong></a>
-        <a href="#/archive"><span>INDEX</span><strong>ALL FIVE RECORDS</strong></a>
+        <a href="#/archive"><span>INDEX</span><strong>ALL FOUR RECORDS</strong></a>
         <a href={`#/creature/${next.id}`}><span>NEXT →</span><strong>{next.name}</strong></a>
       </nav>
     </main>

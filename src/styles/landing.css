@@ -3,66 +3,54 @@
   height: 100dvh;
   min-height: 680px;
   overflow: hidden;
-  color: #101019;
-  background:
-    linear-gradient(rgba(16,16,25,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16,16,25,.08) 1px, transparent 1px),
-    linear-gradient(115deg, #f4f9ff 0 48%, #fff3e8 48% 71%, #f3ffed 71% 100%);
-  background-size: 12.5vw 12.5vh, 12.5vw 12.5vh, 100% 100%;
+  color: #111111;
+  background: linear-gradient(90deg, #fff 0 71.528%, #D5FB4E 71.528%, #fff 86.284%, #D5FB4E 104.11%);
 }
 
-.landing-specimens { position: absolute; inset: 48px 0 0; z-index: 2; pointer-events: none; }
+.landing-specimens { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .landing-specimen {
   position: absolute;
-  width: clamp(150px, 19vw, 340px);
+  width: min(12.86vw, 247px);
   aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid #101019;
-  background: #f8f7ef;
+  background: #D5FB4E;
   box-shadow: 8px 8px 0 rgba(16, 16, 25, .86);
-  animation: landingFloat 8s ease-in-out infinite alternate;
 }
-.landing-specimen::after {
-  position: absolute;
-  right: 5px;
-  bottom: 5px;
-  padding: 3px 5px;
-  color: #f7f7f0;
-  background: #101019;
-  font-size: 7px;
-  letter-spacing: .08em;
-}
-.landing-specimen--1::after { content: 'E01 / TACTILE'; }
-.landing-specimen--2::after { content: 'E02 / CAPACITANCE'; }
-.landing-specimen--3::after { content: 'E03 / SOUND'; }
-.landing-specimen--4::after { content: 'E04 / MOTION'; }
-.landing-specimen--5::after { content: 'E05 / OPTIC'; }
-.landing-specimen .specimen-glyph { width: 100%; height: 100%; transform: scale(1.18); }
-.landing-specimen--1 { top: 10%; left: -3%; transform: rotate(-9deg); }
-.landing-specimen--2 { top: 9%; right: 17%; width: clamp(118px, 14vw, 240px); transform: rotate(7deg); animation-delay: -1.4s; }
-.landing-specimen--3 { right: -3%; bottom: 6%; width: clamp(175px, 22vw, 380px); transform: rotate(-4deg); animation-delay: -2.8s; }
-.landing-specimen--4 { bottom: -10%; left: 24%; width: clamp(120px, 15vw, 260px); transform: rotate(12deg); animation-delay: -4.2s; }
-.landing-specimen--5 { top: 38%; left: 53%; width: clamp(105px, 12vw, 210px); transform: rotate(-12deg); animation-delay: -5.6s; }
+.landing-specimen .specimen-glyph { width: 100%; height: 100%; transform: scale(1.24); }
+.landing-specimen .riso-shape--primary { mix-blend-mode: normal; }
+.landing-specimen .riso-shape--halftone { opacity: 0; animation: none; }
+.landing-specimen--1 { top: 6.43%; left: 9.74%; }
+.landing-specimen--2 { top: 5.93%; left: 55%; width: min(12.5vw, 240px); }
+.landing-specimen--3 { top: 5.93%; left: 39.79%; width: min(12.76vw, 245px); }
+.landing-specimen--4 { top: 6.1%; left: 25.05%; width: min(12.81vw, 246px); }
 
 .landing-title {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  bottom: 1.4%;
+  left: 2.5%;
   z-index: 5;
-  width: 94vw;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+  width: min(30vw, 575px);
 }
-.landing-title > p { margin-left: .7vw; font-size: 8px; letter-spacing: .12em; }
-.landing-title h1 {
-  font-size: clamp(142px, 28vw, 560px);
-  font-weight: 700;
-  letter-spacing: -.105em;
-  line-height: .7;
-  transform: scaleX(.94);
-  transform-origin: left center;
-  color: #08080d;
-  text-shadow: none;
+.landing-title__logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  color: #D5FB4E;
+  filter: none;
+  will-change: filter;
+}
+.landing-title__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .landing-manifesto {
@@ -70,70 +58,47 @@
   top: 72px;
   right: 24px;
   z-index: 7;
-  width: min(310px, 29vw);
-  padding-top: 8px;
-  border-top: 1px solid currentColor;
+  width: min(520px, calc(28.5vw - 24px));
+  min-height: 217px;
+  padding: 13px 11px 12px;
+  border: 1px solid currentColor;
+  background: #D5FB4E;
 }
 .landing-manifesto span { font-size: 8px; letter-spacing: .1em; }
-.landing-manifesto p { margin-top: 28px; font-size: clamp(19px, 1.7vw, 31px); letter-spacing: -.045em; line-height: .96; }
+.landing-manifesto p { margin-top: 31px; font-size: clamp(19px, 1.615vw, 31px); letter-spacing: -.045em; line-height: .96; }
 
 .landing-portals {
   position: absolute;
   right: 24px;
   bottom: 44px;
   z-index: 8;
-  width: min(520px, 49vw);
+  width: min(520px, calc(28.5vw - 24px));
   border-top: 1px solid currentColor;
+  background: #D5FB4E;
 }
 .landing-portals a { display: grid; grid-template-columns: 1fr 2fr 24px; align-items: center; min-height: 70px; border-bottom: 1px solid currentColor; }
 .landing-portals a > span { font-size: 8px; letter-spacing: .08em; }
 .landing-portals strong { font-size: clamp(26px, 3vw, 54px); font-weight: 400; letter-spacing: -.055em; }
 .landing-portals i { font-size: 20px; font-style: normal; text-align: right; }
-.landing-portals a:hover { padding: 0 10px; color: #f4f9ff; background: #101019; }
-
-.landing-signal {
-  position: absolute;
-  bottom: 15px;
-  left: 24px;
-  z-index: 7;
-  display: flex;
-  gap: 22px;
-  font-size: 7px;
-  letter-spacing: .09em;
-}
-.landing-signal span::before { content: '●'; margin-right: 6px; }
-.landing-signal span:nth-child(1)::before { color: #2457ff; }
-.landing-signal span:nth-child(2)::before { color: #6dff37; }
-.landing-signal span:nth-child(3)::before { color: #ff4438; }
-.landing-signal span:nth-child(4)::before { color: #ff7b31; }
-.landing-signal span:nth-child(5)::before { color: #00c9bd; }
-
-@keyframes landingFloat {
-  to { translate: 2vw -2.5vh; rotate: 5deg; scale: 1.08; }
-}
+.landing-portals a:hover { padding: 0 10px; color: #D5FB4E; background: #111111; }
 
 @media (max-width: 760px) {
   .landing-page { min-height: 620px; }
   .landing-specimen { width: 42vw; }
   .landing-specimen--1 { top: 10%; left: -17%; }
-  .landing-specimen--2 { top: 18%; right: -10%; width: 35vw; }
-  .landing-specimen--3 { right: -18%; bottom: 14%; width: 48vw; }
-  .landing-specimen--4 { bottom: -2%; left: -7%; width: 36vw; }
-  .landing-specimen--5 { top: 40%; left: 42%; width: 28vw; }
-  .landing-title { top: 43%; }
-  .landing-title h1 { font-size: 29vw; }
+  .landing-specimen--2 { top: 18%; right: -10%; left: auto; width: 35vw; }
+  .landing-specimen--3 { top: auto; right: -18%; bottom: 14%; left: auto; width: 48vw; }
+  .landing-specimen--4 { top: auto; bottom: -2%; left: -7%; width: 36vw; }
+  .landing-title { top: auto; bottom: 14%; left: 3vw; width: 54vw; }
   .landing-manifesto { top: 62px; right: 12px; width: 58vw; }
   .landing-manifesto p { margin-top: 14px; font-size: 17px; }
-  .landing-portals { right: 12px; bottom: 42px; left: 12px; width: auto; background: rgba(244,249,255,.86); }
+  .landing-portals { right: 12px; bottom: 42px; left: 12px; width: auto; background: color-mix(in srgb, #D5FB4E 90%, transparent); }
   .landing-portals a { grid-template-columns: 1fr 1.7fr 18px; min-height: 58px; padding: 0 7px; }
   .landing-portals strong { font-size: 7vw; }
-  .landing-signal { bottom: 13px; left: 12px; gap: 10px; }
-  .landing-signal span { font-size: 0; }
-  .landing-signal span::before { font-size: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-specimen { animation: none; }
+  .landing-title__logo { filter: none; }
 }
 
 /* ── Vitrine landing — 전시 진열장 렌더 ─────────────────────── */

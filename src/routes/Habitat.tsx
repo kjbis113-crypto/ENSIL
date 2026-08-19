@@ -14,8 +14,6 @@ export function Habitat({ id }: { id: string }) {
 
   return (
     <main className={`habitat-page habitat-page--${record.id}`} style={style}>
-      <div className="habitat-print habitat-print--a" aria-hidden />
-      <div className="habitat-print habitat-print--b" aria-hidden />
       <HabitatScene record={record} />
       <div className="habitat-meta">
         <span>{record.code} / INDIVIDUAL ECOLOGY</span>

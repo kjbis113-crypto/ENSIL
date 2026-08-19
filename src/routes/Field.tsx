@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { EcosystemCanvas } from '../components/field/EcosystemCanvas';
 import { CREATURE_RECORDS, getCreatureRecord, type CreatureState } from '../data/creatureRecords';
 
@@ -9,14 +9,8 @@ export function Field() {
   const [proximityId, setProximityId] = useState<string | null>(null);
   const [observation, setObservation] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [hintVisible, setHintVisible] = useState(true);
   const [snapshot, setSnapshot] = useState<Snapshot[]>([]);
   const [sensorStatus, setSensorStatus] = useState<'POINTER' | 'MIC ACTIVE' | 'CAMERA ACTIVE'>('POINTER');
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setHintVisible(false), 4200);
-    return () => window.clearTimeout(timeout);
-  }, []);
 
   const activeRecordId = selectedId ?? proximityId;
   const selected = activeRecordId ? getCreatureRecord(activeRecordId) : null;
@@ -58,16 +52,8 @@ export function Field() {
 
       <div className="field-index" aria-hidden>
         <span>FIELD 01</span>
-        <span>05 LIVING RECORDS</span>
+        <span>04 LIVING RECORDS</span>
       </div>
-
-      {hintVisible && (
-        <div className="field-intro" role="status">
-          <p>MOVE TO DISTURB</p>
-          <p>CLICK TO ENTER HABITAT</p>
-          <p>HOLD TO ATTRACT</p>
-        </div>
-      )}
 
       <div className="field-controls" aria-label="Field controls">
         <button type="button" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>
@@ -83,7 +69,7 @@ export function Field() {
       <div className="field-environment">
         <span>INPUT / {sensorStatus}</span>
         <span>LIGHT 61%</span>
-        <span>DENSITY 05</span>
+        <span>DENSITY 04</span>
       </div>
 
       <aside className="field-species-rail" aria-label="Electronic organisms">
@@ -107,11 +93,10 @@ export function Field() {
 
       <div className="field-ticker" aria-hidden>
         <div>
-          <span>TACTILE / CONTACT PRESSURE / VIBRATION</span>
-          <span>CAPACITANCE / DISTANCE / CONNECTION</span>
-          <span>SOUND / RHYTHM / RESONANCE</span>
-          <span>MOTION / GESTURE / LIGHT</span>
-          <span>OPTIC / COLOUR / MATERIAL MEMORY</span>
+          <span>CLICK / FORCE / DIRECTIONAL LIGHT</span>
+          <span>CURRENT / PROXIMITY / TAIL RECOIL</span>
+          <span>SOUND / COMPUTATION / RESPONSE</span>
+          <span>COLONY / CURRENT / SHARED LIGHT</span>
         </div>
       </div>
 
@@ -123,7 +108,7 @@ export function Field() {
           <dl>
             <div><dt>SENSES</dt><dd>{selected.input}</dd></div>
             <div><dt>RESPONDS</dt><dd>{selected.response}</dd></div>
-            <div><dt>HABITAT</dt><dd>{selected.ecology.habitat}</dd></div>
+            <div><dt>ORIGIN</dt><dd>{selected.archive.origin}</dd></div>
           </dl>
           <div className="encounter-card__actions">
             <a href={`#/habitat/${selected.id}`}>ENTER HABITAT <span>→</span></a>

@@ -1,22 +1,49 @@
-import { VitrineScene } from '../components/landing/VitrineScene';
-import { useSiteRoute } from '../state/useSiteRoute';
+import { SpecimenGlyph } from '../components/archive/SpecimenGlyph';
+import { LiquidEnsilLogo } from '../components/branding/LiquidEnsilLogo';
+import { CREATURE_RECORDS } from '../data/creatureRecords';
 
-/** 랜딩 — 전시 진열장(비트린) 렌더. 상자를 클릭하면 유리 안으로 줌인 → 필드 진입. */
 export function Landing() {
-  const { navigate } = useSiteRoute();
-
   return (
-    <main className="landing-page landing-page--vitrine">
-      <VitrineScene onEnter={() => navigate('/field')} />
+    <main className="landing-page">
+      <div className="landing-specimens" aria-hidden>
+        {CREATURE_RECORDS.map((record, index) => (
+          <div
+            className={`landing-specimen landing-specimen--${index + 1}`}
+            data-label={`${record.code} / ${record.sensor.toUpperCase()}`}
+            key={record.id}
+          >
+            <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} code={record.code} />
+          </div>
+        ))}
+      </div>
 
-      <section className="vitrine-caption" aria-hidden>
-        <span>INTERACTIVE ELECTRONIC ECOLOGY / SEOUL 2026</span>
-        <p>상자를 클릭하면 내부 생태계로 들어갑니다</p>
+      <section className="landing-title">
+        <h1 className="landing-title__sr-only">ENSIL</h1>
+        <LiquidEnsilLogo className="landing-title__logo" />
       </section>
 
-      <nav className="vitrine-links" aria-label="Enter ENSIL">
-        <a href="#/field">01 / ENTER FIELD →</a>
-        <a href="#/archive">02 / OPEN ARCHIVE →</a>
+      <section className="landing-manifesto">
+        <span>04 AUTONOMOUS BODIES</span>
+        <p>
+          Four creatures sense,<br />
+          respond and<br />
+          remember. Enter the<br />
+          shared field or inspect<br />
+          their living records.
+        </p>
+      </section>
+
+      <nav className="landing-portals" aria-label="Enter ENSIL">
+        <a href="#/field">
+          <span>01 / LIVE SYSTEM</span>
+          <strong>ENTER FIELD</strong>
+          <i>→</i>
+        </a>
+        <a href="#/archive">
+          <span>02 / LIVING RECORDS</span>
+          <strong>OPEN ARCHIVE</strong>
+          <i>→</i>
+        </a>
       </nav>
     </main>
   );
