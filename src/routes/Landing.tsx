@@ -1,49 +1,22 @@
-import { SpecimenGlyph } from '../components/archive/SpecimenGlyph';
-import { LiquidEnsilLogo } from '../components/branding/LiquidEnsilLogo';
-import { CREATURE_RECORDS } from '../data/creatureRecords';
+import { ScreenWall } from '../components/landing/ScreenWall';
 
+/** 인덱스 — 미디어 설치 벽. 스크린들이 곧 내비게이션이다 (ScreenWall 참조). */
 export function Landing() {
   return (
-    <main className="landing-page">
-      <div className="landing-specimens" aria-hidden>
-        {CREATURE_RECORDS.map((record, index) => (
-          <div
-            className={`landing-specimen landing-specimen--${index + 1}`}
-            data-label={`${record.code} / ${record.sensor.toUpperCase()}`}
-            key={record.id}
-          >
-            <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} code={record.code} />
-          </div>
-        ))}
-      </div>
+    <main className="landing-page landing-page--wall">
+      <ScreenWall />
 
-      <section className="landing-title">
-        <h1 className="landing-title__sr-only">ENSIL</h1>
-        <LiquidEnsilLogo className="landing-title__logo" />
-      </section>
-
-      <section className="landing-manifesto">
+      <section className="wall-manifesto">
         <span>04 AUTONOMOUS BODIES</span>
         <p>
-          Four creatures sense,<br />
-          respond and<br />
-          remember. Enter the<br />
-          shared field or inspect<br />
-          their living records.
+          Four creatures sense, respond and remember.
+          Each screen is a window — enter it.
         </p>
       </section>
 
-      <nav className="landing-portals" aria-label="Enter ENSIL">
-        <a href="#/field">
-          <span>01 / LIVE SYSTEM</span>
-          <strong>ENTER FIELD</strong>
-          <i>→</i>
-        </a>
-        <a href="#/archive">
-          <span>02 / LIVING RECORDS</span>
-          <strong>OPEN ARCHIVE</strong>
-          <i>→</i>
-        </a>
+      <nav className="wall-portals" aria-label="Enter ENSIL">
+        <a href="#/field">01 / ENTER FIELD →</a>
+        <a href="#/archive">02 / OPEN ARCHIVE →</a>
       </nav>
     </main>
   );
