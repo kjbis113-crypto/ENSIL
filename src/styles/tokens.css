@@ -1,4 +1,4 @@
-/* ENSIL identity system — aqueous mint, oxidised green, structural grey and carbon. */
+/* ENSIL identity system — neutral paper with aqueous signal colours. */
 :root {
   color-scheme: light;
 
@@ -6,12 +6,14 @@
   --brand-secondary: #5FA48D;
   --brand-structure: #545756;
   --brand-dark: #171818;
+  --brand-white: #FFFFFF;
+  --brand-off-white: #F4F6F3;
 
-  /* Deep-culture surfaces */
-  --paper: var(--brand-primary);
-  --paper-bright: var(--brand-primary);
-  --bg: var(--brand-primary);
-  --surface: var(--brand-secondary);
+  /* White is the field; brand colours remain signals rather than page fills. */
+  --paper: var(--brand-white);
+  --paper-bright: var(--brand-white);
+  --bg: var(--brand-white);
+  --surface: var(--brand-off-white);
   --ink: var(--brand-dark);
   --ink-mute: var(--brand-structure);
   --ink-soft: var(--brand-structure);

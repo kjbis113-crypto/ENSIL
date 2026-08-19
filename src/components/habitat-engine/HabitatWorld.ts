@@ -77,7 +77,7 @@ function buildPlaceholder(runtime: Pick<HabitatRuntime, 'context'>) {
   const { config } = runtime.context;
   const group = new THREE.Group();
   const dark = new THREE.MeshStandardMaterial({ color: 0x171818, roughness: 0.78, metalness: 0.08 });
-  const mineral = new THREE.MeshStandardMaterial({ color: 0x73d2be, roughness: 0.92, metalness: 0.02 });
+  const mineral = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.92, metalness: 0.02 });
   if (config.id === 'accretion') {
     for (let index = 0; index < 7; index += 1) {
       const fragment = new THREE.Mesh(new THREE.BoxGeometry(0.75 + index * 0.08, 0.28, 0.48), index % 3 ? dark : mineral);
@@ -108,7 +108,7 @@ function buildPlaceholder(runtime: Pick<HabitatRuntime, 'context'>) {
 
 function buildWorldScaffold(scene: THREE.Scene, mobile: boolean, mode: HabitatWorldOptions['mode']) {
   if (mode === 'single') {
-    const baseMaterial = new THREE.MeshStandardMaterial({ color: 0x5fa48d, roughness: 0.94, metalness: 0.01, flatShading: true });
+    const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xf4f6f3, roughness: 0.94, metalness: 0.01, flatShading: true });
     const base = new THREE.Mesh(new THREE.PlaneGeometry(118, 86, 8, 6), baseMaterial);
     base.rotation.x = -Math.PI / 2;
     base.position.y = -2.85;
@@ -178,8 +178,8 @@ export class HabitatWorld {
 
   constructor(options: HabitatWorldOptions) {
     this.options = options;
-    this.scene.background = new THREE.Color(0x73d2be);
-    this.scene.fog = new THREE.FogExp2(0x73d2be, options.mode === 'field' ? 0.0038 : 0.0065);
+    this.scene.background = new THREE.Color(0xffffff);
+    this.scene.fog = new THREE.FogExp2(0xffffff, options.mode === 'field' ? 0.0038 : 0.0065);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: !this.mobile, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.mobile ? 1.15 : 1.5));
@@ -353,8 +353,9 @@ export class HabitatWorld {
         }
         const model = gltf.scene;
         model.name = 'GREEN_CIRCUIT_RUINS';
+        const paper = new THREE.Color(0xffffff);
+        const mineral = new THREE.Color(0xe0e8e5);
         const primary = new THREE.Color(0x73d2be);
-        const secondary = new THREE.Color(0x5fa48d);
         const structure = new THREE.Color(0x545756);
         let meshCount = 0;
         model.traverse((child) => {
@@ -375,9 +376,9 @@ export class HabitatWorld {
             const mineralBand = Math.sin(x * 22 + z * 7.5)
               + Math.cos(z * 19 - x * 5.5)
               + Math.sin((x + z) * 31 + y * 8);
-            const signalAmount = THREE.MathUtils.smoothstep(mineralBand, 0.2, 1.35) * 0.92;
-            const structureAmount = THREE.MathUtils.smoothstep(-mineralBand, 1.35, 2.4) * 0.48;
-            colour.copy(secondary).lerp(primary, signalAmount).lerp(structure, structureAmount);
+            const signalAmount = Math.pow(THREE.MathUtils.smoothstep(mineralBand, 1.05, 2.2), 1.4) * 0.76;
+            const structureAmount = Math.pow(THREE.MathUtils.smoothstep(-mineralBand, 1.65, 2.7), 1.2) * 0.52;
+            colour.copy(paper).lerp(mineral, 0.34).lerp(primary, signalAmount).lerp(structure, structureAmount);
             colours[index * 3] = colour.r;
             colours[index * 3 + 1] = colour.g;
             colours[index * 3 + 2] = colour.b;

@@ -79,13 +79,13 @@
   aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid var(--ink);
-  background: var(--brand-primary);
+  background: var(--brand-white);
   transition: background-color 220ms ease, transform 220ms ease;
 }
 
 .archive-card:hover .archive-card__visual,
 .archive-card:focus-visible .archive-card__visual {
-  background: var(--brand-secondary);
+  background: var(--brand-primary);
   transform: translateY(-7px);
 }
 
@@ -148,7 +148,7 @@
   min-height: 100dvh;
   overflow: hidden;
   border-bottom: 1px solid var(--ink);
-  background: var(--brand-primary);
+  background: var(--brand-white);
 }
 
 .record-meta-rail {
@@ -215,7 +215,7 @@
   transform: translateX(-50%);
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
-  background: color-mix(in srgb, var(--brand-primary) 90%, transparent);
+  background: color-mix(in srgb, var(--brand-white) 92%, transparent);
 }
 .record-controls button { min-width: 86px; padding: 9px 12px; border-right: 1px solid var(--hairline, rgba(17, 17, 17, 0.14)); font-size: 8px; letter-spacing: 0.08em; }
 .record-controls button:last-child { border-right: 0; }
@@ -318,7 +318,7 @@
   --collection-primary: var(--brand-primary);
   --collection-secondary: var(--brand-secondary);
   --collection-accent: var(--brand-structure);
-  --collection-paper: var(--brand-primary);
+  --collection-paper: var(--brand-white);
   --collection-ink: var(--brand-dark);
   color: var(--collection-ink);
   background: var(--collection-paper);
@@ -544,7 +544,7 @@
   margin-top: 46px;
   padding: 82px 24px 28px;
   color: var(--brand-dark);
-  background: var(--brand-primary);
+  background: var(--brand-white);
 }
 .archive-ledger header,
 .archive-ledger > a { display: grid; grid-template-columns: 74px 2fr 1fr 28px 70px; align-items: center; gap: 18px; border-bottom: 1px solid currentColor; }
@@ -561,7 +561,7 @@
 .archive-page .archive-footer {
   min-height: 58dvh;
   color: var(--collection-ink);
-  background: rgba(213, 251, 78, .9);
+  background: var(--brand-white);
 }
 .archive-page .archive-footer p { text-transform: uppercase; }
 

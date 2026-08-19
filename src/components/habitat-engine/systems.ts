@@ -66,8 +66,8 @@ export type HabitatSystems = {
   frame: number;
 };
 
-const MINERAL = new THREE.Color(0x73d2be);
-const MINERAL_SHADOW = new THREE.Color(0x5fa48d);
+const MINERAL = new THREE.Color(0xffffff);
+const MINERAL_SHADOW = new THREE.Color(0xdfe8e4);
 const CHARCOAL = new THREE.Color(0x545756);
 const BIOFILM = new THREE.Color(0x5fa48d);
 

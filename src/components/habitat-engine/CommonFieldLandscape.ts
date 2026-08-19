@@ -47,8 +47,8 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
   terrainGeometry.rotateX(-Math.PI / 2);
   const position = terrainGeometry.getAttribute('position') as THREE.BufferAttribute;
   const colours = new Float32Array(position.count * 3);
-  const pale = new THREE.Color(0x73d2be);
-  const grey = new THREE.Color(0x5fa48d);
+  const pale = new THREE.Color(0xffffff);
+  const grey = new THREE.Color(0xe0e8e5);
   const dark = new THREE.Color(0x545756);
   const colour = new THREE.Color();
   for (let index = 0; index < position.count; index += 1) {

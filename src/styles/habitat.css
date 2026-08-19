@@ -2,15 +2,15 @@
   --habitat-primary: var(--brand-primary);
   --habitat-secondary: var(--brand-secondary);
   --habitat-accent: var(--brand-structure);
-  --habitat-paper: var(--brand-primary);
+  --habitat-paper: var(--brand-white);
   --habitat-ink: var(--brand-dark);
   position: relative;
   height: 100dvh;
   overflow: hidden;
   color: var(--habitat-ink);
   background:
-    radial-gradient(circle at 72% 30%, color-mix(in srgb, var(--habitat-accent), transparent 20%) 0 4%, transparent 4.3%),
-    linear-gradient(118deg, var(--habitat-secondary) 0 54%, color-mix(in srgb, var(--habitat-primary), var(--habitat-secondary) 34%) 54% 100%);
+    radial-gradient(circle at 72% 30%, color-mix(in srgb, var(--habitat-primary), transparent 35%) 0 3.5%, transparent 3.8%),
+    linear-gradient(118deg, var(--brand-white) 0 71%, color-mix(in srgb, var(--habitat-primary), var(--brand-white) 64%) 71% 100%);
 }
 
 .habitat-scene { position: absolute; inset: 48px 0 0; z-index: 2; }

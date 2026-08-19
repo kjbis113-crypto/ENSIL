@@ -4,7 +4,7 @@
   min-height: 680px;
   overflow: hidden;
   color: var(--brand-dark);
-  background: linear-gradient(90deg, var(--brand-primary) 0 71.528%, var(--brand-secondary) 71.528% 79%, var(--brand-structure) 79% 86.284%, var(--brand-primary) 104.11%);
+  background: linear-gradient(90deg, var(--brand-white) 0 71.528%, var(--brand-primary) 71.528% 79%, var(--brand-secondary) 79% 86.284%, var(--brand-structure) 86.284% 100%);
 }
 
 .landing-specimens { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
@@ -14,7 +14,7 @@
   aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid var(--brand-dark);
-  background: var(--brand-secondary);
+  background: var(--brand-white);
   box-shadow: 8px 8px 0 var(--brand-structure);
 }
 .landing-specimen .specimen-glyph { width: 100%; height: 100%; transform: scale(1.24); }
@@ -62,7 +62,7 @@
   min-height: 217px;
   padding: 13px 11px 12px;
   border: 1px solid currentColor;
-  background: var(--brand-secondary);
+  background: var(--brand-primary);
 }
 .landing-manifesto span { font-size: 8px; letter-spacing: .1em; }
 .landing-manifesto p { margin-top: 31px; font-size: clamp(19px, 1.615vw, 31px); letter-spacing: -.045em; line-height: .96; }
@@ -74,7 +74,7 @@
   z-index: 8;
   width: min(520px, calc(28.5vw - 24px));
   border-top: 1px solid currentColor;
-  background: var(--brand-primary);
+  background: var(--brand-white);
 }
 .landing-portals a { display: grid; grid-template-columns: 1fr 2fr 24px; align-items: center; min-height: 70px; border-bottom: 1px solid currentColor; }
 .landing-portals a > span { font-size: 8px; letter-spacing: .08em; }
@@ -92,7 +92,7 @@
   .landing-title { top: auto; bottom: 14%; left: 3vw; width: 54vw; }
   .landing-manifesto { top: 62px; right: 12px; width: 58vw; }
   .landing-manifesto p { margin-top: 14px; font-size: 17px; }
-  .landing-portals { right: 12px; bottom: 42px; left: 12px; width: auto; background: color-mix(in srgb, var(--brand-primary) 90%, transparent); }
+  .landing-portals { right: 12px; bottom: 42px; left: 12px; width: auto; background: color-mix(in srgb, var(--brand-white) 94%, transparent); }
   .landing-portals a { grid-template-columns: 1fr 1.7fr 18px; min-height: 58px; padding: 0 7px; }
   .landing-portals strong { font-size: 7vw; }
 }
