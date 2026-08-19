@@ -48,20 +48,11 @@ type HabitatRuntime = {
   loaded: boolean;
 };
 
-type FieldReferencePart = {
-  object: THREE.Object3D;
-  basePosition: THREE.Vector3;
-  baseQuaternion: THREE.Quaternion;
-  separationDirection: THREE.Vector3;
-  rotationAxis: THREE.Vector3;
-  amplitude: number;
-  phase: number;
-};
-
 type FieldReferenceLandscape = {
   model: THREE.Group;
-  parts: FieldReferencePart[];
-  separation: number;
+  basePosition: THREE.Vector3;
+  baseRotation: THREE.Euler;
+  baseScale: THREE.Vector3;
   pointerEnergy: number;
 };
 
@@ -182,7 +173,6 @@ export class HabitatWorld {
   private desiredCamera = new THREE.Vector3();
   private commonLandscape: CommonFieldLandscape | null = null;
   private fieldReferenceLandscape: FieldReferenceLandscape | null = null;
-  private fieldCursorDirection = new THREE.Vector3();
   private lastPointerClient = new THREE.Vector2();
   private hasPointerClient = false;
 
@@ -361,131 +351,72 @@ export class HabitatWorld {
           this.disposeObject(gltf.scene);
           return;
         }
-        const sourceModel = gltf.scene;
-        sourceModel.updateMatrixWorld(true);
-        const sourceParts: THREE.Object3D[] = [];
-        sourceModel.traverse((child) => {
-          if (/^model_part\d+$/.test(child.name)) sourceParts.push(child);
-        });
-        const model = new THREE.Group();
+        const model = gltf.scene;
         model.name = 'GREEN_CIRCUIT_RUINS';
-        const whiteMaterial = new THREE.MeshStandardMaterial({
-          color: 0xf2f2ed,
-          roughness: 0.9,
-          metalness: 0.01,
-          flatShading: true,
-          side: THREE.DoubleSide,
-        });
-        const limeMaterial = new THREE.MeshStandardMaterial({
-          color: 0xd5fb4e,
-          emissive: 0x566817,
-          emissiveIntensity: 0.28,
-          roughness: 0.94,
-          metalness: 0.01,
-          flatShading: true,
-          side: THREE.DoubleSide,
-        });
-        const wireMaterial = new THREE.MeshBasicMaterial({
-          color: 0x718126,
-          wireframe: true,
-          transparent: true,
-          opacity: 0.32,
-          depthWrite: false,
-          side: THREE.DoubleSide,
-        });
-        const partObjects: THREE.Object3D[] = sourceParts.map((sourcePart) => {
-          const part = new THREE.Group();
-          part.name = sourcePart.name;
-          sourcePart.traverse((child) => {
-            if (!(child instanceof THREE.Mesh)) return;
-            const geometry = child.geometry.clone();
-            geometry.applyMatrix4(child.matrixWorld);
-            geometry.deleteAttribute('color');
-            geometry.computeBoundingBox();
-            geometry.computeBoundingSphere();
-            const mesh = new THREE.Mesh(geometry, wireMaterial);
-            mesh.castShadow = false;
-            mesh.receiveShadow = true;
-            mesh.frustumCulled = false;
-            mesh.userData.isCommonField = true;
-            this.terrains.push(mesh);
-            part.add(mesh);
+        const white = new THREE.Color(0xf7f7f2);
+        const lime = new THREE.Color(0xd5fb4e);
+        let meshCount = 0;
+        model.traverse((child) => {
+          if (!(child instanceof THREE.Mesh)) return;
+          meshCount += 1;
+          const geometry = child.geometry;
+          geometry.deleteAttribute('color');
+          if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
+          geometry.computeBoundingBox();
+          geometry.computeBoundingSphere();
+          const positions = geometry.getAttribute('position');
+          const colours = new Float32Array(positions.count * 3);
+          const colour = new THREE.Color();
+          for (let index = 0; index < positions.count; index += 1) {
+            const x = positions.getX(index);
+            const y = positions.getY(index);
+            const z = positions.getZ(index);
+            const mineralBand = Math.sin(x * 22 + z * 7.5)
+              + Math.cos(z * 19 - x * 5.5)
+              + Math.sin((x + z) * 31 + y * 8);
+            const limeAmount = THREE.MathUtils.smoothstep(mineralBand, 0.2, 1.35) * 0.92;
+            colour.copy(white).lerp(lime, limeAmount);
+            colours[index * 3] = colour.r;
+            colours[index * 3 + 1] = colour.g;
+            colours[index * 3 + 2] = colour.b;
+          }
+          geometry.setAttribute('color', new THREE.BufferAttribute(colours, 3));
+          child.material = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            vertexColors: true,
+            roughness: 0.91,
+            metalness: 0.015,
+            flatShading: true,
+            side: THREE.DoubleSide,
           });
-          model.add(part);
-          return part;
+          child.castShadow = false;
+          child.receiveShadow = true;
+          child.frustumCulled = false;
+          child.userData.isCommonField = true;
+          this.terrains.push(child);
         });
-        this.disposeObject(sourceModel);
+        model.updateMatrixWorld(true);
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
         const horizontal = Math.max(size.x, size.z) || 1;
-        const modelCentre = bounds.getCenter(new THREE.Vector3());
-        const minimumFootprint = horizontal * 0.012;
-        const maximumFootprint = horizontal * 0.16;
-        partObjects.forEach((part, index) => {
-          const partBounds = new THREE.Box3().setFromObject(part);
-          const partSize = partBounds.getSize(new THREE.Vector3());
-          const partCentre = partBounds.getCenter(new THREE.Vector3());
-          const proxyGeometry = index % 3 === 0
-            ? new THREE.BoxGeometry(1, 1, 1, 2, 1, 2)
-            : new THREE.IcosahedronGeometry(0.62, index % 5 === 0 ? 1 : 0);
-          const proxy = new THREE.Mesh(
-            proxyGeometry,
-            (index % 2 === 0 || index % 7 === 1) ? limeMaterial : whiteMaterial,
-          );
-          proxy.position.copy(partCentre);
-          proxy.scale.set(
-            Math.min(Math.max(partSize.x * 1.2, minimumFootprint), maximumFootprint),
-            Math.min(Math.max(partSize.y * 1.35, minimumFootprint * 0.38), maximumFootprint * 0.46),
-            Math.min(Math.max(partSize.z * 1.2, minimumFootprint), maximumFootprint),
-          );
-          proxy.rotation.set(index * 0.37, index * 0.61, index * 0.19);
-          proxy.castShadow = false;
-          proxy.receiveShadow = true;
-          proxy.frustumCulled = false;
-          proxy.userData.isCommonField = true;
-          part.add(proxy);
-          this.terrains.push(proxy);
-        });
-        const parts: FieldReferencePart[] = partObjects.map((part, index) => {
-          const partCentre = new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3());
-          const separationDirection = partCentre.sub(modelCentre);
-          separationDirection.y = 0.48 + ((index * 7) % 11) * 0.035;
-          if (separationDirection.lengthSq() < 0.0001) {
-            separationDirection.set(Math.cos(index * 2.399), 0.22, Math.sin(index * 2.399));
-          }
-          separationDirection.normalize();
-          const rotationAxis = new THREE.Vector3(
-            Math.sin(index * 1.7),
-            0.35 + Math.cos(index * 0.91) * 0.2,
-            Math.cos(index * 1.31),
-          ).normalize();
-          return {
-            object: part,
-            basePosition: part.position.clone(),
-            baseQuaternion: part.quaternion.clone(),
-            separationDirection,
-            rotationAxis,
-            amplitude: horizontal * (0.035 + (index % 9) * 0.004),
-            phase: index * 0.73,
-          };
-        });
-        const baseScale = 104 / horizontal;
-        model.scale.set(baseScale, baseScale * 0.82, baseScale);
+        const baseScale = 100 / horizontal;
+        model.scale.set(baseScale, baseScale * 0.62, baseScale);
         const fitted = new THREE.Box3().setFromObject(model);
         const centre = fitted.getCenter(new THREE.Vector3());
-        model.position.set(-centre.x, -1.8 - fitted.min.y, -centre.z - 1.5);
-        model.rotation.set(-0.035, -0.055, 0.01);
+        model.position.set(-centre.x, -2.15 - fitted.min.y, -centre.z - 1.5);
+        model.rotation.set(0, -0.055, 0);
         this.scene.add(model);
         this.setFieldFallbackVisible(false);
         this.fieldReferenceLandscape = {
           model,
-          parts,
-          separation: 0,
+          basePosition: model.position.clone(),
+          baseRotation: model.rotation.clone(),
+          baseScale: model.scale.clone(),
           pointerEnergy: 0,
         };
         this.renderer.domElement.dataset.habitatModel = model.name;
-        this.renderer.domElement.dataset.habitatParts = String(parts.length);
-        this.renderer.domElement.dataset.habitatInteractive = String(parts.length > 1);
+        this.renderer.domElement.dataset.habitatParts = String(meshCount);
+        this.renderer.domElement.dataset.habitatInteractive = 'true';
         this.renderer.domElement.dataset.habitatError = 'false';
         model.updateMatrixWorld(true);
         this.raiseEcologiesToReferenceSurface(model);
@@ -798,23 +729,46 @@ export class HabitatWorld {
   private updateFieldReferenceLandscape(now: number, dt: number) {
     const reference = this.fieldReferenceLandscape;
     if (!reference) return;
-    reference.pointerEnergy = damp(reference.pointerEnergy, 0, 2.6, dt);
-    const idlePulse = (Math.sin(now * 0.00072) + Math.sin(now * 0.00031 + 1.7)) * 0.1 + 0.15;
-    const targetSeparation = this.reducedMotion
-      ? 0
-      : clamp(idlePulse + reference.pointerEnergy * 0.92, 0.025, 1);
-    reference.separation = damp(reference.separation, targetSeparation, targetSeparation > reference.separation ? 5.8 : 1.55, dt);
-
-    this.fieldCursorDirection.set(this.pointerNdc.x, -this.pointerNdc.y * 0.18, -this.pointerNdc.y).normalize();
-    reference.parts.forEach((part) => {
-      const localWave = 0.68 + Math.sin(now * 0.0011 + part.phase) * 0.22;
-      const distance = part.amplitude * reference.separation * localWave;
-      part.object.position.copy(part.basePosition)
-        .addScaledVector(part.separationDirection, distance)
-        .addScaledVector(this.fieldCursorDirection, distance * reference.pointerEnergy * 0.22);
-      part.object.quaternion.copy(part.baseQuaternion);
-      part.object.rotateOnAxis(part.rotationAxis, reference.separation * Math.sin(now * 0.0008 + part.phase) * 0.075);
-    });
+    reference.pointerEnergy = damp(reference.pointerEnergy, 0, 2.15, dt);
+    const motion = this.reducedMotion ? 0 : reference.pointerEnergy;
+    const idleLift = this.reducedMotion ? 0 : Math.sin(now * 0.00038) * 0.045;
+    reference.model.position.x = damp(
+      reference.model.position.x,
+      reference.basePosition.x + this.pointerNdc.x * motion * 0.16,
+      1.9,
+      dt,
+    );
+    reference.model.position.y = damp(
+      reference.model.position.y,
+      reference.basePosition.y + idleLift + motion * 0.06,
+      1.4,
+      dt,
+    );
+    reference.model.position.z = damp(
+      reference.model.position.z,
+      reference.basePosition.z - this.pointerNdc.y * motion * 0.12,
+      1.9,
+      dt,
+    );
+    reference.model.rotation.x = damp(
+      reference.model.rotation.x,
+      reference.baseRotation.x + this.pointerNdc.y * motion * 0.0025,
+      1.6,
+      dt,
+    );
+    reference.model.rotation.y = damp(
+      reference.model.rotation.y,
+      reference.baseRotation.y + this.pointerNdc.x * motion * 0.0035,
+      1.6,
+      dt,
+    );
+    reference.model.rotation.z = reference.baseRotation.z;
+    const breath = 1 + (this.reducedMotion ? 0 : Math.sin(now * 0.00029 + 0.8) * 0.0015 + motion * 0.001);
+    reference.model.scale.set(
+      reference.baseScale.x * breath,
+      reference.baseScale.y * breath,
+      reference.baseScale.z * breath,
+    );
   }
 
   private applyEmergence(runtime: HabitatRuntime, now: number) {
