@@ -111,7 +111,7 @@ export function InteractiveCreature({ record }: { record: CreatureRecord }) {
       });
       const before = new THREE.Box3().setFromObject(object);
       const size = before.getSize(new THREE.Vector3());
-      object.scale.setScalar(3.6 / (Math.max(size.x, size.y, size.z) || 1));
+      object.scale.setScalar(2.9 / (Math.max(size.x, size.y, size.z) || 1));
       const after = new THREE.Box3().setFromObject(object);
       object.position.sub(after.getCenter(new THREE.Vector3()));
       pivot.add(object);

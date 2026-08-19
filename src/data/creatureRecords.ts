@@ -45,7 +45,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Distance / capacitance',
     response: 'Extension, orbit, connection',
     status: 'LIVE MODEL',
-    palette: { primary: '#D5FB4E', secondary: '#7F86F7', accent: '#111111', paper: '#7F86F7', ink: '#111111' },
+    palette: { primary: '#D5FB4E', secondary: '#FFFFFF', accent: '#111111', paper: '#FFFFFF', ink: '#111111' },
     temperament: { speed: 0.34, curiosity: 0.91, fear: 0.18, sociality: 0.82 },
     ecology: {
       habitat: 'Open conductive fields between moving bodies.',
@@ -70,7 +70,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Sound / voice / rhythm',
     response: 'Resonance and radial movement',
     status: 'LIVE MODEL',
-    palette: { primary: '#7F86F7', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
+    palette: { primary: '#FFFFFF', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
     temperament: { speed: 0.44, curiosity: 0.68, fear: 0.3, sociality: 0.72 },
     ecology: {
       habitat: 'Quiet rooms punctuated by speech and mechanical rhythm.',
@@ -95,7 +95,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Motion and gesture',
     response: 'Tracking light and wing flare',
     status: 'LIVE MODEL',
-    palette: { primary: '#D5FB4E', secondary: '#7F86F7', accent: '#111111', paper: '#7F86F7', ink: '#111111' },
+    palette: { primary: '#D5FB4E', secondary: '#FFFFFF', accent: '#111111', paper: '#FFFFFF', ink: '#111111' },
     temperament: { speed: 0.88, curiosity: 0.86, fear: 0.64, sociality: 0.39 },
     ecology: {
       habitat: 'Edges of screens and illuminated thresholds.',
@@ -120,7 +120,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Light / colour',
     response: 'Material sampling and display',
     status: 'LIVE MODEL',
-    palette: { primary: '#7F86F7', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
+    palette: { primary: '#FFFFFF', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
     temperament: { speed: 0.28, curiosity: 0.57, fear: 0.21, sociality: 0.66 },
     ecology: {
       habitat: 'Chromatic gradients and reflected display light.',

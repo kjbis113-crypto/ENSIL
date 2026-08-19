@@ -316,9 +316,9 @@
 /* Animated collection archive */
 .archive-page {
   --collection-primary: #D5FB4E;
-  --collection-secondary: #7F86F7;
+  --collection-secondary: #FFFFFF;
   --collection-accent: #111111;
-  --collection-paper: #7F86F7;
+  --collection-paper: #FFFFFF;
   --collection-ink: #111111;
   color: var(--collection-ink);
   background: var(--collection-paper);
@@ -541,6 +541,7 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  margin-top: 46px;
   padding: 82px 24px 28px;
   color: #111111;
   background: #D5FB4E;
@@ -559,9 +560,10 @@
 
 .archive-page .archive-footer {
   min-height: 58dvh;
-  color: var(--collection-paper);
-  background: var(--collection-ink);
+  color: var(--collection-ink);
+  background: rgba(213, 251, 78, .9);
 }
+.archive-page .archive-footer p { text-transform: uppercase; }
 
 /* Riso specimen engine */
 .specimen-glyph { transition: transform 700ms cubic-bezier(.2,.8,.2,1); }

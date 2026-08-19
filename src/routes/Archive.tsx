@@ -119,7 +119,7 @@ export function Archive() {
       </section>
 
       <footer className="archive-footer">
-        <p>THE FIELD IS THE PRIMARY RECORD.<br />THIS INDEX KEEPS ITS AFTERIMAGE.</p>
+        <p>Researching Electro Fermentation. Archiving the life it creates.</p>
         <a href="#/field">RETURN TO FIELD →</a>
       </footer>
     </main>

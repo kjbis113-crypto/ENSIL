@@ -18,14 +18,19 @@ export function Landing() {
       </div>
 
       <section className="landing-title">
-        <p>INTERACTIVE ELECTRONIC ECOLOGY / SEOUL 2026</p>
         <h1 className="landing-title__sr-only">ENSIL</h1>
         <LiquidEnsilLogo className="landing-title__logo" />
       </section>
 
       <section className="landing-manifesto">
         <span>04 AUTONOMOUS BODIES</span>
-        <p>Four creatures sense, respond and remember. Enter the shared field or inspect their living records.</p>
+        <p>
+          Four creatures sense,<br />
+          respond and<br />
+          remember. Enter the<br />
+          shared field or inspect<br />
+          their living records.
+        </p>
       </section>
 
       <nav className="landing-portals" aria-label="Enter ENSIL">
@@ -40,10 +45,6 @@ export function Landing() {
           <i>→</i>
         </a>
       </nav>
-
-      <div className="landing-signal" aria-hidden>
-        <span>CAPACITANCE</span><span>SOUND</span><span>MOTION</span><span>OPTIC</span>
-      </div>
     </main>
   );
 }
