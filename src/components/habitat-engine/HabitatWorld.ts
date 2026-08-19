@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { CreatureRecord, CreatureState } from '../../data/creatureRecords';
 import { getBiomeConfig } from './biomes';
 import { buildHabitatSystems, terrainHeight, updateHabitatSystems, type HabitatSystems } from './systems';
@@ -222,7 +221,7 @@ export class HabitatWorld {
     if (options.mode === 'field') {
       this.commonLandscape = buildCommonFieldLandscape(this.scene, this.mobile);
       this.terrains.push(this.commonLandscape.terrain);
-      if (!this.mobile) this.loadFieldReferenceLandscape();
+      this.loadFieldReferenceLandscape();
     }
     this.buildRuntimes();
     this.bindEvents();
@@ -287,13 +286,6 @@ export class HabitatWorld {
       systems.terrain.mesh.userData.biomeId = record.id;
       if (this.options.mode === 'field') {
         systems.terrain.mesh.visible = false;
-        systems.contours.group.visible = false;
-        systems.roots.visible = false;
-        systems.features.group.visible = false;
-        systems.biofilm.mesh.visible = false;
-        systems.signals.mesh.visible = false;
-        systems.signals.seams.visible = false;
-        systems.annotations.visible = false;
         group.position.y = commonFieldHeight(layout.x, layout.z) - terrainHeight(context, 0, 0);
       } else {
         this.terrains.push(systems.terrain.mesh);
@@ -345,56 +337,114 @@ export class HabitatWorld {
     this.options.onLoaded?.(0, count);
   }
 
+  private setFieldFallbackVisible(visible: boolean) {
+    if (this.options.mode !== 'field') return;
+    if (this.commonLandscape) this.commonLandscape.group.visible = visible;
+    this.runtimes.forEach((runtime) => {
+      runtime.systems.contours.group.visible = visible;
+      runtime.systems.roots.visible = visible;
+      runtime.systems.features.group.visible = visible;
+      runtime.systems.biofilm.mesh.visible = visible;
+      runtime.systems.signals.mesh.visible = visible;
+      runtime.systems.signals.seams.visible = visible;
+      runtime.systems.annotations.visible = visible;
+    });
+  }
+
   private loadFieldReferenceLandscape() {
-    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(
+    this.renderer.domElement.dataset.habitatModel = 'LOADING';
+    this.renderer.domElement.dataset.habitatError = 'false';
+    new GLTFLoader().load(
       '/models/ensil-green-circuit-ruins.glb',
       (gltf) => {
         if (this.disposed) {
           this.disposeObject(gltf.scene);
           return;
         }
-        const model = gltf.scene;
+        const sourceModel = gltf.scene;
+        sourceModel.updateMatrixWorld(true);
+        const sourceParts: THREE.Object3D[] = [];
+        sourceModel.traverse((child) => {
+          if (/^model_part\d+$/.test(child.name)) sourceParts.push(child);
+        });
+        const model = new THREE.Group();
         model.name = 'GREEN_CIRCUIT_RUINS';
         const whiteMaterial = new THREE.MeshStandardMaterial({
           color: 0xf2f2ed,
-          emissive: 0x777772,
-          emissiveIntensity: 0.42,
-          roughness: 0.84,
-          metalness: 0.025,
+          roughness: 0.9,
+          metalness: 0.01,
           flatShading: true,
           side: THREE.DoubleSide,
         });
         const limeMaterial = new THREE.MeshStandardMaterial({
           color: 0xd5fb4e,
-          emissive: 0x687c22,
-          emissiveIntensity: 0.5,
-          roughness: 0.92,
+          emissive: 0x566817,
+          emissiveIntensity: 0.28,
+          roughness: 0.94,
           metalness: 0.01,
           flatShading: true,
           side: THREE.DoubleSide,
         });
-        let meshIndex = 0;
-        model.traverse((child) => {
-          if (!(child instanceof THREE.Mesh)) return;
-          child.castShadow = false;
-          child.receiveShadow = true;
-          child.userData.isCommonField = true;
-          this.terrains.push(child);
-          const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
-          sourceMaterials.forEach((source) => {
-            Object.values(source).forEach((value) => { if (value instanceof THREE.Texture) value.dispose(); });
-            source.dispose();
-          });
-          child.material = (meshIndex % 5 === 0 || meshIndex % 7 === 2) ? limeMaterial : whiteMaterial;
-          meshIndex += 1;
+        const wireMaterial = new THREE.MeshBasicMaterial({
+          color: 0x718126,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.32,
+          depthWrite: false,
+          side: THREE.DoubleSide,
         });
+        const partObjects: THREE.Object3D[] = sourceParts.map((sourcePart) => {
+          const part = new THREE.Group();
+          part.name = sourcePart.name;
+          sourcePart.traverse((child) => {
+            if (!(child instanceof THREE.Mesh)) return;
+            const geometry = child.geometry.clone();
+            geometry.applyMatrix4(child.matrixWorld);
+            geometry.deleteAttribute('color');
+            geometry.computeBoundingBox();
+            geometry.computeBoundingSphere();
+            const mesh = new THREE.Mesh(geometry, wireMaterial);
+            mesh.castShadow = false;
+            mesh.receiveShadow = true;
+            mesh.frustumCulled = false;
+            mesh.userData.isCommonField = true;
+            this.terrains.push(mesh);
+            part.add(mesh);
+          });
+          model.add(part);
+          return part;
+        });
+        this.disposeObject(sourceModel);
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
         const horizontal = Math.max(size.x, size.z) || 1;
         const modelCentre = bounds.getCenter(new THREE.Vector3());
-        const partObjects: THREE.Object3D[] = [];
-        model.traverse((child) => {
-          if (/^model_part\d+$/.test(child.name)) partObjects.push(child);
+        const minimumFootprint = horizontal * 0.012;
+        const maximumFootprint = horizontal * 0.16;
+        partObjects.forEach((part, index) => {
+          const partBounds = new THREE.Box3().setFromObject(part);
+          const partSize = partBounds.getSize(new THREE.Vector3());
+          const partCentre = partBounds.getCenter(new THREE.Vector3());
+          const proxyGeometry = index % 3 === 0
+            ? new THREE.BoxGeometry(1, 1, 1, 2, 1, 2)
+            : new THREE.IcosahedronGeometry(0.62, index % 5 === 0 ? 1 : 0);
+          const proxy = new THREE.Mesh(
+            proxyGeometry,
+            (index % 2 === 0 || index % 7 === 1) ? limeMaterial : whiteMaterial,
+          );
+          proxy.position.copy(partCentre);
+          proxy.scale.set(
+            Math.min(Math.max(partSize.x * 1.2, minimumFootprint), maximumFootprint),
+            Math.min(Math.max(partSize.y * 1.35, minimumFootprint * 0.38), maximumFootprint * 0.46),
+            Math.min(Math.max(partSize.z * 1.2, minimumFootprint), maximumFootprint),
+          );
+          proxy.rotation.set(index * 0.37, index * 0.61, index * 0.19);
+          proxy.castShadow = false;
+          proxy.receiveShadow = true;
+          proxy.frustumCulled = false;
+          proxy.userData.isCommonField = true;
+          part.add(proxy);
+          this.terrains.push(proxy);
         });
         const parts: FieldReferencePart[] = partObjects.map((part, index) => {
           const partCentre = new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3());
@@ -420,13 +470,13 @@ export class HabitatWorld {
           };
         });
         const baseScale = 104 / horizontal;
-        model.scale.set(baseScale, baseScale * 2.15, baseScale);
+        model.scale.set(baseScale, baseScale * 0.82, baseScale);
         const fitted = new THREE.Box3().setFromObject(model);
         const centre = fitted.getCenter(new THREE.Vector3());
         model.position.set(-centre.x, -1.8 - fitted.min.y, -centre.z - 1.5);
         model.rotation.set(-0.035, -0.055, 0.01);
         this.scene.add(model);
-        if (this.commonLandscape) this.commonLandscape.group.visible = false;
+        this.setFieldFallbackVisible(false);
         this.fieldReferenceLandscape = {
           model,
           parts,
@@ -436,12 +486,18 @@ export class HabitatWorld {
         this.renderer.domElement.dataset.habitatModel = model.name;
         this.renderer.domElement.dataset.habitatParts = String(parts.length);
         this.renderer.domElement.dataset.habitatInteractive = String(parts.length > 1);
+        this.renderer.domElement.dataset.habitatError = 'false';
         model.updateMatrixWorld(true);
         this.raiseEcologiesToReferenceSurface(model);
       },
       undefined,
-      () => {
-        // The procedural common ground remains a complete mobile/failure fallback.
+      (error) => {
+        this.setFieldFallbackVisible(true);
+        this.renderer.domElement.dataset.habitatModel = 'PROCEDURAL_FALLBACK';
+        this.renderer.domElement.dataset.habitatParts = '0';
+        this.renderer.domElement.dataset.habitatInteractive = 'false';
+        this.renderer.domElement.dataset.habitatError = 'true';
+        console.warn('ENSIL habitat GLB could not be loaded; using procedural fallback.', error);
       },
     );
   }
