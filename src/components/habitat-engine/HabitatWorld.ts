@@ -208,7 +208,7 @@ export class HabitatWorld {
     this.controls.rotateSpeed = 0.26;
     this.controls.zoomSpeed = 0.45;
     this.controls.minPolarAngle = 0.48;
-    this.controls.maxPolarAngle = 1.02;
+    this.controls.maxPolarAngle = options.mode === 'field' ? 1.28 : 1.02;
     this.controls.autoRotate = !this.reducedMotion;
     this.controls.autoRotateSpeed = 0.075;
     this.controls.minDistance = options.mode === 'field' ? 40 : 24;
@@ -235,8 +235,8 @@ export class HabitatWorld {
 
   private setupCamera() {
     if (this.options.mode === 'field') {
-      this.camera.position.set(0, this.mobile ? 65 : 82, this.mobile ? 82 : 92);
-      this.controls.target.set(0, this.mobile ? -0.7 : 12, 0);
+      this.camera.position.set(0, this.mobile ? 65 : 46, this.mobile ? 82 : 105);
+      this.controls.target.set(0, this.mobile ? -0.7 : 10, 0);
     } else {
       this.camera.position.set(this.mobile ? 19 : 24, this.mobile ? 27 : 22, this.mobile ? 42 : 34);
       this.controls.target.set(0, -0.4, 0);
@@ -287,6 +287,13 @@ export class HabitatWorld {
       systems.terrain.mesh.userData.biomeId = record.id;
       if (this.options.mode === 'field') {
         systems.terrain.mesh.visible = false;
+        systems.contours.group.visible = false;
+        systems.roots.visible = false;
+        systems.features.group.visible = false;
+        systems.biofilm.mesh.visible = false;
+        systems.signals.mesh.visible = false;
+        systems.signals.seams.visible = false;
+        systems.annotations.visible = false;
         group.position.y = commonFieldHeight(layout.x, layout.z) - terrainHeight(context, 0, 0);
       } else {
         this.terrains.push(systems.terrain.mesh);
@@ -349,14 +356,18 @@ export class HabitatWorld {
         const model = gltf.scene;
         model.name = 'GREEN_CIRCUIT_RUINS';
         const whiteMaterial = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-          roughness: 0.9,
-          metalness: 0.015,
+          color: 0xf2f2ed,
+          emissive: 0x777772,
+          emissiveIntensity: 0.42,
+          roughness: 0.84,
+          metalness: 0.025,
           flatShading: true,
           side: THREE.DoubleSide,
         });
         const limeMaterial = new THREE.MeshStandardMaterial({
           color: 0xd5fb4e,
+          emissive: 0x687c22,
+          emissiveIntensity: 0.5,
           roughness: 0.92,
           metalness: 0.01,
           flatShading: true,
@@ -367,6 +378,8 @@ export class HabitatWorld {
           if (!(child instanceof THREE.Mesh)) return;
           child.castShadow = false;
           child.receiveShadow = true;
+          child.userData.isCommonField = true;
+          this.terrains.push(child);
           const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
           sourceMaterials.forEach((source) => {
             Object.values(source).forEach((value) => { if (value instanceof THREE.Texture) value.dispose(); });
@@ -386,7 +399,7 @@ export class HabitatWorld {
         const parts: FieldReferencePart[] = partObjects.map((part, index) => {
           const partCentre = new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3());
           const separationDirection = partCentre.sub(modelCentre);
-          separationDirection.y *= 0.42;
+          separationDirection.y = 0.48 + ((index * 7) % 11) * 0.035;
           if (separationDirection.lengthSq() < 0.0001) {
             separationDirection.set(Math.cos(index * 2.399), 0.22, Math.sin(index * 2.399));
           }
@@ -402,16 +415,18 @@ export class HabitatWorld {
             baseQuaternion: part.quaternion.clone(),
             separationDirection,
             rotationAxis,
-            amplitude: horizontal * (0.022 + (index % 9) * 0.0028),
+            amplitude: horizontal * (0.035 + (index % 9) * 0.004),
             phase: index * 0.73,
           };
         });
-        model.scale.setScalar(104 / horizontal);
+        const baseScale = 104 / horizontal;
+        model.scale.set(baseScale, baseScale * 2.15, baseScale);
         const fitted = new THREE.Box3().setFromObject(model);
         const centre = fitted.getCenter(new THREE.Vector3());
-        model.position.set(-centre.x, -13.2 - fitted.min.y, -centre.z - 1.5);
-        model.rotation.y = -0.055;
+        model.position.set(-centre.x, -1.8 - fitted.min.y, -centre.z - 1.5);
+        model.rotation.set(-0.035, -0.055, 0.01);
         this.scene.add(model);
+        if (this.commonLandscape) this.commonLandscape.group.visible = false;
         this.fieldReferenceLandscape = {
           model,
           parts,
@@ -652,8 +667,8 @@ export class HabitatWorld {
       this.desiredCamera.copy(runtime.group.position).add(new THREE.Vector3(0, this.mobile ? 37 : 28, this.mobile ? 48 : 39));
       this.activate(runtime.record.id, 0.45);
     } else if (this.options.mode === 'field') {
-      this.desiredTarget.set(0, this.mobile ? -0.7 : 12, 0);
-      this.desiredCamera.set(0, this.mobile ? 65 : 82, this.mobile ? 82 : 92);
+      this.desiredTarget.set(0, this.mobile ? -0.7 : 10, 0);
+      this.desiredCamera.set(0, this.mobile ? 65 : 46, this.mobile ? 82 : 105);
     } else {
       this.desiredTarget.set(0, -0.4, 0);
       this.desiredCamera.set(this.mobile ? 19 : 24, this.mobile ? 27 : 22, this.mobile ? 42 : 34);
@@ -728,7 +743,7 @@ export class HabitatWorld {
     const reference = this.fieldReferenceLandscape;
     if (!reference) return;
     reference.pointerEnergy = damp(reference.pointerEnergy, 0, 2.6, dt);
-    const idlePulse = (Math.sin(now * 0.00072) + Math.sin(now * 0.00031 + 1.7)) * 0.055 + 0.095;
+    const idlePulse = (Math.sin(now * 0.00072) + Math.sin(now * 0.00031 + 1.7)) * 0.1 + 0.15;
     const targetSeparation = this.reducedMotion
       ? 0
       : clamp(idlePulse + reference.pointerEnergy * 0.92, 0.025, 1);
