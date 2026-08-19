@@ -261,6 +261,7 @@ export class HabitatWorld {
         mobile: this.mobile,
       };
       const systems = buildHabitatSystems(context);
+      if (this.options.mode === 'single') systems.annotations.visible = false;
       systems.terrain.mesh.userData.biomeId = record.id;
       if (this.options.mode === 'field') {
         systems.terrain.mesh.visible = false;
@@ -694,7 +695,7 @@ export class HabitatWorld {
       runtime.systems.signals.mesh.count,
       Math.max(1, Math.floor(runtime.systems.signals.positions.length * emergence)),
     );
-    runtime.systems.annotations.visible = emergence > 0.68;
+    runtime.systems.annotations.visible = false;
     runtime.trail.visible = emergence > 0.58;
     runtime.creatureRoot.visible = emergence > 0.31;
     runtime.creatureRoot.scale.setScalar(THREE.MathUtils.smoothstep(emergence, 0.28, 0.72));
