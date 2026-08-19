@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { EcosystemCanvas } from '../components/field/EcosystemCanvas';
 import { CREATURE_RECORDS, getCreatureRecord, type CreatureState } from '../data/creatureRecords';
 
@@ -9,14 +9,8 @@ export function Field() {
   const [proximityId, setProximityId] = useState<string | null>(null);
   const [observation, setObservation] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [hintVisible, setHintVisible] = useState(true);
   const [snapshot, setSnapshot] = useState<Snapshot[]>([]);
   const [sensorStatus, setSensorStatus] = useState<'POINTER' | 'MIC ACTIVE' | 'CAMERA ACTIVE'>('POINTER');
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setHintVisible(false), 4200);
-    return () => window.clearTimeout(timeout);
-  }, []);
 
   const activeRecordId = selectedId ?? proximityId;
   const selected = activeRecordId ? getCreatureRecord(activeRecordId) : null;
@@ -60,14 +54,6 @@ export function Field() {
         <span>FIELD 01</span>
         <span>04 LIVING RECORDS</span>
       </div>
-
-      {hintVisible && (
-        <div className="field-intro" role="status">
-          <p>MOVE TO DISTURB</p>
-          <p>CLICK CREATURE TO ACTIVATE</p>
-          <p>USE ENCOUNTER CARD TO ENTER</p>
-        </div>
-      )}
 
       <div className="field-controls" aria-label="Field controls">
         <button type="button" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>

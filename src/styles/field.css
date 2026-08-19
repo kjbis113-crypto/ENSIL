@@ -7,7 +7,7 @@
   position: relative;
   height: 100dvh;
   overflow: hidden;
-  background: #7F86F7;
+  background: #fff;
   transition: background-color 400ms ease;
 }
 
@@ -60,23 +60,6 @@
 
 .field-index span:last-child { color: var(--ink-mute); }
 
-.field-intro {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 10;
-  display: grid;
-  gap: 4px;
-  padding: 12px 14px;
-  transform: translate(-50%, -50%);
-  color: var(--paper-bright);
-  background: var(--ink);
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  animation: fieldIntro 4.2s ease both;
-  pointer-events: none;
-}
-
 .field-controls {
   position: absolute;
   right: 30px;
@@ -120,7 +103,7 @@
   z-index: 13;
   width: 244px;
   background: rgba(244, 244, 239, .72);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   font-size: 8px;
   letter-spacing: .06em;
 }
@@ -136,7 +119,7 @@
   text-align: left;
   text-transform: uppercase;
 }
-.field-species-rail header { grid-template-columns: 14px 1fr 1fr; border-top: 1px solid var(--ink); color: var(--ink-mute); }
+.field-species-rail header { grid-template-columns: 14px 1fr 1fr; border-top: .8px solid rgba(17,17,17,.16); color: var(--ink-mute); }
 .field-species-rail header span:first-child { grid-column: 2; }
 .field-species-rail i { width: 8px; height: 8px; border-radius: 50%; }
 .field-species-rail button span:last-child { color: var(--ink-mute); }
@@ -266,12 +249,6 @@
 }
 .observation-layer header { border-top: 1px solid var(--ink); color: var(--ink-mute); }
 .observation-layer button:hover { background: var(--ink); color: var(--paper-bright); }
-
-@keyframes fieldIntro {
-  0% { opacity: 0; transform: translate(-50%, -45%); }
-  12%, 72% { opacity: 1; transform: translate(-50%, -50%); }
-  100% { opacity: 0; transform: translate(-50%, -55%); }
-}
 
 @keyframes encounterIn {
   from { opacity: 0; transform: translateY(10px); }
