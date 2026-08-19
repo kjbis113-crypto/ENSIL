@@ -19,10 +19,6 @@ export function Habitat({ id }: { id: string }) {
         <span>{record.code} / INDIVIDUAL ECOLOGY</span>
         <span>STATE / RESPONSIVE</span>
       </div>
-      <section className="habitat-title">
-        <span>{record.sensor}</span>
-        <h1>{record.name}</h1>
-      </section>
       <aside className="habitat-signal">
         <span>INPUT</span>
         <strong>{record.input}</strong>

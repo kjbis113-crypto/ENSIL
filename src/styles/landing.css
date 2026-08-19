@@ -4,11 +4,7 @@
   min-height: 680px;
   overflow: hidden;
   color: #111111;
-  background:
-    linear-gradient(rgba(16, 16, 25, .03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16, 16, 25, .03) 1px, transparent 1px),
-    linear-gradient(90deg, #fff 0 71.528%, #D5FB4E 71.528%, #fff 86.284%, #D5FB4E 104.11%);
-  background-size: 12.5vw 12.5vh, 12.5vw 12.5vh, 100% 100%;
+  background: linear-gradient(90deg, #fff 0 71.528%, #D5FB4E 71.528%, #fff 86.284%, #D5FB4E 104.11%);
 }
 
 .landing-specimens { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
