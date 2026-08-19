@@ -66,10 +66,10 @@ export type HabitatSystems = {
   frame: number;
 };
 
-const MINERAL = new THREE.Color(0xe8e8e1);
-const MINERAL_SHADOW = new THREE.Color(0xc4c4bd);
-const CHARCOAL = new THREE.Color(0x292b29);
-const BIOFILM = new THREE.Color(0x435139);
+const MINERAL = new THREE.Color(0xffffff);
+const MINERAL_SHADOW = new THREE.Color(0xd5fb4e);
+const CHARCOAL = new THREE.Color(0xd5fb4e);
+const BIOFILM = new THREE.Color(0xd5fb4e);
 
 export function terrainHeight(context: HabitatBuildContext, x: number, z: number) {
   const { config, state, terrainWidth, terrainDepth } = context;
@@ -119,10 +119,10 @@ export function createMaterials(context: HabitatBuildContext): HabitatMaterials 
       roughness: 0.48,
       metalness: 0.12,
     }),
-    wire: new THREE.LineBasicMaterial({ color: 0x24302a, transparent: true, opacity: 0.58 }),
-    contour: new THREE.LineBasicMaterial({ color: 0x343633, transparent: true, opacity: 0.42 }),
+    wire: new THREE.LineBasicMaterial({ color: 0x849d2d, transparent: true, opacity: 0.62 }),
+    contour: new THREE.LineBasicMaterial({ color: 0x7a9028, transparent: true, opacity: 0.46 }),
     membrane: new THREE.MeshPhysicalMaterial({
-      color: 0xe8e8df,
+      color: 0xffffff,
       transparent: true,
       opacity: 0.3,
       roughness: 0.52,

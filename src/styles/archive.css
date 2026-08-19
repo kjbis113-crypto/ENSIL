@@ -351,9 +351,9 @@
   display: flex;
   align-items: baseline;
   font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
-  font-size: clamp(132px, 22.6vw, 430px);
+  font-size: clamp(76px, 8.7vw, 168px);
   font-weight: 400;
-  letter-spacing: -0.105em;
+  letter-spacing: -0.075em;
   line-height: 0.78;
   white-space: nowrap;
 }
@@ -596,7 +596,7 @@
 @media (max-width: 900px) {
   .archive-masthead { min-height: 430px; padding: 56px 14px 14px; }
   .archive-masthead__rail { top: 58px; left: 14px; }
-  .archive-masthead h1 { right: 10px; bottom: 34px; font-size: clamp(92px, 25vw, 210px); }
+  .archive-masthead h1 { right: 10px; bottom: 34px; font-size: clamp(52px, 9.2vw, 108px); }
   .archive-masthead__dots { top: 25%; right: 14px; gap: 12px; }
   .archive-masthead__dots i { width: 13px; height: 13px; }
   .archive-prologue { min-height: 0; grid-template-columns: 1fr; padding: 12px; }
@@ -622,7 +622,7 @@
 
 @media (max-width: 560px) {
   .archive-masthead { min-height: 350px; }
-  .archive-masthead h1 { right: 12px; bottom: 30px; left: 12px; justify-content: flex-end; font-size: 22vw; transform: scaleX(.9); transform-origin: right bottom; }
+  .archive-masthead h1 { right: 12px; bottom: 30px; left: 12px; justify-content: flex-end; font-size: 10.2vw; transform: none; }
   .archive-masthead__pixel { text-shadow: -2px 0 0 var(--collection-primary), 2px 0 0 var(--collection-secondary); }
   .archive-prologue__print { min-height: 390px; }
   .archive-prologue__echo { font-size: 14vw; }

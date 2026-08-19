@@ -167,14 +167,14 @@ export class HabitatWorld {
 
   constructor(options: HabitatWorldOptions) {
     this.options = options;
-    this.scene.background = new THREE.Color(0xdedfd9);
-    this.scene.fog = new THREE.FogExp2(0xdedfd9, options.mode === 'field' ? 0.0068 : 0.009);
+    this.scene.background = new THREE.Color(0xffffff);
+    this.scene.fog = new THREE.FogExp2(0xffffff, options.mode === 'field' ? 0.0038 : 0.0065);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: !this.mobile, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.mobile ? 1.15 : 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.02;
+    this.renderer.toneMapping = THREE.NeutralToneMapping;
+    this.renderer.toneMappingExposure = 0.92;
     this.renderer.shadowMap.enabled = !this.mobile && options.mode === 'single' && !this.reducedMotion;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     options.mount.appendChild(this.renderer.domElement);
@@ -224,8 +224,8 @@ export class HabitatWorld {
   }
 
   private setupLighting() {
-    this.scene.add(new THREE.HemisphereLight(0xf7f8f3, 0x7e827a, 2.25));
-    const overhead = new THREE.DirectionalLight(0xf7f8f3, 3.1);
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xd5fb4e, 1.45));
+    const overhead = new THREE.DirectionalLight(0xffffff, 1.8);
     overhead.position.set(-22, 48, 18);
     overhead.castShadow = this.renderer.shadowMap.enabled;
     overhead.shadow.mapSize.set(1024, 1024);
@@ -234,7 +234,7 @@ export class HabitatWorld {
     overhead.shadow.camera.top = 28;
     overhead.shadow.camera.bottom = -28;
     this.scene.add(overhead);
-    const coolFill = new THREE.DirectionalLight(0xa7abc4, 0.64);
+    const coolFill = new THREE.DirectionalLight(0xd5fb4e, 0.32);
     coolFill.position.set(35, 17, -24);
     this.scene.add(coolFill);
   }
@@ -257,7 +257,7 @@ export class HabitatWorld {
         group,
         terrainWidth: this.options.mode === 'field' ? 34 : 54,
         terrainDepth: this.options.mode === 'field' ? 26 : 40,
-        detail: this.options.mode === 'field' ? 30 : 44,
+        detail: this.options.mode === 'field' ? 24 : 30,
         mobile: this.mobile,
       };
       const systems = buildHabitatSystems(context);
@@ -325,20 +325,50 @@ export class HabitatWorld {
         }
         const model = gltf.scene;
         model.name = 'GHOST_FOREST_CARTOGRAPHY';
+        let meshIndex = 0;
         model.traverse((child) => {
           if (!(child instanceof THREE.Mesh)) return;
           child.castShadow = false;
           child.receiveShadow = true;
-          const multipleMaterials = Array.isArray(child.material);
-          const materials = multipleMaterials ? child.material : [child.material];
-          const styledMaterials = materials.map((source: THREE.Material) => {
-            const material = source.clone() as THREE.MeshStandardMaterial;
-            if ('roughness' in material) material.roughness = 0.9;
-            if ('metalness' in material) material.metalness = 0.025;
-            if ('color' in material) material.color.lerp(new THREE.Color(0xd8d9d1), 0.34);
-            return material;
+          const geometry = child.geometry;
+          const position = geometry.getAttribute('position');
+          if (position) {
+            geometry.computeBoundingBox();
+            const box = geometry.boundingBox;
+            const size = box?.getSize(new THREE.Vector3()) ?? new THREE.Vector3(1, 1, 1);
+            const colours = new Float32Array(position.count * 3);
+            const white = new THREE.Color(0xffffff);
+            const lime = new THREE.Color(0xd5fb4e);
+            const colour = new THREE.Color();
+            for (let vertex = 0; vertex < position.count; vertex += 1) {
+              const nx = size.x ? (position.getX(vertex) - (box?.min.x ?? 0)) / size.x : 0;
+              const ny = size.y ? (position.getY(vertex) - (box?.min.y ?? 0)) / size.y : 0;
+              const nz = size.z ? (position.getZ(vertex) - (box?.min.z ?? 0)) / size.z : 0;
+              const patch = Math.sin(nx * 19 + meshIndex * 0.7)
+                + Math.cos(nz * 15 - meshIndex * 0.4)
+                + Math.sin((nx + ny + nz) * 11);
+              colour.copy(patch > -0.28 ? lime : white);
+              colours[vertex * 3] = colour.r;
+              colours[vertex * 3 + 1] = colour.g;
+              colours[vertex * 3 + 2] = colour.b;
+            }
+            geometry.setAttribute('color', new THREE.BufferAttribute(colours, 3));
+          }
+          const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
+          const styledMaterials = sourceMaterials.map((source) => {
+            Object.values(source).forEach((value) => { if (value instanceof THREE.Texture) value.dispose(); });
+            source.dispose();
+            return new THREE.MeshStandardMaterial({
+              color: 0xffffff,
+              vertexColors: Boolean(position),
+              roughness: 0.94,
+              metalness: 0.01,
+              flatShading: true,
+              side: THREE.DoubleSide,
+            });
           });
-          child.material = multipleMaterials ? styledMaterials : styledMaterials[0];
+          child.material = Array.isArray(child.material) ? styledMaterials : styledMaterials[0];
+          meshIndex += 1;
         });
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());

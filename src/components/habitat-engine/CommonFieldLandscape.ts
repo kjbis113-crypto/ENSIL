@@ -41,15 +41,15 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
   group.name = 'ENSIL_COMMON_GROUND';
   scene.add(group);
 
-  const segmentsX = mobile ? 48 : 96;
-  const segmentsZ = mobile ? 36 : 72;
+  const segmentsX = mobile ? 34 : 58;
+  const segmentsZ = mobile ? 26 : 44;
   const terrainGeometry = new THREE.PlaneGeometry(104, 78, segmentsX, segmentsZ);
   terrainGeometry.rotateX(-Math.PI / 2);
   const position = terrainGeometry.getAttribute('position') as THREE.BufferAttribute;
   const colours = new Float32Array(position.count * 3);
-  const pale = new THREE.Color(0xe6e7e1);
-  const grey = new THREE.Color(0xa9aaa4);
-  const dark = new THREE.Color(0x343633);
+  const pale = new THREE.Color(0xffffff);
+  const grey = new THREE.Color(0xd5fb4e);
+  const dark = new THREE.Color(0xffffff);
   const colour = new THREE.Color();
   for (let index = 0; index < position.count; index += 1) {
     const x = position.getX(index);
@@ -79,7 +79,7 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
   group.add(terrain);
 
   const mineralMaterial = new THREE.MeshStandardMaterial({
-    color: 0xc9cac3,
+    color: 0xffffff,
     roughness: 0.9,
     metalness: 0.03,
     flatShading: true,
@@ -100,14 +100,14 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
     dummy.scale.set(scale * (0.6 + seeded(index, 29)), scale * (0.3 + seeded(index, 31) * 0.8), scale);
     dummy.updateMatrix();
     fragments.setMatrixAt(index, dummy.matrix);
-    fragmentColour.set(index % 11 === 0 ? 0x384039 : index % 7 === 0 ? 0x7f86f7 : 0xbfc0b9);
+    fragmentColour.set(index % 4 === 0 ? 0xd5fb4e : 0xffffff);
     fragments.setColorAt(index, fragmentColour);
   }
   group.add(fragments);
 
   const ghostCount = mobile ? 76 : 240;
   const ghostMaterial = new THREE.MeshStandardMaterial({
-    color: 0x333a35,
+    color: 0xffffff,
     roughness: 0.86,
     metalness: 0.04,
     flatShading: true,
@@ -126,13 +126,13 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
     dummy.scale.set(0.38 + seeded(index, 47) * 0.9, height, 0.38 + seeded(index, 49) * 0.9);
     dummy.updateMatrix();
     ghostStructures.setMatrixAt(index, dummy.matrix);
-    fragmentColour.set(index % 13 === 0 ? 0xd5fb4e : index % 9 === 0 ? 0x7f86f7 : 0x424941);
+    fragmentColour.set(index % 3 === 0 ? 0xffffff : 0xd5fb4e);
     ghostStructures.setColorAt(index, fragmentColour);
   }
   group.add(ghostStructures);
 
   const biofilmCount = mobile ? 210 : 680;
-  const biofilmMaterial = new THREE.MeshStandardMaterial({ color: 0x47533f, roughness: 0.97, flatShading: true });
+  const biofilmMaterial = new THREE.MeshStandardMaterial({ color: 0xd5fb4e, roughness: 0.97, flatShading: true });
   const biofilm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.13, 0), biofilmMaterial, biofilmCount);
   for (let index = 0; index < biofilmCount; index += 1) {
     const cluster = index % 23;
@@ -174,9 +174,9 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
   }
   const cableGeometry = new THREE.BufferGeometry();
   cableGeometry.setAttribute('position', new THREE.Float32BufferAttribute(cablePositions, 3));
-  group.add(new THREE.LineSegments(cableGeometry, new THREE.LineBasicMaterial({ color: 0x28312c, transparent: true, opacity: 0.48 })));
+  group.add(new THREE.LineSegments(cableGeometry, new THREE.LineBasicMaterial({ color: 0x8ca52f, transparent: true, opacity: 0.52 })));
 
-  const contourMaterial = new THREE.LineBasicMaterial({ color: 0x353834, transparent: true, opacity: 0.28 });
+  const contourMaterial = new THREE.LineBasicMaterial({ color: 0x829a2c, transparent: true, opacity: 0.34 });
   for (let ringIndex = 0; ringIndex < (mobile ? 11 : 22); ringIndex += 1) {
     const points: THREE.Vector3[] = [];
     const radius = 5 + ringIndex * 2.05;

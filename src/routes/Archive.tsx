@@ -42,10 +42,7 @@ export function Archive() {
           <span>COLLECTION *E</span>
           <span>04 ELECTRONIC ORGANISMS</span>
         </div>
-        <h1 aria-label="Electronic Ecologies">
-          <span className="archive-masthead__pixel">E</span>
-          <span>cologies</span>
-        </h1>
+        <h1 aria-label="Electro-Fermentation">Electro-Fermentation</h1>
         <div className="archive-masthead__dots" aria-hidden>
           {CREATURE_RECORDS.map((record) => <i key={record.id} style={{ backgroundColor: record.palette.primary }} />)}
         </div>
@@ -55,14 +52,6 @@ export function Archive() {
         <div className="archive-prologue__print" aria-hidden>
           <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} code={active.code} />
           <span className="archive-prologue__echo">SENSE<br />RESPOND<br />REMEMBER</span>
-        </div>
-        <div className="archive-prologue__ascii" aria-hidden>
-          <p>┌───────────────────────┐</p>
-          <p>│  SIGNAL BECOMES BODY  │</p>
-          <p>│  BODY BECOMES MEMORY  │</p>
-          <p>└──────────┬────────────┘</p>
-          <p>           ↓</p>
-          <p>      LIVING RECORD</p>
         </div>
         <p className="archive-prologue__statement">
           Four bodies read the same world differently. This archive is not a cabinet—it is a live transmission.
