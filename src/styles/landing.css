@@ -31,10 +31,10 @@
 
 .landing-title {
   position: absolute;
-  bottom: 2.2%;
+  bottom: 1.4%;
   left: 2.5%;
   z-index: 5;
-  width: min(36vw, 690px);
+  width: min(30vw, 575px);
 }
 .landing-title__logo {
   display: block;
@@ -93,7 +93,7 @@
   .landing-specimen--2 { top: 18%; right: -10%; left: auto; width: 35vw; }
   .landing-specimen--3 { top: auto; right: -18%; bottom: 14%; left: auto; width: 48vw; }
   .landing-specimen--4 { top: auto; bottom: -2%; left: -7%; width: 36vw; }
-  .landing-title { top: auto; bottom: 19%; left: 3vw; width: 62vw; }
+  .landing-title { top: auto; bottom: 14%; left: 3vw; width: 54vw; }
   .landing-manifesto { top: 62px; right: 12px; width: 58vw; }
   .landing-manifesto p { margin-top: 14px; font-size: 17px; }
   .landing-portals { right: 12px; bottom: 42px; left: 12px; width: auto; background: color-mix(in srgb, #D5FB4E 90%, transparent); }

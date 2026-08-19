@@ -357,7 +357,7 @@ function makeLabelSprite(text: string, colour = '#22231f') {
 
 function buildAnnotations(context: HabitatBuildContext) {
   const group = new THREE.Group();
-  const labels = [context.config.id.toUpperCase(), 'GROWTH', 'SIGNAL', 'TRACE'];
+  const labels = [context.config.id.toUpperCase()];
   const probePositions: number[] = [];
   labels.forEach((label, index) => {
     const angle = index * 1.49 + 0.4;
@@ -366,7 +366,7 @@ function buildAnnotations(context: HabitatBuildContext) {
     const z = Math.sin(angle) * radius * (context.terrainDepth / context.terrainWidth);
     const ground = terrainHeight(context, x, z);
     const height = 1.5 + index * 0.45;
-    const sprite = makeLabelSprite(`${context.record.code.replace('EO–', 'E')}.${index + 1} / ${label}`);
+    const sprite = makeLabelSprite(`${context.record.code} / ${label}`);
     sprite.position.set(x + 1.35, ground + height, z);
     sprite.userData.phase = index * 1.8;
     sprite.userData.baseY = sprite.position.y;
