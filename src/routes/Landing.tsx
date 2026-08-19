@@ -1,43 +1,23 @@
-import { SpecimenGlyph } from '../components/archive/SpecimenGlyph';
-import { CREATURE_RECORDS } from '../data/creatureRecords';
+import { VitrineScene } from '../components/landing/VitrineScene';
+import { useSiteRoute } from '../state/useSiteRoute';
 
+/** 랜딩 — 전시 진열장(비트린) 렌더. 상자를 클릭하면 유리 안으로 줌인 → 필드 진입. */
 export function Landing() {
+  const { navigate } = useSiteRoute();
+
   return (
-    <main className="landing-page">
-      <div className="landing-specimens" aria-hidden>
-        {CREATURE_RECORDS.map((record, index) => (
-          <div className={`landing-specimen landing-specimen--${index + 1}`} key={record.id}>
-            <SpecimenGlyph index={index} live palette={record.palette} />
-          </div>
-        ))}
-      </div>
+    <main className="landing-page landing-page--vitrine">
+      <VitrineScene onEnter={() => navigate('/field')} />
 
-      <section className="landing-title">
-        <p>INTERACTIVE ELECTRONIC ECOLOGY / SEOUL 2026</p>
-        <h1>ENSIL</h1>
+      <section className="vitrine-caption" aria-hidden>
+        <span>INTERACTIVE ELECTRONIC ECOLOGY / SEOUL 2026</span>
+        <p>상자를 클릭하면 내부 생태계로 들어갑니다</p>
       </section>
 
-      <section className="landing-manifesto">
-        <span>05 AUTONOMOUS BODIES</span>
-        <p>Five creatures sense, respond and remember. Enter the shared field or inspect their living records.</p>
-      </section>
-
-      <nav className="landing-portals" aria-label="Enter ENSIL">
-        <a href="#/field">
-          <span>01 / LIVE SYSTEM</span>
-          <strong>ENTER FIELD</strong>
-          <i>→</i>
-        </a>
-        <a href="#/archive">
-          <span>02 / LIVING RECORDS</span>
-          <strong>OPEN ARCHIVE</strong>
-          <i>→</i>
-        </a>
+      <nav className="vitrine-links" aria-label="Enter ENSIL">
+        <a href="#/field">01 / ENTER FIELD →</a>
+        <a href="#/archive">02 / OPEN ARCHIVE →</a>
       </nav>
-
-      <div className="landing-signal" aria-hidden>
-        <span>TACTILE</span><span>CAPACITANCE</span><span>SOUND</span><span>MOTION</span><span>OPTIC</span>
-      </div>
     </main>
   );
 }

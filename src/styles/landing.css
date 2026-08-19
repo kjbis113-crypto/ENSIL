@@ -135,3 +135,50 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-specimen { animation: none; }
 }
+
+/* ── Vitrine landing — 전시 진열장 렌더 ─────────────────────── */
+.landing-page--vitrine {
+  background: #35373a;
+  min-height: 0;
+}
+.vitrine-stage { position: absolute; inset: 0; }
+.vitrine-stage canvas { display: block; }
+.vitrine-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #f4f9ff;
+  opacity: 0;
+  pointer-events: none;
+}
+.vitrine-caption {
+  position: absolute;
+  left: 26px;
+  bottom: 24px;
+  z-index: 3;
+  color: #55585a; /* 하단은 밝은 바닥 위 */
+  pointer-events: none;
+}
+.vitrine-caption span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.72;
+}
+.vitrine-caption p { margin-top: 8px; font-size: 12px; }
+.vitrine-links {
+  position: absolute;
+  right: 26px;
+  bottom: 24px;
+  z-index: 3;
+  display: flex;
+  gap: 26px;
+}
+.vitrine-links a {
+  color: #55585a;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  opacity: 0.85;
+}
+.vitrine-links a:hover { opacity: 1; text-decoration: underline; }
