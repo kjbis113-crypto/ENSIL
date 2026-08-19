@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { CreatureRecord, CreatureState } from '../../data/creatureRecords';
 import { getBiomeConfig } from './biomes';
 import { buildHabitatSystems, terrainHeight, updateHabitatSystems, type HabitatSystems } from './systems';
@@ -46,6 +47,23 @@ type HabitatRuntime = {
   emergence: number;
   enteredAt: number;
   loaded: boolean;
+};
+
+type FieldReferencePart = {
+  object: THREE.Object3D;
+  basePosition: THREE.Vector3;
+  baseQuaternion: THREE.Quaternion;
+  separationDirection: THREE.Vector3;
+  rotationAxis: THREE.Vector3;
+  amplitude: number;
+  phase: number;
+};
+
+type FieldReferenceLandscape = {
+  model: THREE.Group;
+  parts: FieldReferencePart[];
+  separation: number;
+  pointerEnergy: number;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -164,6 +182,10 @@ export class HabitatWorld {
   private desiredTarget = new THREE.Vector3();
   private desiredCamera = new THREE.Vector3();
   private commonLandscape: CommonFieldLandscape | null = null;
+  private fieldReferenceLandscape: FieldReferenceLandscape | null = null;
+  private fieldCursorDirection = new THREE.Vector3();
+  private lastPointerClient = new THREE.Vector2();
+  private hasPointerClient = false;
 
   constructor(options: HabitatWorldOptions) {
     this.options = options;
@@ -317,69 +339,88 @@ export class HabitatWorld {
   }
 
   private loadFieldReferenceLandscape() {
-    new GLTFLoader().load(
-      '/models/ensil-ghost-forest-cartography.glb',
+    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(
+      '/models/ensil-green-circuit-ruins.glb',
       (gltf) => {
         if (this.disposed) {
           this.disposeObject(gltf.scene);
           return;
         }
         const model = gltf.scene;
-        model.name = 'GHOST_FOREST_CARTOGRAPHY';
+        model.name = 'GREEN_CIRCUIT_RUINS';
+        const whiteMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          roughness: 0.9,
+          metalness: 0.015,
+          flatShading: true,
+          side: THREE.DoubleSide,
+        });
+        const limeMaterial = new THREE.MeshStandardMaterial({
+          color: 0xd5fb4e,
+          roughness: 0.92,
+          metalness: 0.01,
+          flatShading: true,
+          side: THREE.DoubleSide,
+        });
         let meshIndex = 0;
         model.traverse((child) => {
           if (!(child instanceof THREE.Mesh)) return;
           child.castShadow = false;
           child.receiveShadow = true;
-          const geometry = child.geometry;
-          const position = geometry.getAttribute('position');
-          if (position) {
-            geometry.computeBoundingBox();
-            const box = geometry.boundingBox;
-            const size = box?.getSize(new THREE.Vector3()) ?? new THREE.Vector3(1, 1, 1);
-            const colours = new Float32Array(position.count * 3);
-            const white = new THREE.Color(0xffffff);
-            const lime = new THREE.Color(0xd5fb4e);
-            const colour = new THREE.Color();
-            for (let vertex = 0; vertex < position.count; vertex += 1) {
-              const nx = size.x ? (position.getX(vertex) - (box?.min.x ?? 0)) / size.x : 0;
-              const ny = size.y ? (position.getY(vertex) - (box?.min.y ?? 0)) / size.y : 0;
-              const nz = size.z ? (position.getZ(vertex) - (box?.min.z ?? 0)) / size.z : 0;
-              const patch = Math.sin(nx * 19 + meshIndex * 0.7)
-                + Math.cos(nz * 15 - meshIndex * 0.4)
-                + Math.sin((nx + ny + nz) * 11);
-              colour.copy(patch > -0.28 ? lime : white);
-              colours[vertex * 3] = colour.r;
-              colours[vertex * 3 + 1] = colour.g;
-              colours[vertex * 3 + 2] = colour.b;
-            }
-            geometry.setAttribute('color', new THREE.BufferAttribute(colours, 3));
-          }
           const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
-          const styledMaterials = sourceMaterials.map((source) => {
+          sourceMaterials.forEach((source) => {
             Object.values(source).forEach((value) => { if (value instanceof THREE.Texture) value.dispose(); });
             source.dispose();
-            return new THREE.MeshStandardMaterial({
-              color: 0xffffff,
-              vertexColors: Boolean(position),
-              roughness: 0.94,
-              metalness: 0.01,
-              flatShading: true,
-              side: THREE.DoubleSide,
-            });
           });
-          child.material = Array.isArray(child.material) ? styledMaterials : styledMaterials[0];
+          child.material = (meshIndex % 5 === 0 || meshIndex % 7 === 2) ? limeMaterial : whiteMaterial;
           meshIndex += 1;
         });
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
         const horizontal = Math.max(size.x, size.z) || 1;
-        model.scale.setScalar(96 / horizontal);
+        const modelCentre = bounds.getCenter(new THREE.Vector3());
+        const partObjects: THREE.Object3D[] = [];
+        model.traverse((child) => {
+          if (/^model_part\d+$/.test(child.name)) partObjects.push(child);
+        });
+        const parts: FieldReferencePart[] = partObjects.map((part, index) => {
+          const partCentre = new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3());
+          const separationDirection = partCentre.sub(modelCentre);
+          separationDirection.y *= 0.42;
+          if (separationDirection.lengthSq() < 0.0001) {
+            separationDirection.set(Math.cos(index * 2.399), 0.22, Math.sin(index * 2.399));
+          }
+          separationDirection.normalize();
+          const rotationAxis = new THREE.Vector3(
+            Math.sin(index * 1.7),
+            0.35 + Math.cos(index * 0.91) * 0.2,
+            Math.cos(index * 1.31),
+          ).normalize();
+          return {
+            object: part,
+            basePosition: part.position.clone(),
+            baseQuaternion: part.quaternion.clone(),
+            separationDirection,
+            rotationAxis,
+            amplitude: horizontal * (0.022 + (index % 9) * 0.0028),
+            phase: index * 0.73,
+          };
+        });
+        model.scale.setScalar(104 / horizontal);
         const fitted = new THREE.Box3().setFromObject(model);
         const centre = fitted.getCenter(new THREE.Vector3());
-        model.position.set(-centre.x, -15 - fitted.min.y, -centre.z - 2.5);
-        model.rotation.y = -0.08;
+        model.position.set(-centre.x, -13.2 - fitted.min.y, -centre.z - 1.5);
+        model.rotation.y = -0.055;
         this.scene.add(model);
+        this.fieldReferenceLandscape = {
+          model,
+          parts,
+          separation: 0,
+          pointerEnergy: 0,
+        };
+        this.renderer.domElement.dataset.habitatModel = model.name;
+        this.renderer.domElement.dataset.habitatParts = String(parts.length);
+        this.renderer.domElement.dataset.habitatInteractive = String(parts.length > 1);
         model.updateMatrixWorld(true);
         this.raiseEcologiesToReferenceSurface(model);
       },
@@ -510,6 +551,12 @@ export class HabitatWorld {
   }
 
   private handlePointerMove = (event: PointerEvent) => {
+    if (this.hasPointerClient && this.fieldReferenceLandscape) {
+      const movement = Math.hypot(event.clientX - this.lastPointerClient.x, event.clientY - this.lastPointerClient.y);
+      this.fieldReferenceLandscape.pointerEnergy = Math.min(1, this.fieldReferenceLandscape.pointerEnergy + movement * 0.018);
+    }
+    this.lastPointerClient.set(event.clientX, event.clientY);
+    this.hasPointerClient = true;
     this.updatePointer(event);
     this.runtimes.forEach((runtime) => {
       runtime.pointerInfluence = runtime.record.id === this.pointerBiomeId ? 1 : 0;
@@ -517,6 +564,7 @@ export class HabitatWorld {
   };
 
   private handlePointerLeave = () => {
+    this.hasPointerClient = false;
     this.pointerBiomeId = null;
     this.hoveredId = null;
     this.options.onProximity?.(null);
@@ -676,6 +724,28 @@ export class HabitatWorld {
     trailMaterial.opacity = (context.config.id === 'accretion' ? 0.13 : 0.045) + state.residual * 0.18;
   }
 
+  private updateFieldReferenceLandscape(now: number, dt: number) {
+    const reference = this.fieldReferenceLandscape;
+    if (!reference) return;
+    reference.pointerEnergy = damp(reference.pointerEnergy, 0, 2.6, dt);
+    const idlePulse = (Math.sin(now * 0.00072) + Math.sin(now * 0.00031 + 1.7)) * 0.055 + 0.095;
+    const targetSeparation = this.reducedMotion
+      ? 0
+      : clamp(idlePulse + reference.pointerEnergy * 0.92, 0.025, 1);
+    reference.separation = damp(reference.separation, targetSeparation, targetSeparation > reference.separation ? 5.8 : 1.55, dt);
+
+    this.fieldCursorDirection.set(this.pointerNdc.x, -this.pointerNdc.y * 0.18, -this.pointerNdc.y).normalize();
+    reference.parts.forEach((part) => {
+      const localWave = 0.68 + Math.sin(now * 0.0011 + part.phase) * 0.22;
+      const distance = part.amplitude * reference.separation * localWave;
+      part.object.position.copy(part.basePosition)
+        .addScaledVector(part.separationDirection, distance)
+        .addScaledVector(this.fieldCursorDirection, distance * reference.pointerEnergy * 0.22);
+      part.object.quaternion.copy(part.baseQuaternion);
+      part.object.rotateOnAxis(part.rotationAxis, reference.separation * Math.sin(now * 0.0008 + part.phase) * 0.075);
+    });
+  }
+
   private applyEmergence(runtime: HabitatRuntime, now: number) {
     if (this.options.mode === 'field') return;
     const progress = clamp((now - runtime.enteredAt) / (this.reducedMotion ? 900 : 2800), 0, 1);
@@ -722,6 +792,7 @@ export class HabitatWorld {
     }
 
     this.commonLandscape?.update(now);
+    this.updateFieldReferenceLandscape(now, dt);
 
     if (!this.userInteracting) {
       const transition = now - this.focusStartedAt < 2200;
