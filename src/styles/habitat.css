@@ -42,6 +42,25 @@
   letter-spacing: 0.09em;
 }
 
+.habitat-title {
+  position: absolute;
+  bottom: 56px;
+  left: 24px;
+  z-index: 7;
+  max-width: 72vw;
+  pointer-events: none;
+}
+.habitat-title > span { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
+.habitat-title h1 {
+  margin-top: 6px;
+  font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  font-size: clamp(78px, 11.5vw, 220px);
+  font-weight: 400;
+  letter-spacing: -0.08em;
+  line-height: 0.72;
+  text-shadow: none;
+}
+
 .habitat-signal {
   position: absolute;
   top: 112px;
@@ -86,6 +105,8 @@
 @media (max-width: 760px) {
   .habitat-meta { top: 57px; right: 12px; left: 12px; }
   .habitat-meta span:last-child { display: none; }
+  .habitat-title { bottom: 118px; left: 12px; max-width: calc(100vw - 24px); }
+  .habitat-title h1 { font-size: clamp(64px, 19vw, 112px); text-shadow: none; }
   .habitat-signal { top: 86px; right: 12px; width: min(228px, calc(100vw - 24px)); }
   .habitat-actions { right: 12px; bottom: 12px; left: 12px; }
   .habitat-actions a { flex: 1; text-align: center; }
