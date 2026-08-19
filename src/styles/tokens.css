@@ -1,31 +1,36 @@
-/* ENSIL identity system — electric lime, spectral lavender and carbon. */
+/* ENSIL identity system — aqueous mint, oxidised green, structural grey and carbon. */
 :root {
   color-scheme: light;
 
+  --brand-primary: #73D2BE;
+  --brand-secondary: #5FA48D;
+  --brand-structure: #545756;
+  --brand-dark: #171818;
+
   /* Deep-culture surfaces */
-  --paper: #D5FB4E;
-  --paper-bright: #FFFFFF;
-  --bg: var(--paper-bright);
-  --surface: var(--paper);
-  --ink: #111111;
-  --ink-mute: #33333a;
-  --ink-soft: #202025;
-  --line: rgba(17, 17, 17, 0.1);
-  --line-2: rgba(17, 17, 17, 0.28);
-  --line-strong: rgba(17, 17, 17, 0.66);
+  --paper: var(--brand-primary);
+  --paper-bright: var(--brand-primary);
+  --bg: var(--brand-primary);
+  --surface: var(--brand-secondary);
+  --ink: var(--brand-dark);
+  --ink-mute: var(--brand-structure);
+  --ink-soft: var(--brand-structure);
+  --line: rgba(23, 24, 24, 0.1);
+  --line-2: rgba(23, 24, 24, 0.28);
+  --line-strong: rgba(23, 24, 24, 0.66);
 
   /* Biotechnical signal palette */
-  --lime: #D5FB4E;
-  --blue: #7F86F7;
-  --cyan: #111111;
-  --magenta: #7F86F7;
-  --violet: #7F86F7;
-  --amber: #D5FB4E;
-  --accent: #111111;
-  --sensor: #111111;
+  --lime: var(--brand-primary);
+  --blue: var(--brand-secondary);
+  --cyan: var(--brand-secondary);
+  --magenta: var(--brand-structure);
+  --violet: var(--brand-structure);
+  --amber: var(--brand-primary);
+  --accent: var(--brand-dark);
+  --sensor: var(--brand-structure);
 
   /* Ambient interaction field */
-  --cursor-blob: rgba(17, 17, 17, 0.12);
+  --cursor-blob: rgba(23, 24, 24, 0.12);
   --cursor-blob-size: 96px;
 
   /* Spacing */

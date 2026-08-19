@@ -1,13 +1,13 @@
 .field-page {
-  --field-primary: #D5FB4E;
-  --field-secondary: #7F86F7;
-  --field-accent: #111111;
-  --field-paper: #7F86F7;
-  --field-ink: #111111;
+  --field-primary: var(--brand-primary);
+  --field-secondary: var(--brand-secondary);
+  --field-accent: var(--brand-structure);
+  --field-paper: var(--brand-primary);
+  --field-ink: var(--brand-dark);
   position: relative;
   height: 100dvh;
   overflow: hidden;
-  background: #fff;
+  background: var(--brand-primary);
   transition: background-color 400ms ease;
 }
 
@@ -21,7 +21,7 @@
   position: absolute;
   inset: 48px 18px 18px;
   pointer-events: none;
-  border: 1px solid rgba(17, 17, 17, 0.09);
+  border: 1px solid rgba(23, 24, 24, 0.12);
 }
 
 .ecosystem-canvas canvas {
@@ -68,12 +68,12 @@
   display: flex;
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
-  background: rgba(244, 244, 239, 0.88);
+  background: color-mix(in srgb, var(--brand-primary) 88%, transparent);
 }
 
 .field-controls button {
   padding: 9px 12px;
-  border-right: 1px solid var(--hairline, rgba(17, 17, 17, 0.14));
+  border-right: 1px solid var(--hairline, rgba(23, 24, 24, 0.14));
   color: var(--ink-mute);
   font-size: 8px;
   letter-spacing: 0.07em;
@@ -102,7 +102,7 @@
   left: 30px;
   z-index: 13;
   width: 244px;
-  background: rgba(244, 244, 239, .72);
+  background: color-mix(in srgb, var(--brand-primary) 72%, transparent);
   backdrop-filter: blur(4px);
   font-size: 8px;
   letter-spacing: .06em;
@@ -115,11 +115,11 @@
   align-items: center;
   gap: 8px;
   padding: 7px 0;
-  border-bottom: 1px solid rgba(17,17,17,.16);
+  border-bottom: 1px solid rgba(23,24,24,.16);
   text-align: left;
   text-transform: uppercase;
 }
-.field-species-rail header { grid-template-columns: 14px 1fr 1fr; border-top: .8px solid rgba(17,17,17,.16); color: var(--ink-mute); }
+.field-species-rail header { grid-template-columns: 14px 1fr 1fr; border-top: .8px solid rgba(23,24,24,.16); color: var(--ink-mute); }
 .field-species-rail header span:first-child { grid-column: 2; }
 .field-species-rail i { width: 8px; height: 8px; border-radius: 50%; }
 .field-species-rail button span:last-child { color: var(--ink-mute); }

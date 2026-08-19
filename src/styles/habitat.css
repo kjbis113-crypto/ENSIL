@@ -1,16 +1,16 @@
 .habitat-page {
-  --habitat-primary: #D5FB4E;
-  --habitat-secondary: #7F86F7;
-  --habitat-accent: #111111;
-  --habitat-paper: #7F86F7;
-  --habitat-ink: #111111;
+  --habitat-primary: var(--brand-primary);
+  --habitat-secondary: var(--brand-secondary);
+  --habitat-accent: var(--brand-structure);
+  --habitat-paper: var(--brand-primary);
+  --habitat-ink: var(--brand-dark);
   position: relative;
   height: 100dvh;
   overflow: hidden;
   color: var(--habitat-ink);
   background:
     radial-gradient(circle at 72% 30%, color-mix(in srgb, var(--habitat-accent), transparent 20%) 0 4%, transparent 4.3%),
-    linear-gradient(118deg, var(--habitat-paper) 0 54%, color-mix(in srgb, var(--habitat-primary), white 34%) 54% 100%);
+    linear-gradient(118deg, var(--habitat-secondary) 0 54%, color-mix(in srgb, var(--habitat-primary), var(--habitat-secondary) 34%) 54% 100%);
 }
 
 .habitat-scene { position: absolute; inset: 48px 0 0; z-index: 2; }
