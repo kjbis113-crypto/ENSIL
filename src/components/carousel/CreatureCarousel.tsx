@@ -16,13 +16,16 @@ import { PortraitViewer } from './PortraitViewer';
  */
 
 const N = CREATURE_RECORDS.length;
-const STEP = 51; // 궤도 위 개체 간 각도(도)
+/** 완전 원환: 8슬롯 × 45도 = 360도. 개체 4종을 마주보게 두 번씩 놓아
+    바퀴가 어느 방향으로든 무한히 돌 수 있다 (재활용 점프 없음). */
+const SLOTS = 8;
+const STEP = 360 / SLOTS; // 45도
 const wrap = (i: number) => ((i % N) + N) % N;
-/** index 기준 부호 있는 궤도 거리: -1(왼쪽), 0(활성), 1(오른쪽), 2(반대편) */
-const signedDist = (i: number, index: number) => ((i - index + N + 1) % N) - 1;
+/** 슬롯 s의 현재 위상(활성 기준 부호 있는 슬롯 거리, -4..3) */
+const slotOffset = (s: number, turn: number) => ((((s - turn) % SLOTS) + SLOTS + 4) % SLOTS) - 4;
 
 export function CreatureCarousel() {
-  const [index, setIndex] = useState(0);
+  const [turn, setTurn] = useState(0); // 연속 회전값(슬롯 단위, 무한)
   const [open, setOpen] = useState(false);
   const [drag, setDrag] = useState(0); // 드래그 중 임시 회전(도)
   const [dragging, setDragging] = useState(false);
@@ -30,10 +33,11 @@ export function CreatureCarousel() {
   const { peerAlive, sendCharge } = useFieldLink('panel');
   const dragStart = useRef({ x: 0, moved: false });
 
+  const index = wrap(turn);
   const record = CREATURE_RECORDS[index];
 
   const step = useCallback((dir: 1 | -1) => {
-    setIndex((i) => wrap(i + dir));
+    setTurn((t) => t + dir);
     setOpen(false);
   }, []);
 
@@ -63,9 +67,11 @@ export function CreatureCarousel() {
   const onDialUp = () => {
     if (!dragging) return;
     setDragging(false);
-    const steps = Math.round(-drag / STEP);
+    // 스냅: 반 칸(0.33 STEP)만 넘겨도 다음 슬롯으로
+    let steps = Math.round(-drag / STEP);
+    if (steps === 0 && Math.abs(drag) > STEP * 0.33) steps = drag < 0 ? 1 : -1;
     if (steps !== 0) {
-      setIndex((i) => wrap(i + steps));
+      setTurn((t) => t + steps);
       setOpen(false);
     }
     setDrag(0);
@@ -92,36 +98,50 @@ export function CreatureCarousel() {
         </ul>
       </header>
 
-      {/* 궤도 위의 개체 원들 — 다이얼과 함께 회전 */}
-      {CREATURE_RECORDS.map((r, i) => {
-        const d = signedDist(i, index);
-        const angle = d * STEP + drag;
-        const active = d === 0 && Math.abs(drag) < STEP / 2;
-        return (
-          <button
-            type="button"
-            key={r.id}
-            className={`cr-orb${active ? ' is-active' : ''}`}
-            style={{ '--a': `${angle}deg` } as React.CSSProperties}
-            onClick={() => {
-              if (dragStart.current.moved) return; // 드래그 직후 클릭 무시
-              if (d !== 0) { setIndex(i); setOpen(false); }
-            }}
-            aria-label={r.name}
-            aria-pressed={active}
-            tabIndex={d === 0 ? -1 : 0}
-          >
-            <SpecimenGlyph index={r.glyphIndex} palette={r.palette} />
-          </button>
-        );
-      })}
+      {/* 궤도(바퀴) — 8슬롯 완전 원환, 바퀴째 회전. 개체는 마주보게 2번씩 */}
+      <div
+        className="cr-orbit"
+        style={{ '--wheel': `${-turn * STEP + drag}deg` } as React.CSSProperties}
+        aria-hidden={false}
+      >
+        {Array.from({ length: SLOTS }, (_, s) => {
+          const r = CREATURE_RECORDS[wrap(s)];
+          const o = slotOffset(s, turn);
+          const active = o === 0 && Math.abs(drag) < STEP / 2;
+          return (
+            <button
+              type="button"
+              key={s}
+              className={`cr-orb${active ? ' is-active' : ''}`}
+              style={{ '--base': `${s * STEP}deg` } as React.CSSProperties}
+              onClick={() => {
+                if (dragStart.current.moved) return; // 드래그 직후 클릭 무시
+                if (o !== 0) { setTurn((t) => t + o); setOpen(false); }
+              }}
+              aria-label={r.name}
+              aria-pressed={active}
+              tabIndex={o === 0 || Math.abs(o) > 1 ? -1 : 0}
+            >
+              <SpecimenGlyph index={r.glyphIndex} palette={r.palette} />
+            </button>
+          );
+        })}
+      </div>
 
-      {/* 활성 슬롯 위 고정 포트레이트 */}
-      <div className="cr-stage" key={`stage-pulse-${record.id}`}>
-        <PortraitViewer modelUrl={record.modelUrl} />
-        <button type="button" className="cr-pill cr-pill--explore" onClick={() => setOpen((v) => !v)}>
-          <i /> {open ? 'Close' : 'Explore'}
-        </button>
+      {/* 활성 슬롯의 포트레이트 — 드래그하면 궤도를 따라 같이 돌면서 살짝 수축한다 */}
+      <div
+        className="cr-stage"
+        style={{
+          '--a': `${drag}deg`,
+          '--shrink': 1 - Math.min(Math.abs(drag) / STEP, 1) * 0.18,
+        } as React.CSSProperties}
+      >
+        <div className="cr-stage__disc" key={`stage-pulse-${record.id}`}>
+          <PortraitViewer modelUrl={record.modelUrl} />
+          <button type="button" className="cr-pill cr-pill--explore" onClick={() => setOpen((v) => !v)}>
+            <i /> {open ? 'Close' : 'Explore'}
+          </button>
+        </div>
       </div>
 
       {/* 상세 시트 — 뎁스 0 모핑 */}
@@ -153,7 +173,7 @@ export function CreatureCarousel() {
       >
         <div
           className="cr-dial__plate"
-          style={{ '--rot': `${-index * STEP + drag}deg` } as React.CSSProperties}
+          style={{ '--rot': `${-turn * STEP + drag}deg` } as React.CSSProperties}
           aria-hidden
         >
           <i className="cr-dial__notch" />

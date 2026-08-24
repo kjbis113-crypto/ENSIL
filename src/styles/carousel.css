@@ -97,11 +97,24 @@
 }
 .is-open .cr-info { opacity: 0.25; transition: opacity 0.3s ease; }
 
-/* ── 궤도 위 개체 원 (orb) ─────────────────────────────────── */
-.cr-orb {
+/* ── 궤도(바퀴) — 8슬롯 완전 원환, 바퀴째 회전 ──────────────── */
+.cr-orbit {
   position: absolute;
   left: 50%;
   top: var(--dial-cy);
+  width: 0;
+  height: 0;
+  transform: rotate(var(--wheel, 0deg));
+  transition: transform 0.72s var(--spring);
+}
+.is-dragging .cr-orbit { transition: none; }
+
+/* 개체 원: 바퀴 안 고정 슬롯(--base). 콘텐츠는 --base+--wheel 역회전으로 항상 수직 —
+   부모와 같은 트랜지션 곡선이라 회전 내내 상쇄가 유지된다. */
+.cr-orb {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: var(--orb-d);
   aspect-ratio: 1;
   padding: 0;
@@ -114,12 +127,13 @@
   opacity: 0.6;
   transform:
     translate(-50%, -50%)
-    rotate(var(--a))
+    rotate(var(--base))
     translateY(calc(-1 * var(--ring-r)))
-    rotate(calc(-1 * var(--a)))
+    rotate(calc(-1 * var(--base) - var(--wheel, 0deg)))
     scale(0.62);
   transition: transform 0.72s var(--spring), opacity 0.45s ease, filter 0.45s ease;
 }
+.is-dragging .cr-orb { transition: opacity 0.45s ease, filter 0.45s ease; }
 .cr-orb > :first-child { width: 100%; height: 100%; }
 .cr-orb:hover { opacity: 0.85; }
 .cr-orb.is-active {
@@ -128,37 +142,55 @@
   cursor: default;
   transform:
     translate(-50%, -50%)
-    rotate(var(--a))
+    rotate(var(--base))
     translateY(calc(-1 * var(--ring-r)))
-    rotate(calc(-1 * var(--a)))
+    rotate(calc(-1 * var(--base) - var(--wheel, 0deg)))
     scale(0.94);
 }
-.is-dragging .cr-orb { transition: opacity 0.45s ease, filter 0.45s ease; }
 .is-open .cr-orb:not(.is-active) { opacity: 0.15; }
 
-/* ── 활성 슬롯 위 고정 포트레이트 ──────────────────────────── */
+/* ── 활성 슬롯의 포트레이트 — 궤도와 같은 수식으로 드래그를 따라 돈다 ── */
 .cr-stage {
   position: absolute;
   left: 50%;
-  top: calc(var(--dial-cy) - var(--ring-r));
+  top: var(--dial-cy);
   z-index: 3;
   width: var(--stage-d);
   aspect-ratio: 1;
+  pointer-events: none;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--a, 0deg))
+    translateY(calc(-1 * var(--ring-r)))
+    rotate(calc(-1 * var(--a, 0deg)))
+    scale(var(--shrink, 1));
+  transition: transform 0.72s var(--spring);
+}
+.is-dragging .cr-stage { transition: none; }
+.is-open .cr-stage {
+  transform:
+    translate(-50%, -50%)
+    rotate(0deg)
+    translateY(calc(-1 * var(--ring-r) - 6dvh))
+    rotate(0deg)
+    scale(0.82);
+}
+.cr-stage__disc {
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
   overflow: hidden;
+  pointer-events: auto;
   background: radial-gradient(circle at 50% 42%, #ffffff 0%, #eceee6 78%, #e4e6dd 100%);
   box-shadow:
     0 30px 70px rgba(17, 17, 17, 0.13),
     inset 0 0 0 1px rgba(17, 17, 17, 0.05);
-  transform: translate(-50%, -50%);
-  transition: transform 0.68s var(--spring);
   animation: crPop 0.7s var(--spring);
 }
 @keyframes crPop {
-  from { transform: translate(-50%, -50%) scale(0.955); }
-  to { transform: translate(-50%, -50%) scale(1); }
+  from { transform: scale(0.955); }
+  to { transform: scale(1); }
 }
-.is-open .cr-stage { transform: translate(-50%, -60%) scale(0.82); }
 
 .portrait-viewer {
   position: absolute;
