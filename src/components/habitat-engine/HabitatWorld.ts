@@ -170,6 +170,14 @@ export class HabitatWorld {
   private pointerBiomeId: string | null = null;
   private hoveredId: string | null = null;
   private frame = 0;
+  private charges: Array<{
+    orb: THREE.Mesh;
+    ring: THREE.Mesh;
+    targetId: string;
+    targetY: number;
+    startAt: number;
+    landed: boolean;
+  }> = [];
   private lastTime = performance.now();
   private lastSnapshot = 0;
   private loaded = 0;
@@ -660,6 +668,73 @@ export class HabitatWorld {
     runtime.state.tension = Math.min(1, runtime.state.tension + 0.16 * strength);
   }
 
+  /** 아카이브 패널에서 던진 전하 — 라임 구체가 개체 위로 떨어지고, 닿는 순간 개체가 반응한다 */
+  dropCharge(id?: string) {
+    const records = this.options.records;
+    const targetId = id && this.runtimes.has(id)
+      ? id
+      : records[Math.floor(Math.random() * records.length)]?.id;
+    const runtime = targetId ? this.runtimes.get(targetId) : null;
+    if (!runtime || !targetId) return;
+
+    const orb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.85, 20, 14),
+      new THREE.MeshStandardMaterial({
+        color: 0xd5fb4e,
+        emissive: 0xd5fb4e,
+        emissiveIntensity: 1.4,
+        roughness: 0.3,
+        transparent: true,
+      }),
+    );
+    const targetY = runtime.group.position.y;
+    orb.position.set(runtime.group.position.x, targetY + 36, runtime.group.position.z);
+    this.scene.add(orb);
+
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(1.1, 1.32, 48),
+      new THREE.MeshBasicMaterial({ color: 0xd5fb4e, transparent: true, opacity: 0, side: THREE.DoubleSide }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(runtime.group.position.x, targetY + 0.08, runtime.group.position.z);
+    this.scene.add(ring);
+
+    this.charges.push({ orb, ring, targetId, targetY, startAt: performance.now(), landed: false });
+  }
+
+  private updateCharges(now: number) {
+    const FALL_MS = 620;
+    const AFTER_MS = 1500;
+    for (let i = this.charges.length - 1; i >= 0; i -= 1) {
+      const c = this.charges[i];
+      const t = (now - c.startAt) / FALL_MS;
+      if (!c.landed) {
+        const k = Math.min(1, t);
+        c.orb.position.y = c.targetY + 36 - 35.2 * k * k; // 자유낙하 느낌
+        if (k >= 1) {
+          c.landed = true;
+          this.activate(c.targetId, 1.25);
+        }
+      } else {
+        const a = Math.min(1, (now - c.startAt - FALL_MS) / AFTER_MS);
+        const orbMat = c.orb.material as THREE.MeshStandardMaterial;
+        orbMat.opacity = 1 - a;
+        c.orb.scale.setScalar(1 + a * 1.6);
+        const ringMat = c.ring.material as THREE.MeshBasicMaterial;
+        ringMat.opacity = a < 0.25 ? a / 0.25 : 1 - (a - 0.25) / 0.75;
+        c.ring.scale.setScalar(1 + a * 5.5);
+        if (a >= 1) {
+          this.scene.remove(c.orb, c.ring);
+          c.orb.geometry.dispose();
+          orbMat.dispose();
+          c.ring.geometry.dispose();
+          ringMat.dispose();
+          this.charges.splice(i, 1);
+        }
+      }
+    }
+  }
+
   private setFocus(id: string | null | undefined, immediate = false) {
     const runtime = id ? this.runtimes.get(id) : null;
     this.focusStartedAt = performance.now();
@@ -832,6 +907,7 @@ export class HabitatWorld {
       })));
     }
 
+    this.updateCharges(now);
     this.renderer.render(this.scene, this.camera);
     this.frame = window.requestAnimationFrame(this.animate);
   };

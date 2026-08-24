@@ -1,5 +1,6 @@
-import { useMemo, useState, type CSSProperties } from 'react';
-import { EcosystemCanvas } from '../components/field/EcosystemCanvas';
+import { useCallback, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { EcosystemCanvas, type EcosystemApi } from '../components/field/EcosystemCanvas';
+import { useFieldLink } from '../state/useFieldLink';
 import { CREATURE_RECORDS, getCreatureRecord, type CreatureState } from '../data/creatureRecords';
 
 type Snapshot = { id: string; state: CreatureState; energy: number; stress: number };
@@ -11,6 +12,10 @@ export function Field() {
   const [paused, setPaused] = useState(false);
   const [snapshot, setSnapshot] = useState<Snapshot[]>([]);
   const [sensorStatus, setSensorStatus] = useState<'POINTER' | 'MIC ACTIVE' | 'CAMERA ACTIVE'>('POINTER');
+
+  // 스테이지(프로젝터) 역할 — 아카이브 패널 창이 던진 전하를 받아 떨어뜨린다
+  const apiRef = useRef<EcosystemApi | null>(null);
+  useFieldLink('stage', useCallback((id?: string) => apiRef.current?.dropCharge(id), []));
 
   const activeRecordId = selectedId ?? proximityId;
   const selected = activeRecordId ? getCreatureRecord(activeRecordId) : null;
@@ -48,6 +53,7 @@ export function Field() {
         onEnter={(id) => { window.location.hash = `/habitat/${id}`; }}
         onProximity={setProximityId}
         onSnapshot={setSnapshot}
+        bindApi={(api) => { apiRef.current = api; }}
       />
 
       <div className="field-index" aria-hidden>
