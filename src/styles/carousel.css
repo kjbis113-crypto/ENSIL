@@ -1,13 +1,21 @@
-/* ── Archive carousel — 미니멀 캐러셀 인덱스 ─────────────────────
-   모션 규칙: 모든 전환은 --spring 하나(오버슛 베지어)로 통일, transform/opacity만 움직인다. */
+/* ── Archive carousel — 원형 다이얼 캐러셀 ───────────────────────
+   기하: 개체 원(orb)들은 화면 아래(--dial-cy)에 중심을 둔 궤도(--ring-r) 위에 있고
+   다이얼과 함께 회전한다. 12시 슬롯 위에 고정 포트레이트(--stage)가 겹친다.
+   조판: 스위스 — 플러시레프트 정보 칼럼, 일관 마진(--page-m), 명확한 크기 위계.
+   모션: 모든 전환은 --spring 하나, transform/opacity만. */
 
 :root {
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --spring-soft: cubic-bezier(0.22, 1.2, 0.36, 1);
   --cr-ink: #111111;
-  --cr-mute: #8b8b85;
+  --cr-mute: #77776f;
   --cr-lime: #d5fb4e;
   --cr-paper: #f6f6f2;
+
+  --page-m: 40px;
+  --dial-cy: 122dvh;  /* 궤도·다이얼 중심 (뷰포트 아래) */
+  --ring-r: 76dvh;    /* 궤도 반지름 — 활성 슬롯 중심 = 46dvh */
+  --orb-d: min(38vh, 28vw);
+  --stage-d: min(46vh, 36vw);
 }
 
 .carousel-page {
@@ -16,56 +24,141 @@
   overflow: hidden;
   background: var(--cr-paper);
   color: var(--cr-ink);
+  font-family: var(--font, Arial, sans-serif);
 }
 
-/* 배경 — 은은한 라임 글로우 + 점 그리드 (우리 톤) */
+/* 배경 — 은은한 라임 글로우 + 점 그리드 */
 .cr-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(52% 40% at 50% 118%, color-mix(in srgb, var(--cr-lime) 42%, transparent) 0%, transparent 70%),
-    radial-gradient(30% 24% at 82% -6%, color-mix(in srgb, var(--cr-lime) 20%, transparent) 0%, transparent 75%),
-    radial-gradient(circle, rgba(17, 17, 17, 0.05) 0.6px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 26px 26px;
+    radial-gradient(54% 42% at 50% 120%, color-mix(in srgb, var(--cr-lime) 40%, transparent) 0%, transparent 70%),
+    radial-gradient(30% 24% at 84% -6%, color-mix(in srgb, var(--cr-lime) 18%, transparent) 0%, transparent 75%),
+    radial-gradient(circle, rgba(17, 17, 17, 0.045) 0.6px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 28px 28px;
 }
 
-.cr-caption {
+/* ── 좌측 정보 칼럼 (스위스 플러시레프트) ──────────────────── */
+.cr-info {
   position: absolute;
-  top: 62px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  letter-spacing: 0.22em;
+  left: var(--page-m);
+  top: 50%;
+  z-index: 4;
+  transform: translateY(-56%); /* 시각 보정: 기하 중앙보다 살짝 위 */
+  max-width: min(340px, 26vw);
+  animation: crRise 0.6s var(--spring);
+}
+@keyframes crRise {
+  from { opacity: 0; transform: translateY(calc(-56% + 16px)); }
+  to { opacity: 1; transform: translateY(-56%); }
+}
+.cr-info__kicker {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--cr-mute);
 }
-
-/* ── 원(circle) 3형제 ─────────────────────────────────────── */
-.cr-circle {
-  position: absolute;
-  top: 47%;
-  transform: translate(-50%, -50%);
-  border: none;
+.cr-info__index {
+  margin-top: 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--cr-mute);
+}
+.cr-info h1 {
+  margin-top: 18px;
+  font-size: clamp(40px, 4.6vw, 72px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  word-break: keep-all;
+}
+.cr-info ul {
+  margin-top: 28px;
+  list-style: none;
   padding: 0;
+  border-top: 1px solid rgba(17, 17, 17, 0.16);
+}
+.cr-info li {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.09);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.cr-info li span {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cr-mute);
+  padding-top: 2px;
+}
+.is-open .cr-info { opacity: 0.25; transition: opacity 0.3s ease; }
+
+/* ── 궤도 위 개체 원 (orb) ─────────────────────────────────── */
+.cr-orb {
+  position: absolute;
+  left: 50%;
+  top: var(--dial-cy);
+  width: var(--orb-d);
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
   border-radius: 50%;
   overflow: hidden;
-  transition: transform 0.68s var(--spring), opacity 0.5s ease, filter 0.5s ease;
+  cursor: pointer;
+  background: #ecece6;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.6;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--a))
+    translateY(calc(-1 * var(--ring-r)))
+    rotate(calc(-1 * var(--a)))
+    scale(0.62);
+  transition: transform 0.72s var(--spring), opacity 0.45s ease, filter 0.45s ease;
 }
-.cr-circle--main {
+.cr-orb > :first-child { width: 100%; height: 100%; }
+.cr-orb:hover { opacity: 0.85; }
+.cr-orb.is-active {
+  filter: none;
+  opacity: 1;
+  cursor: default;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--a))
+    translateY(calc(-1 * var(--ring-r)))
+    rotate(calc(-1 * var(--a)))
+    scale(0.94);
+}
+.is-dragging .cr-orb { transition: opacity 0.45s ease, filter 0.45s ease; }
+.is-open .cr-orb:not(.is-active) { opacity: 0.15; }
+
+/* ── 활성 슬롯 위 고정 포트레이트 ──────────────────────────── */
+.cr-stage {
+  position: absolute;
   left: 50%;
-  width: min(52vh, 42vw);
+  top: calc(var(--dial-cy) - var(--ring-r));
+  z-index: 3;
+  width: var(--stage-d);
   aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
   background: radial-gradient(circle at 50% 42%, #ffffff 0%, #eceee6 78%, #e4e6dd 100%);
   box-shadow:
-    0 30px 70px rgba(17, 17, 17, 0.12),
+    0 30px 70px rgba(17, 17, 17, 0.13),
     inset 0 0 0 1px rgba(17, 17, 17, 0.05);
+  transform: translate(-50%, -50%);
+  transition: transform 0.68s var(--spring);
   animation: crPop 0.7s var(--spring);
 }
 @keyframes crPop {
   from { transform: translate(-50%, -50%) scale(0.955); }
   to { transform: translate(-50%, -50%) scale(1); }
 }
-.is-open .cr-circle--main { transform: translate(-50%, -56%) scale(0.86); }
+.is-open .cr-stage { transform: translate(-50%, -60%) scale(0.82); }
 
 .portrait-viewer {
   position: absolute;
@@ -75,34 +168,19 @@
 }
 .portrait-viewer canvas { display: block; }
 
-.cr-circle--side {
-  width: min(34vh, 26vw);
-  aspect-ratio: 1;
-  cursor: pointer;
-  background: #ecece6;
-  filter: grayscale(1) contrast(0.82);
-  opacity: 0.55;
-}
-.cr-circle--side:hover { opacity: 0.85; transform: translate(-50%, -50%) scale(1.04); }
-.cr-circle--side .specimen-glyph,
-.cr-circle--side > :first-child { width: 100%; height: 100%; }
-.cr-circle--prev { left: -3vw; }
-.cr-circle--next { left: 103vw; }
-.is-open .cr-circle--side { opacity: 0.2; }
-
 /* ── 알약 버튼 — 조작의 단일 형태 언어 ─────────────────────── */
 .cr-pill {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 12px 22px;
+  gap: 10px;
+  padding: 13px 24px;
   border: none;
   border-radius: 999px;
-  background: rgba(17, 17, 17, 0.82);
+  background: rgba(17, 17, 17, 0.85);
   color: #f6f6f2;
   font-family: inherit;
-  font-size: 12px;
-  letter-spacing: 0.14em;
+  font-size: 14px;
+  letter-spacing: 0.01em;
   text-decoration: none;
   cursor: pointer;
   backdrop-filter: blur(6px);
@@ -113,51 +191,28 @@
 .cr-pill--explore {
   position: absolute;
   left: 50%;
-  top: 58%;
+  top: 60%;
   transform: translateX(-50%);
 }
 .cr-pill--explore:hover { transform: translateX(-50%) scale(1.06); }
 .cr-pill--explore:active { transform: translateX(-50%) scale(0.94); }
 .cr-pill--explore i {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--cr-lime);
 }
-
-/* ── 이름 ─────────────────────────────────────────────────── */
-.cr-name {
-  position: absolute;
-  left: 50%;
-  top: 92px;
-  transform: translateX(-50%);
-  text-align: center;
-  animation: crRise 0.6s var(--spring);
-}
-@keyframes crRise {
-  from { opacity: 0; transform: translate(-50%, 14px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
-.cr-name span { font-size: 9px; letter-spacing: 0.2em; color: var(--cr-mute); }
-.cr-name h1 {
-  margin-top: 7px;
-  font-size: clamp(26px, 3vw, 44px);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-.is-open .cr-name { opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
 
 /* ── 상세 시트 (뎁스 0 모핑) ──────────────────────────────── */
 .cr-sheet {
   position: absolute;
   left: 50%;
-  bottom: 21dvh;
-  z-index: 3;
-  width: min(600px, 86vw);
-  padding: 22px 26px 20px;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.86);
+  bottom: 20dvh;
+  z-index: 5;
+  width: min(640px, 88vw);
+  padding: 28px 32px 26px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
   box-shadow: 0 24px 60px rgba(17, 17, 17, 0.14), inset 0 0 0 1px rgba(17, 17, 17, 0.05);
   backdrop-filter: blur(14px);
   transform: translate(-50%, 24px) scale(0.94);
@@ -173,114 +228,91 @@
 .cr-sheet dl {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 13px 26px;
+  gap: 18px 32px;
 }
-.cr-sheet dt { font-size: 9px; letter-spacing: 0.18em; color: var(--cr-mute); }
-.cr-sheet dd { margin-top: 4px; font-size: 13px; line-height: 1.4; }
+.cr-sheet dt {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cr-mute);
+}
+.cr-sheet dd { margin-top: 5px; font-size: 15px; line-height: 1.5; }
 .cr-sheet__actions {
   display: flex;
-  gap: 10px;
-  margin-top: 18px;
+  gap: 12px;
+  margin-top: 24px;
 }
-.cr-sheet__actions .cr-pill { padding: 10px 18px; font-size: 11px; }
+.cr-sheet__actions .cr-pill { padding: 11px 20px; font-size: 13px; }
 
-/* ── 라디얼 다이얼 (엄지 존) ──────────────────────────────── */
-.cr-dial {
+/* ── 다이얼 원판 + 드래그 존 ──────────────────────────────── */
+.cr-dial-zone {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: 0;
-  width: 0;
-  height: 0;
+  height: 24dvh;
+  z-index: 2;
+  cursor: grab;
+  touch-action: none;
 }
-.cr-dial__thumb {
+.is-dragging .cr-dial-zone { cursor: grabbing; }
+.cr-dial__plate {
   position: absolute;
   left: 50%;
-  bottom: calc(-1 * min(34vh, 30vw));
-  transform: translateX(-50%);
-  width: min(58vh, 52vw);
+  top: calc(var(--dial-cy) - 100dvh + 24dvh); /* 존 좌표계 보정 */
+  width: 72dvh;
   aspect-ratio: 1;
   border-radius: 50%;
   background: #e3e5dc;
-  box-shadow: inset 0 6px 24px rgba(17, 17, 17, 0.05);
+  box-shadow: inset 0 8px 28px rgba(17, 17, 17, 0.06);
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  transition: transform 0.72s var(--spring);
 }
-.cr-dot {
-  position: absolute;
-  left: 0;
-  bottom: min(7vh, 6vw);
-  width: 46px;
-  height: 46px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: #d3d5cc;
-  cursor: pointer;
-  /* 부채꼴 배치: 다이얼 중심 기준 회전 */
-  transform:
-    translate(-50%, 50%)
-    rotate(var(--angle))
-    translateY(calc(-1 * min(17vh, 15vw)))
-    rotate(calc(-1 * var(--angle)));
-  transition: transform 0.55s var(--spring), background 0.3s ease;
-}
-.cr-dot i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #f6f6f2;
-  transition: background 0.3s ease;
-}
-.cr-dot:hover {
-  transform:
-    translate(-50%, 50%)
-    rotate(var(--angle))
-    translateY(calc(-1 * min(17vh, 15vw)))
-    rotate(calc(-1 * var(--angle)))
-    scale(1.12);
-}
-.cr-dot.is-active {
-  background: var(--cr-ink);
-  transform:
-    translate(-50%, 50%)
-    rotate(var(--angle))
-    translateY(calc(-1 * min(18.5vh, 16.5vw)))
-    rotate(calc(-1 * var(--angle)))
-    scale(1.28);
-}
-.cr-dot.is-active i { background: var(--cr-lime); }
-
-.cr-pill--charge {
+.is-dragging .cr-dial__plate { transition: none; }
+.cr-dial__notch {
   position: absolute;
   left: 50%;
-  bottom: min(4.5vh, 4vw);
+  top: 14px;
+  width: 4px;
+  height: 26px;
+  border-radius: 2px;
+  background: var(--cr-lime);
   transform: translateX(-50%);
+}
+
+/* ── 하단 액션 (전하 + 연동 상태) ──────────────────────────── */
+.cr-actions {
+  position: absolute;
+  left: 50%;
+  bottom: var(--page-m);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+}
+.cr-pill--charge {
   background: var(--cr-ink);
   animation: crChargePulse 0.55s var(--spring);
 }
-.cr-pill--charge:hover { transform: translateX(-50%) scale(1.06); background: #000; }
-.cr-pill--charge:active { transform: translateX(-50%) scale(0.92); }
+.cr-pill--charge:hover { background: #000000; }
 @keyframes crChargePulse {
   0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cr-lime) 90%, transparent); }
-  100% { box-shadow: 0 0 0 26px transparent; }
+  100% { box-shadow: 0 0 0 28px transparent; }
 }
-
 .cr-link-status {
-  position: absolute;
-  left: 50%;
-  bottom: min(1.6vh, 1.4vw);
-  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 8px;
-  letter-spacing: 0.2em;
+  gap: 7px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
   color: var(--cr-mute);
   white-space: nowrap;
 }
 .cr-link-status i {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #c2c4bb;
   transition: background 0.3s ease;
@@ -289,14 +321,28 @@
 .cr-link-status.is-live { color: var(--cr-ink); }
 
 /* ── 좁은 화면 ────────────────────────────────────────────── */
-@media (max-width: 760px) {
-  .cr-circle--main { width: min(46vh, 82vw); }
-  .cr-circle--side { display: none; }
-  .cr-name { top: 84px; }
-  .cr-sheet { bottom: 24dvh; }
+@media (max-width: 900px) {
+  :root {
+    --page-m: 20px;
+    --orb-d: min(34vh, 44vw);
+    --stage-d: min(42vh, 78vw);
+  }
+  .cr-info {
+    top: auto;
+    bottom: 26dvh;
+    transform: none;
+    max-width: 60vw;
+    animation: none;
+  }
+  .cr-info h1 { font-size: clamp(28px, 8vw, 44px); }
+  .cr-info ul { display: none; }
+  .cr-sheet { bottom: 18dvh; }
   .cr-sheet dl { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cr-circle, .cr-pill, .cr-dot, .cr-sheet, .cr-name { animation: none !important; transition-duration: 0.01ms !important; }
+  .cr-orb, .cr-stage, .cr-pill, .cr-sheet, .cr-info, .cr-dial__plate {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
 }
