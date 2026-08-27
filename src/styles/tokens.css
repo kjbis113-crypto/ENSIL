@@ -2,12 +2,16 @@
 :root {
   color-scheme: light;
 
-  --brand-primary: #73D2BE;
-  --brand-secondary: #5FA48D;
-  --brand-structure: #545756;
-  --brand-dark: #171818;
+  --ensil-green: #5FA48D;
+  --ensil-grey: #545756;
+  --ensil-white: #FFFFFF;
+
+  --brand-primary: var(--ensil-green);
+  --brand-secondary: var(--ensil-grey);
+  --brand-structure: var(--ensil-grey);
+  --brand-dark: var(--ensil-grey);
   --brand-white: #FFFFFF;
-  --brand-off-white: #F4F6F3;
+  --brand-off-white: #FFFFFF;
 
   /* White is the field; brand colours remain signals rather than page fills. */
   --paper: var(--brand-white);
@@ -35,6 +39,15 @@
   --cursor-blob: rgba(23, 24, 24, 0.12);
   --cursor-blob-size: 96px;
 
+  --motion-fast: 160ms;
+  --motion-ui: 280ms;
+  --motion-panel: 520ms;
+  --motion-page: 760ms;
+  --motion-spatial: 760ms;
+  --ease-precise: cubic-bezier(.22, .8, .24, 1);
+  --ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --ease-exit: cubic-bezier(.7, 0, .84, 0);
+
   /* Spacing */
   --sp-1: 5px;
   --sp-2: 10px;
@@ -45,9 +58,9 @@
   /* Square, technical geometry */
   --radius: 0;
 
-  --font: Helvetica, 'Helvetica Neue', Arial, sans-serif;
-  --font-display: Helvetica, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --fw-md: 400;
   --fw-bd: 700;
   --lh-tight: 0.93;

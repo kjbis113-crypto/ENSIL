@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { CreatureRecord, CreatureState } from '../../data/creatureRecords';
+import { FirstPersonFieldController } from '../field/FirstPersonFieldController';
 import { getBiomeConfig } from './biomes';
 import { buildHabitatSystems, terrainHeight, updateHabitatSystems, type HabitatSystems } from './systems';
 import {
@@ -25,6 +26,7 @@ export type HabitatWorldOptions = {
   onEnter?: (id: string) => void;
   onProximity?: (id: string | null) => void;
   onSnapshot?: (snapshot: HabitatSnapshot[]) => void;
+  onImmersiveChange?: (active: boolean) => void;
 };
 
 type HabitatRuntime = {
@@ -150,12 +152,15 @@ export class HabitatWorld {
   private camera = new THREE.PerspectiveCamera(33, 1, 0.1, 220);
   private renderer: THREE.WebGLRenderer;
   private controls: OrbitControls;
+  private fieldController: FirstPersonFieldController | null = null;
   private runtimes = new Map<string, HabitatRuntime>();
   private pickables: THREE.Object3D[] = [];
   private terrains: THREE.Object3D[] = [];
   private raycaster = new THREE.Raycaster();
   private pointerNdc = new THREE.Vector2(10, 10);
+  private centerNdc = new THREE.Vector2(0, 0);
   private pointerWorld = new THREE.Vector3();
+  private scratchWorld = new THREE.Vector3();
   private pointerBiomeId: string | null = null;
   private hoveredId: string | null = null;
   private frame = 0;
@@ -198,14 +203,23 @@ export class HabitatWorld {
     this.controls.zoomSpeed = 0.45;
     this.controls.minPolarAngle = 0.48;
     this.controls.maxPolarAngle = options.mode === 'field' ? 1.28 : 1.02;
-    this.controls.autoRotate = !this.reducedMotion;
+    this.controls.autoRotate = options.mode === 'single' && !this.reducedMotion;
     this.controls.autoRotateSpeed = 0.075;
     this.controls.minDistance = options.mode === 'field' ? 40 : 24;
     this.controls.maxDistance = options.mode === 'field' ? 92 : 62;
+    this.controls.enabled = options.mode === 'single';
     this.controls.addEventListener('start', this.handleControlStart);
     this.controls.addEventListener('end', this.handleControlEnd);
 
     this.setupCamera();
+    if (options.mode === 'field') {
+      this.fieldController = new FirstPersonFieldController({
+        camera: this.camera,
+        canvas: this.renderer.domElement,
+        onActiveChange: (active) => this.options.onImmersiveChange?.(active),
+        onInteract: () => this.interactFromView(),
+      });
+    }
     this.setupLighting();
     buildWorldScaffold(this.scene, this.mobile, options.mode);
     if (options.mode === 'field') {
@@ -224,8 +238,9 @@ export class HabitatWorld {
 
   private setupCamera() {
     if (this.options.mode === 'field') {
-      this.camera.position.set(0, this.mobile ? 65 : 46, this.mobile ? 82 : 105);
-      this.controls.target.set(0, this.mobile ? -0.7 : 10, 0);
+      this.camera.position.set(0, commonFieldHeight(0, 27) + 3.2, 27);
+      this.camera.lookAt(0, 1.5, 0);
+      this.controls.target.set(0, 1.5, 0);
     } else {
       this.camera.position.set(this.mobile ? 19 : 24, this.mobile ? 27 : 22, this.mobile ? 42 : 34);
       this.controls.target.set(0, -0.4, 0);
@@ -508,7 +523,9 @@ export class HabitatWorld {
     const canvas = this.renderer.domElement;
     canvas.tabIndex = 0;
     const habitatLabel = this.options.records.length === 1 ? 'habitat' : 'habitats';
-    canvas.setAttribute('aria-label', `${this.options.records.length} autonomous electronic ${habitatLabel}. Drag to orbit, move to disturb contours, and select a creature to activate its ecology.`);
+    canvas.setAttribute('aria-label', this.options.mode === 'field'
+      ? `${this.options.records.length} autonomous electronic ${habitatLabel}. Enter the field, move with W A S D, look with the pointer, and press E to inspect a creature.`
+      : `${this.options.records.length} autonomous electronic ${habitatLabel}. Drag to orbit, move to disturb contours, and select a creature to activate its ecology.`);
     canvas.addEventListener('pointermove', this.handlePointerMove);
     canvas.addEventListener('pointerleave', this.handlePointerLeave);
     canvas.addEventListener('pointerdown', this.handlePointerDown);
@@ -582,6 +599,7 @@ export class HabitatWorld {
   };
 
   private handlePointerUp = (event: PointerEvent) => {
+    if (this.options.mode === 'field' && this.fieldController?.isActive) return;
     if (Math.hypot(event.clientX - this.down.x, event.clientY - this.down.y) > 7) return;
     this.updatePointer(event);
     if (this.hoveredId) {
@@ -600,10 +618,12 @@ export class HabitatWorld {
   };
 
   private handleDoubleClick = () => {
+    if (this.options.mode === 'field' && this.fieldController?.isActive) return;
     if (this.hoveredId) this.options.onEnter?.(this.hoveredId);
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {
+    if (this.options.mode === 'field' && this.fieldController?.isActive) return;
     const records = this.options.records;
     const selectedIndex = Math.max(0, records.findIndex((record) => record.id === this.options.selectedId));
     if (event.key === 'Tab' && this.options.mode === 'field') {
@@ -630,7 +650,7 @@ export class HabitatWorld {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.mobile ? 1.15 : 1.5));
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
-    this.camera.fov = this.mobile ? 39 : 33;
+    this.camera.fov = this.options.mode === 'field' ? (this.mobile ? 64 : 58) : (this.mobile ? 39 : 33);
     this.camera.updateProjectionMatrix();
   };
 
@@ -649,21 +669,55 @@ export class HabitatWorld {
     runtime.state.tension = Math.min(1, runtime.state.tension + 0.16 * strength);
   }
 
+  enterFirstPerson() {
+    this.fieldController?.requestEntry();
+  }
+
+  exitFirstPerson() {
+    this.fieldController?.exit();
+  }
+
+  private inspectViewTarget() {
+    this.raycaster.setFromCamera(this.centerNdc, this.camera);
+    const hit = this.raycaster.intersectObjects(this.pickables, true)[0];
+    let target: THREE.Object3D | null = hit?.object ?? null;
+    while (target && !target.userData.creatureId) target = target.parent;
+    const rayId = (target?.userData.creatureId as string | undefined) ?? null;
+    if (rayId) return rayId;
+
+    let nearestId: string | null = null;
+    let nearestDistance = 13;
+    this.runtimes.forEach((runtime) => {
+      const world = runtime.creatureRoot.getWorldPosition(this.scratchWorld);
+      const distance = world.distanceTo(this.camera.position);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestId = runtime.record.id;
+      }
+    });
+    return nearestId;
+  }
+
+  private interactFromView() {
+    if (this.options.mode !== 'field' || !this.fieldController?.isActive) return;
+    const id = this.inspectViewTarget();
+    if (!id) return;
+    this.activate(id, 1);
+    this.options.onSelect?.(id);
+  }
+
   private setFocus(id: string | null | undefined, immediate = false) {
     const runtime = id ? this.runtimes.get(id) : null;
     this.focusStartedAt = performance.now();
     if (runtime && this.options.mode === 'field') {
-      this.desiredTarget.copy(runtime.group.position).add(new THREE.Vector3(0, -0.7, 0));
-      this.desiredCamera.copy(runtime.group.position).add(new THREE.Vector3(0, this.mobile ? 37 : 28, this.mobile ? 48 : 39));
       this.activate(runtime.record.id, 0.45);
     } else if (this.options.mode === 'field') {
-      this.desiredTarget.set(0, this.mobile ? -0.7 : 10, 0);
-      this.desiredCamera.set(0, this.mobile ? 65 : 46, this.mobile ? 82 : 105);
+      this.desiredTarget.set(0, 1.5, 0);
     } else {
       this.desiredTarget.set(0, -0.4, 0);
       this.desiredCamera.set(this.mobile ? 19 : 24, this.mobile ? 27 : 22, this.mobile ? 42 : 34);
     }
-    if (immediate) {
+    if (immediate && this.options.mode === 'single') {
       this.controls.target.copy(this.desiredTarget);
       this.camera.position.copy(this.desiredCamera);
     }
@@ -822,13 +876,24 @@ export class HabitatWorld {
     this.commonLandscape?.update(now);
     this.updateFieldReferenceLandscape(now, dt);
 
-    if (!this.userInteracting) {
-      const transition = now - this.focusStartedAt < 2200;
-      this.controls.target.lerp(this.desiredTarget, transition ? 0.035 : 0.008);
-      if (transition) this.camera.position.lerp(this.desiredCamera, 0.022);
+    if (this.options.mode === 'field') {
+      this.fieldController?.update(dt);
+      if (this.fieldController?.isActive) {
+        const focused = this.inspectViewTarget();
+        if (focused !== this.hoveredId) {
+          this.hoveredId = focused;
+          this.options.onProximity?.(focused);
+        }
+      }
+    } else {
+      if (!this.userInteracting) {
+        const transition = now - this.focusStartedAt < 2200;
+        this.controls.target.lerp(this.desiredTarget, transition ? 0.035 : 0.008);
+        if (transition) this.camera.position.lerp(this.desiredCamera, 0.022);
+      }
+      this.controls.autoRotate = !this.reducedMotion && !this.userInteracting && now - this.focusStartedAt > 2200;
+      this.controls.update();
     }
-    this.controls.autoRotate = !this.reducedMotion && !this.userInteracting && now - this.focusStartedAt > 2200;
-    this.controls.update();
 
     const fog = this.scene.fog as THREE.FogExp2;
     const averageWeather = Array.from(this.runtimes.values()).reduce((sum, runtime) => sum + runtime.state.weatherState, 0) / Math.max(this.runtimes.size, 1);
@@ -882,6 +947,8 @@ export class HabitatWorld {
     this.controls.removeEventListener('start', this.handleControlStart);
     this.controls.removeEventListener('end', this.handleControlEnd);
     this.controls.dispose();
+    this.fieldController?.dispose();
+    this.fieldController = null;
     this.runtimes.forEach((runtime) => saveWorldState(runtime.record.id, runtime.state));
     this.disposeObject(this.scene);
     this.renderer.renderLists.dispose();

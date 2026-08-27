@@ -1,19 +1,12 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
+import { CircularArchiveCarousel } from '../components/archive/CircularArchiveCarousel';
 import { SpecimenGlyph } from '../components/archive/SpecimenGlyph';
+import { InteractiveCreature } from '../components/experience/InteractiveCreature';
 import { CREATURE_RECORDS } from '../data/creatureRecords';
 
 export function Archive() {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = CREATURE_RECORDS[activeIndex];
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const interval = window.setInterval(() => {
-      setActiveIndex((index) => (index + 1) % CREATURE_RECORDS.length);
-    }, 5200);
-    return () => window.clearInterval(interval);
-  }, []);
-
   const paletteStyle = {
     '--collection-primary': active.palette.primary,
     '--collection-secondary': active.palette.secondary,
@@ -23,94 +16,48 @@ export function Archive() {
   } as CSSProperties;
 
   return (
-    <main className="archive-page" style={paletteStyle}>
-      <section className="archive-ledger archive-ledger--top" aria-label="Complete collection ledger">
-        <header><span>ALL LIVING RECORDS</span><span>INDEX 01—04</span></header>
-        {CREATURE_RECORDS.map((record, index) => (
-          <a href={`#/creature/${record.id}`} key={record.id} onMouseEnter={() => setActiveIndex(index)}>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <strong>{record.name}</strong>
-            <span>{record.sensor}</span>
-            <i style={{ backgroundColor: record.palette.primary }} />
-            <span>VIEW ↗</span>
-          </a>
-        ))}
-      </section>
-
-      <header className="archive-masthead">
-        <div className="archive-masthead__rail">
-          <span>COLLECTION *E</span>
-          <span>04 ELECTRONIC ORGANISMS</span>
-        </div>
-        <h1 aria-label="Electro-Fermentation">Electro-Fermentation</h1>
-        <div className="archive-masthead__dots" aria-hidden>
-          {CREATURE_RECORDS.map((record) => <i key={record.id} style={{ backgroundColor: record.palette.primary }} />)}
-        </div>
-      </header>
-
-      <section className="archive-prologue" aria-label="Archive introduction">
-        <div className="archive-prologue__print" aria-hidden>
-          <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} code={active.code} />
-          <span className="archive-prologue__echo">SENSE<br />RESPOND<br />REMEMBER</span>
-        </div>
-        <p className="archive-prologue__statement">
-          Four bodies read the same world differently. This archive is not a cabinet—it is a live transmission.
-        </p>
-      </section>
-
-      <section className="collection-browser" aria-label="Electronic organism collection">
-        <aside className="collection-index">
-          <span className="collection-index__title">COLLECTION “E”</span>
-          <div className="collection-index__grid">
+    <main className="archive-page archive-page--editorial" style={paletteStyle}>
+      <section className="archive-workstation" aria-label="ENSIL living archive">
+        <aside className="archive-specimen-index" aria-label="Specimen index">
+          <header><span>ENSIL / LIVING RECORDS</span><span>01—04</span></header>
+          <div className="archive-specimen-index__grid">
             {CREATURE_RECORDS.map((record, index) => (
-              <button
-                type="button"
-                className={activeIndex === index ? 'is-active' : ''}
-                aria-pressed={activeIndex === index}
-                onClick={() => setActiveIndex(index)}
-                onMouseEnter={() => setActiveIndex(index)}
-                key={record.id}
-              >
+              <button type="button" className={activeIndex === index ? 'is-active' : ''} aria-pressed={activeIndex === index} onClick={() => setActiveIndex(index)} key={record.id}>
                 <SpecimenGlyph index={record.glyphIndex} live palette={record.palette} label={`Select ${record.name}`} code={record.code} />
-                <b>▣ {record.code}</b>
+                <span><b>{record.code}</b><i>{record.sensor}</i></span>
               </button>
             ))}
           </div>
+          <p>SELECT A BODY<br />TO READ ITS<br />LIVING RECORD.</p>
         </aside>
 
-        <article className="collection-stage" key={active.id}>
-          <header className="collection-stage__header">
-            <span>{active.code}</span>
-            <span>COLLECTION E</span>
-            <span>{active.shortName.toUpperCase()}</span>
-          </header>
-          <a className="collection-stage__art" href={`#/creature/${active.id}`} aria-label={`Open archive record for ${active.name}`}>
-            <SpecimenGlyph index={active.glyphIndex} live palette={active.palette} label={active.name} code={active.code} />
-            <span className="collection-stage__enter">OPEN RECORD ↗</span>
-          </a>
-        </article>
+        <section className="archive-living-stage" aria-live="polite">
+          <header><span>{active.code} / ACTIVE SPECIMEN</span><span>DRAG / ROTATE / TOUCH</span></header>
+          <CircularArchiveCarousel
+            activeIndex={activeIndex}
+            onChange={setActiveIndex}
+            variant="stage"
+            className="archive-stage-carousel"
+            center={<InteractiveCreature record={active} />}
+          />
+          <footer className="archive-stage-caption"><span>{active.sensor.toUpperCase()}</span><strong>{active.name}</strong></footer>
+        </section>
 
-        <aside className="collection-data">
-          <span>{active.code}</span>
+        <aside className="archive-record-sheet">
+          <header><span>ARCHIVES FOR<br />ELECTRO-FERMENTATION</span><b>{active.code}</b></header>
+          <h1>{active.name}</h1>
           <dl>
-            <div><dt>COLLECTION</dt><dd>E</dd></div>
-            <div><dt>NAME</dt><dd>{active.name}</dd></div>
             <div><dt>ORIGIN</dt><dd>{active.archive.origin}</dd></div>
+            <div><dt>SENSOR</dt><dd>{active.sensor}</dd></div>
+            <div><dt>INPUT</dt><dd>{active.input}</dd></div>
+            <div><dt>RESPONSE</dt><dd>{active.response}</dd></div>
             <div><dt>MOTIF</dt><dd>{active.archive.motif}</dd></div>
           </dl>
-          <div className="collection-swatches" aria-label="Specimen colour register">
-            {Object.entries(active.palette).slice(0, 3).map(([name, color]) => (
-              <span key={name}><i style={{ backgroundColor: color }} />{name}</span>
-            ))}
-          </div>
-          <a href={`#/habitat/${active.id}`}>ENTER HABITAT →</a>
+          <section><span>EMERGENCE</span><p>{active.archive.emergence}</p></section>
+          <ol>{active.observations.map((observation) => <li key={observation.time}><time>{observation.time}</time><span>{observation.state}</span></li>)}</ol>
+          <div className="archive-record-sheet__actions"><a href={`#/creature/${active.id}`}>FULL RECORD ↗</a><a href={`#/habitat/${active.id}`}>ENTER HABITAT →</a></div>
         </aside>
       </section>
-
-      <footer className="archive-footer">
-        <p>Researching Electro Fermentation. Archiving the life it creates.</p>
-        <a href="#/field">RETURN TO FIELD →</a>
-      </footer>
     </main>
   );
 }
