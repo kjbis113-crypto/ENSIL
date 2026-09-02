@@ -44,9 +44,19 @@ export function FluidVeil() {
     if (!sim.supported) return;
     const tintCtx = tint.getContext('2d');
 
+    // 메인 화면(랜딩)에서는 글레이즈 없이 difference 단독 = 흑백 반전 유체
+    let tintEnabled = true;
+    const updateTintEnabled = () => {
+      const path = window.location.hash.replace(/^#/, '') || '/';
+      tintEnabled = !(path === '/' || path === '/index');
+      tint.style.display = tintEnabled ? '' : 'none';
+    };
+    updateTintEnabled();
+    window.addEventListener('hashchange', updateTintEnabled);
+
     // difference 결과 위에 유체 모양 그대로 키컬러를 입힌다 (color 블렌드 글레이즈)
     const paintTint = () => {
-      if (!tintCtx) return;
+      if (!tintCtx || !tintEnabled) return;
       tintCtx.globalCompositeOperation = 'copy';
       tintCtx.drawImage(canvas, 0, 0, tint.width, tint.height);
       tintCtx.globalCompositeOperation = 'source-in';
@@ -148,6 +158,7 @@ export function FluidVeil() {
     return () => {
       cancelAnimationFrame(raf);
       window.clearInterval(maskTimer);
+      window.removeEventListener('hashchange', updateTintEnabled);
       window.removeEventListener('hashchange', updateMask);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerout', onLeave);
