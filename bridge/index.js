@@ -24,9 +24,20 @@ wss.on('connection', (ws) => {
   clients.add(ws);
   log(`웹 연결됨 (${clients.size})`);
   ws.on('close', () => clients.delete(ws));
-  // 웹 → 하드웨어 (LED 피드백 등) — 시리얼이 열려 있으면 그대로 전달
+  // 웹 → 웹 릴레이: 전시 두-창 연동(src/state/fieldLink.ts)의 {type:'field'} 봉투는
+  // 보낸 클라이언트를 뺀 나머지에게 그대로 중계 (노트북을 따로 쓸 때만 필요)
+  // 웹 → 하드웨어 (LED 피드백 등) — 그 외 메시지는 시리얼이 열려 있으면 그대로 전달
   ws.on('message', (data) => {
-    if (serial?.isOpen) serial.write(data.toString() + '\n');
+    const text = data.toString();
+    try {
+      if (JSON.parse(text)?.type === 'field') {
+        for (const c of clients) if (c !== ws && c.readyState === 1) c.send(text);
+        return;
+      }
+    } catch {
+      /* JSON 아님 — 시리얼로 */
+    }
+    if (serial?.isOpen) serial.write(text + '\n');
   });
 });
 

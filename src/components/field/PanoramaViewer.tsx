@@ -5,6 +5,8 @@ import { CREATURE_RECORDS } from '../../data/creatureRecords';
 
 type Props = {
   paused: boolean;
+  /** 스테이지(프로젝터)에서 돌아온 개체 상태 — 있으면 핫스팟 라벨에 표시 */
+  states?: Record<string, string>;
   onSelect: (id: string) => void;
   onProximity: (id: string | null) => void;
   onModeChange?: (mode: 'loading' | 'limited' | '360' | 'error') => void;
@@ -21,7 +23,7 @@ const HOTSPOTS: HotspotPosition[] = [
 
 const PANORAMA_URL = '/panoramas/ensil-field-biome.png';
 
-export function PanoramaViewer({ paused, onSelect, onProximity, onModeChange }: Props) {
+export function PanoramaViewer({ paused, states, onSelect, onProximity, onModeChange }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const hotspotRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const callbacksRef = useRef({ onSelect, onProximity, onModeChange });
@@ -309,7 +311,11 @@ export function PanoramaViewer({ paused, onSelect, onProximity, onModeChange }: 
             key={record.id}
           >
             <i aria-hidden><b>{record.code}</b></i>
-            <span><small>{record.sensor}</small><small>{HOTSPOTS[index].distance.toFixed(1)}M / SIGNAL</small></span>
+            <span>
+              <small>{record.sensor}</small>
+              <small>{HOTSPOTS[index].distance.toFixed(1)}M / SIGNAL</small>
+              {states?.[record.id] && <small className="panorama-hotspot__stage">STAGE / {states[record.id]}</small>}
+            </span>
           </button>
         ))}
       </div>

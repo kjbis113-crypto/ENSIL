@@ -72,3 +72,26 @@
   .panorama-hotspot > span { max-width: 110px; }
 }
 @media (prefers-reduced-motion: reduce) { .panorama-hotspot, .encounter-card, .observation-layer { transition: none; animation: none; } }
+
+/* 스테이지 연동 — 핫스팟 라벨의 스테이지 상태 줄, 조우 카드의 신호 보내기 */
+.panorama-hotspot__stage { color: var(--key); opacity: 1 !important; }
+.encounter-card__signal { display: flex; width: 100%; justify-content: space-between; align-items: center; margin-top: 22px; padding: 11px 0; border-top: 1px solid var(--hairline-strong); border-bottom: 1px solid var(--hairline); font-size: var(--fs-ui); letter-spacing: var(--ls-ui); text-align: left; transition: opacity var(--motion-fast) ease; }
+.encounter-card__signal i { width: 8px; height: 8px; border-radius: 50%; background: var(--key); transition: transform var(--motion-ui) var(--ease-enter); }
+.encounter-card__signal i[data-sent='true'] { transform: scale(2.2); }
+.encounter-card__signal:hover:not(:disabled) { opacity: .6; }
+.encounter-card__signal:disabled { opacity: .4; cursor: default; }
+.encounter-card__signal:disabled i { background: var(--hairline-strong); }
+
+/* ── 스테이지(빔프로젝터) — 크롬 없이 3D 공용 필드 전면, 구석 라벨만 ── */
+.stage-page { position: relative; height: 100dvh; overflow: hidden; color: var(--ensil-black); background: var(--ensil-white); }
+.ecosystem-canvas { position: absolute; inset: 0; }
+.ecosystem-canvas canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.ecosystem-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: var(--fs-micro); letter-spacing: .1em; }
+.stage-page__meta { position: absolute; top: var(--chrome-top); right: var(--chrome-x); left: var(--chrome-x); z-index: 5; display: flex; justify-content: space-between; font-size: var(--fs-micro); letter-spacing: .1em; pointer-events: none; }
+.stage-page__meta i { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--hairline-strong); }
+.stage-page__meta i[data-alive='true'] { background: var(--key); }
+.stage-page__hint { position: absolute; bottom: 24px; left: 50%; z-index: 5; transform: translateX(-50%); font-size: var(--fs-nano); letter-spacing: .09em; opacity: .6; pointer-events: none; }
+/* 콘솔에서 신호가 오면 한 번 번지는 민트 — 3D 반응이 시작되는 순간을 화면 전체로 알린다 */
+.stage-page__pulse { position: absolute; inset: 0; z-index: 4; background: radial-gradient(circle at 50% 56%, color-mix(in srgb, var(--key) 42%, transparent), transparent 62%); animation: stagePulse 1400ms var(--ease-exit) both; pointer-events: none; }
+@keyframes stagePulse { from { opacity: .9; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .stage-page__pulse { animation: none; opacity: 0; } }

@@ -20,6 +20,8 @@ export type HabitatWorldOptions = {
   mount: HTMLElement;
   records: CreatureRecord[];
   mode: 'field' | 'single';
+  /** 스테이지(프로젝터) — 1인칭 진입이 없을 때 카메라가 필드 중심을 천천히 돈다 */
+  ambient?: boolean;
   selectedId?: string | null;
   observation?: boolean;
   paused?: boolean;
@@ -881,6 +883,14 @@ export class HabitatWorld {
 
     if (this.options.mode === 'field') {
       this.fieldController?.update(dt);
+      if (this.options.ambient && !this.fieldController?.isActive && !this.reducedMotion) {
+        // 약 3분에 한 바퀴 — 정지 화면처럼 보이지 않을 만큼만
+        const angle = now * 0.000035;
+        const x = Math.sin(angle) * 27;
+        const z = Math.cos(angle) * 27;
+        this.camera.position.set(x, commonFieldHeight(x, z) + 3.2, z);
+        this.camera.lookAt(0, 1.5, 0);
+      }
       if (this.fieldController?.isActive) {
         const focused = this.inspectViewTarget();
         if (focused !== this.hoveredId) {

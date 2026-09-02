@@ -26,6 +26,7 @@ body {
 }
 
 .site-shell--field,
+.site-shell--stage,
 .site-shell--landing {
   height: 100dvh;
   overflow: hidden;

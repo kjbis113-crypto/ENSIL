@@ -89,7 +89,24 @@
 8. 협업자 쪽 빌드가 안 될 때: meshopt 정적 import(빌드 크래시)나 plain 로더(런타임 로드 실패)가
    원인일 가능성부터
 
+## 2026-09-03 세션 추가분
+
+1. **디자인 시스템 통일** (792653c) — `SiteNavigation` 48px 바 제거, 랜딩의 워드마크+밑줄 링크 룩을
+   `SiteChrome`(chrome.css)으로 모든 화면에 적용. 토큰: `--hairline/--hairline-strong/--key/--chrome-*/--fs-ui…`.
+   필드·서식지·아카이브·레코드의 상자형 버튼→밑줄 텍스트, 굵은 테두리→헤어라인, 핫스팟→흰 원+코드.
+2. **전시 두-창 연동** — `docs/EXHIBITION_SETUP.md` 참조. 권장: 아이맥 1대 + HDMI, 같은 Chrome에 창 2개.
+   - `Ctrl+Alt+Shift+O` → `#/stage` 팝업 창 (`useStageWindow.ts`, Window Management API로 2번째 화면에 배치 시도)
+   - `fieldLink.ts`: BroadcastChannel 기본 + `VITE_FIELD_LINK_URL` 있으면 브릿지 WS 릴레이(노트북 분리용, bridge/index.js 중계 추가)
+   - 콘솔(#/field) focus/pulse → 스테이지 `HabitatWorld.activate`, 스테이지 snapshot(1s) → 콘솔 라벨 `STAGE / …`
+   - `EcosystemCanvas`에 `stimulus`/`ambient` prop, `HabitatWorld`에 `ambient`(카메라 3분/바퀴) 옵션 — 협업자 파일이라 최소 추가
+   - 검증: 스크래치패드 `link-test.mjs` (같은 브라우저 컨텍스트 두 페이지, 배경 탭은 rAF가 멈추므로 bringToFront 필요)
+3. **주의**: 이 세션 중 다른 프로세스가 `FluidHub.tsx`·`LiquidCursor.tsx`·`landing.css`(허브 `#ensil-hub-liquid` 필터)를
+   동시에 수정하고 있었음 — 내 커밋에서 제외했으니 그쪽 작업이 끝나면 따로 커밋할 것
+
 ## 다음 단계 (우선순위순)
+
+0. **스테이지 전용 연출** — 지금은 3D 공용 필드에서 크롬만 뺀 것. 프로젝터용 씬은 `Stage.tsx`의 캔버스만 교체
+   (pulse/focus/snapshot 인터페이스 유지). 전시장 리허설에서 두 창 동시 GPU 부하 확인(프레임 떨어지면 pixelRatio 1로)
 
 1. **유체 톤 실사용 피드백 반영** — 키컬러(`FluidVeil.tsx` KEY_COLOR #58d6c3), 글레이즈 강도
    (landing.css .fluid-veil-tint opacity 0.9), 액체 경계(FluidSim EDGE_LOW/HIGH 0.16/0.4),
