@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode, type WheelEvent } from 'react';
+import { useRef, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode, type WheelEvent } from 'react';
 import { CREATURE_RECORDS } from '../../data/creatureRecords';
 import { SpecimenGlyph } from './SpecimenGlyph';
 
@@ -28,14 +28,13 @@ export function CircularArchiveCarousel({
   center,
   className = '',
 }: Props) {
-  const [dragAngle, setDragAngle] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
   const dragRef = useRef<DragState | null>(null);
   const wheelAtRef = useRef(0);
   const active = CREATURE_RECORDS[activeIndex];
 
   const selectRelative = (delta: number) => {
     onChange((activeIndex + delta + CREATURE_RECORDS.length) % CREATURE_RECORDS.length);
-    setDragAngle(0);
   };
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -47,8 +46,11 @@ export function CircularArchiveCarousel({
       velocity: 0,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
+    sectionRef.current?.classList.add('is-dragging');
   };
 
+  // 드래그 중에는 React 리렌더 없이 CSS 변수만 직접 갱신 —
+  // 마우스 이동마다 글리프 SVG 트리 전체가 다시 그려지던 비용 제거
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag) return;
@@ -58,7 +60,8 @@ export function CircularArchiveCarousel({
     drag.velocity = dx / dt;
     drag.lastX = event.clientX;
     drag.lastTime = now;
-    setDragAngle((event.clientX - drag.startX) * 0.32);
+    const angle = -activeIndex * STEP + (event.clientX - drag.startX) * 0.32;
+    sectionRef.current?.style.setProperty('--carousel-rotation', `${angle}deg`);
   };
 
   const onPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -67,12 +70,16 @@ export function CircularArchiveCarousel({
     const displacement = event.clientX - drag.startX;
     const projected = displacement * 0.32 + drag.velocity * 92;
     dragRef.current = null;
+    const section = sectionRef.current;
+    section?.classList.remove('is-dragging');
+    let nextIndex = activeIndex;
     if (Math.abs(projected) > 22) {
       const steps = Math.max(-2, Math.min(2, Math.round(-projected / STEP) || (projected > 0 ? -1 : 1)));
-      selectRelative(steps);
-    } else {
-      setDragAngle(0);
+      nextIndex = (activeIndex + steps + CREATURE_RECORDS.length) % CREATURE_RECORDS.length;
     }
+    // 최종 각도로 스냅 (트랜지션 복원됨) — React 리렌더가 같은 값을 이어받는다
+    section?.style.setProperty('--carousel-rotation', `${-nextIndex * STEP}deg`);
+    if (nextIndex !== activeIndex) onChange(nextIndex);
   };
 
   const onWheel = (event: WheelEvent<HTMLDivElement>) => {
@@ -86,11 +93,12 @@ export function CircularArchiveCarousel({
   };
 
   const style = {
-    '--carousel-rotation': `${-activeIndex * STEP + dragAngle}deg`,
+    '--carousel-rotation': `${-activeIndex * STEP}deg`,
   } as CSSProperties;
 
   return (
     <section
+      ref={sectionRef}
       className={`circular-archive circular-archive--${variant}${interactive ? ' is-interactive' : ''} ${className}`.trim()}
       style={style}
       onPointerDown={onPointerDown}
@@ -117,7 +125,7 @@ export function CircularArchiveCarousel({
               className={index === activeIndex ? 'is-active' : ''}
               style={{ '--node-angle': `${index * STEP}deg` } as CSSProperties}
               onPointerDown={(event) => event.stopPropagation()}
-              onClick={() => { onChange(index); setDragAngle(0); }}
+              onClick={() => onChange(index)}
               key={record.id}
             >
               {variant === 'index' ? (

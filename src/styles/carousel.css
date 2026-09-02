@@ -177,3 +177,8 @@
   .circular-archive__nodes > button { transition: none; }
   .circular-archive__identity { animation: none; }
 }
+
+/* Drag performance: while dragging, rotation follows the pointer directly - no transitions */
+.circular-archive.is-dragging .circular-archive__nodes,
+.circular-archive.is-dragging .circular-archive__nodes > button { transition: none; }
+
