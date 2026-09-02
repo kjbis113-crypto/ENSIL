@@ -683,9 +683,9 @@
 .archive-stage-carousel .circular-archive__center { overflow: visible; }
 .archive-stage-carousel .record-viewer { position: absolute; inset: -22%; min-height: 0; }
 .archive-stage-carousel .record-viewer__canvas { inset: 0; }
-.archive-stage-carousel .record-controls { right: auto; bottom: 9%; left: 50%; transform: translateX(-50%); }
+/* 캐러셀 맨 아래 노드(03)와 겹치지 않게 두 컨트롤 줄을 캐러셀 밖으로: 1줄 ← 01/04 → (carousel.css), 2줄 AUTO/PAUSE… */
+.archive-stage-carousel .record-controls { right: auto; bottom: -16%; left: 50%; transform: translateX(-50%); }
 .archive-stage-carousel .record-viewer__instruction { display: none; }
-.archive-stage-carousel .circular-archive__controls { bottom: 3%; }
 .archive-living-stage::before {
   content: '';
   position: absolute;

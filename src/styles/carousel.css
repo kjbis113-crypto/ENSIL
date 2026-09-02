@@ -42,6 +42,9 @@
 .circular-archive__nodes {
   position: absolute;
   inset: 0;
+  /* transform 이 스태킹 컨텍스트를 만들어 노드의 z-index 가 밖으로 안 나간다 —
+     스테이지 변형에서는 중앙 3D 캔버스(inset -22%)가 노드를 덮어 클릭이 막히므로 컨테이너째 위로 */
+  z-index: 5;
   transform: rotate(var(--carousel-rotation));
   transition: transform var(--motion-panel) var(--ease-enter);
   pointer-events: none;
@@ -152,7 +155,8 @@
 .circular-archive--stage .circular-archive__center { width: 70%; border: 0; background: transparent; pointer-events: auto; }
 .circular-archive--stage .circular-archive__nodes > button { width: 38px; pointer-events: auto; }
 .circular-archive--stage .circular-archive__nodes > button > small { display: none; }
-.circular-archive--stage .circular-archive__controls { bottom: -3%; pointer-events: auto; }
+/* 맨 아래 노드(반지름 .46 → 하단 4% 지점)와 겹치지 않게 캐러셀 밖으로 */
+.circular-archive--stage .circular-archive__controls { bottom: -10%; pointer-events: auto; }
 
 @keyframes carouselIdentityIn {
   from { opacity: 0; transform: translateY(18px); clip-path: inset(100% 0 0); }
