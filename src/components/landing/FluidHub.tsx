@@ -2,37 +2,35 @@ import { useEffect, useRef } from 'react';
 import { FluidSim, type SplatInput } from '../../fluid/FluidSim';
 
 /**
- * 허브 유체 — 중앙 회전축(흰 구) 안에 갇힌 액체.
- * 보이지 않는 젓개가 상시 돌아 스스로 일렁이고(30fps), 커서가 닿으면 그 지점을
- * 민트-청록-연회색 물감으로 세게 젓는다 (multiply — difference 베일과 달리 발색).
- * 베일은 이 원 위에서 마스크로 비워져 두 유체가 색으로 구분된다.
+ * 허브 유체 — 솔리드 원판이 아니라 베일과 같은 유체 렌더(흑백 difference).
+ * 시뮬레이션 세팅으로 염료가 코어에 응집해 스스로 대략 원형 덩어리를 유지한다:
+ *  - 중앙 염료 방출(느린 궤도) → 덩어리의 몸통
+ *  - 컨파인먼트 링: 반지름 0.36에서 안쪽으로 미는 무염료 스플랫 → 흩어짐 억제
+ *  - 커서가 닿으면 기존 포인터 스플랫이 덩어리를 젓고 베일 유체와 섞인다
+ * 경계는 FluidSim의 threshold가 만드는 일렁이는 유체 윤곽 — 솔리드 원 없음.
  */
 
 const MAX_DPR = 1.25;
-const FRAME_MS = 33; // 30fps — 작은 캔버스라 충분히 부드럽고 저렴
+const FRAME_MS = 33; // 30fps
 
-/** 민트~청록~연회색 듀오톤 */
+/** 베일과 같은 근백색 실버-틸 염료 — difference에서 모노톤 반전 */
 function dyeColor(t: number): [number, number, number] {
-  const k = 0.5 + 0.5 * Math.sin(t * 0.16);
-  return [0.28 + 0.16 * k, 0.55 - 0.06 * k, 0.52 - 0.02 * k];
+  const k = 0.5 + 0.5 * Math.sin(t * 0.14);
+  return [0.62 + 0.1 * k, 0.8 - 0.04 * k, 0.77];
 }
 
 export function FluidHub() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const turbRef = useRef<SVGFETurbulenceElement>(null);
-  const offsetRef = useRef<SVGFEOffsetElement>(null);
-  const dispRef = useRef<SVGFEDisplacementMapElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const mount = canvas?.parentElement;
-    if (!canvas || !mount) return;
+    if (!canvas) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
-    let rect = mount.getBoundingClientRect();
+    let rect = canvas.getBoundingClientRect();
     const fit = () => {
-      rect = mount.getBoundingClientRect();
+      rect = canvas.getBoundingClientRect();
       canvas.width = Math.max(2, Math.round(rect.width * dpr));
       canvas.height = Math.max(2, Math.round(rect.height * dpr));
     };
@@ -43,62 +41,40 @@ export function FluidHub() {
 
     const pending: SplatInput[] = [];
     let last = { x: 0, y: 0, has: false };
-    const pointerPx = { x: -9999, y: -9999 };
     let raf = 0;
     let prevFrame = 0;
     let lastTick = 0;
 
-    let wobbleTick = 0;
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
       if (now - lastTick < FRAME_MS) return;
       lastTick = now;
       const dt = Math.min(1 / 20, Math.max(1 / 240, (now - prevFrame) / 1000));
       prevFrame = now;
-
-      // 보이지 않는 젓개 — 느린 궤도를 돌며 상시 일렁임을 만든다
       const t = now / 1000;
 
-      // 허브 원의 이글이글 — 노이즈 패턴을 feOffset으로 출렁이게 흘려보내고,
-      // 커서가 림에 다가오면 그쪽으로 패턴이 몰리며 요동친다 (섞이는 느낌)
-      wobbleTick += 1;
-      if (offsetRef.current && dispRef.current) {
-        let dx = 30 * Math.sin(t * 1.1) + 13 * Math.sin(t * 2.7);
-        let dy = 30 * Math.cos(t * 0.9) + 13 * Math.sin(t * 2.1 + 1.2);
-        let scale = 24 + 9 * Math.sin(t * 1.4);
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const px = pointerPx.x - cx;
-        const py = pointerPx.y - cy;
-        const d = Math.hypot(px, py);
-        const edge = Math.abs(d - rect.width / 2);
-        const near = Math.max(0, 1 - edge / 200); // 림 200px 근처에서 반응
-        if (near > 0 && d > 1) {
-          const pulse = 0.6 + 0.4 * Math.sin(t * 4.2);
-          dx += (px / d) * 40 * near * pulse;
-          dy += (py / d) * 40 * near * pulse;
-          scale += 24 * near;
-        }
-        offsetRef.current.setAttribute('dx', dx.toFixed(2));
-        offsetRef.current.setAttribute('dy', dy.toFixed(2));
-        dispRef.current.setAttribute('scale', scale.toFixed(2));
-      }
-      if (wobbleTick % 6 === 0 && turbRef.current) {
-        turbRef.current.setAttribute(
-          'baseFrequency',
-          `${(0.014 + 0.004 * Math.sin(t * 0.21)).toFixed(5)} ${(0.019 + 0.004 * Math.cos(t * 0.17)).toFixed(5)}`,
-        );
-      }
-      const a = t * 0.55;
-      const wob = 0.2 + 0.07 * Math.sin(t * 0.9);
+      // ① 코어 방출 — 느린 궤도를 도는 염료 주입이 덩어리 몸통과 일렁임을 만든다
       const base = dyeColor(t);
+      const oa = t * 0.7;
       pending.push({
-        x: 0.5 + Math.cos(a) * wob,
-        y: 0.5 + Math.sin(a * 1.3) * wob,
-        dx: -Math.sin(a) * 0.012,
-        dy: Math.cos(a * 1.3) * 0.012,
-        color: [base[0] * 0.16, base[1] * 0.16, base[2] * 0.16],
+        x: 0.5 + Math.cos(oa) * 0.07,
+        y: 0.5 + Math.sin(oa * 1.3) * 0.07,
+        dx: -Math.sin(oa) * 0.012,
+        dy: Math.cos(oa * 1.3) * 0.012,
+        color: [base[0] * 0.5, base[1] * 0.5, base[2] * 0.5],
       });
+
+      // ② 컨파인먼트 링 — 무염료 스플랫이 안쪽으로 밀어 코어에 뭉치게 한다
+      for (let k = 0; k < 3; k += 1) {
+        const a = t * 0.35 + (k * Math.PI * 2) / 3;
+        pending.push({
+          x: 0.5 + Math.cos(a) * 0.36,
+          y: 0.5 + Math.sin(a) * 0.36,
+          dx: -Math.cos(a) * 0.045,
+          dy: -Math.sin(a) * 0.045,
+          color: [0, 0, 0],
+        });
+      }
 
       while (pending.length) sim.splat(pending.shift()!);
       sim.step(dt);
@@ -106,14 +82,11 @@ export function FluidHub() {
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      pointerPx.x = event.clientX;
-      pointerPx.y = event.clientY;
       if (rect.width < 4) return;
       const lx = (event.clientX - rect.left) / rect.width;
       const ly = 1 - (event.clientY - rect.top) / rect.height;
-      // 원 주변까지 허용 — 커서가 다가오면 가장자리부터 반응해 "붙는" 느낌
-      const x = Math.min(1.2, Math.max(-0.2, lx));
-      const y = Math.min(1.2, Math.max(-0.2, ly));
+      const x = Math.min(1.1, Math.max(-0.1, lx));
+      const y = Math.min(1.1, Math.max(-0.1, ly));
       if (last.has) {
         const dx = (x - last.x) * 0.9;
         const dy = (y - last.y) * 0.9;
@@ -124,9 +97,9 @@ export function FluidHub() {
             x, y,
             dx: Math.max(-0.3, Math.min(0.3, dx)),
             dy: Math.max(-0.3, Math.min(0.3, dy)),
-            color: [base[0] * (0.35 + speed), base[1] * (0.35 + speed), base[2] * (0.35 + speed)],
+            color: [base[0] * (0.35 + speed * 0.5), base[1] * (0.35 + speed * 0.5), base[2] * (0.35 + speed * 0.5)],
           });
-          if (pending.length > 16) pending.shift();
+          if (pending.length > 20) pending.shift();
         }
       }
       last = { x, y, has: true };
@@ -144,7 +117,7 @@ export function FluidHub() {
       fit();
       sim.resize();
     });
-    ro.observe(mount);
+    ro.observe(canvas);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     document.addEventListener('visibilitychange', onVisibility);
     prevFrame = performance.now();
@@ -159,17 +132,5 @@ export function FluidHub() {
     };
   }, []);
 
-  return (
-    <>
-      {/* 허브 원의 액체 테두리 — .index-dial__hub 전체에 CSS filter로 적용된다 */}
-      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden focusable="false">
-        <filter id="ensil-hub-liquid" x="-18%" y="-18%" width="136%" height="136%">
-          <feTurbulence ref={turbRef} type="fractalNoise" baseFrequency="0.014 0.019" numOctaves="3" seed="4" result="noise" />
-          <feOffset ref={offsetRef} in="noise" dx="0" dy="0" result="flow" />
-          <feDisplacementMap ref={dispRef} in="SourceGraphic" in2="flow" scale="24" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </svg>
-      <canvas ref={canvasRef} className="fluid-hub" aria-hidden />
-    </>
-  );
+  return <canvas ref={canvasRef} className="fluid-hub" aria-hidden />;
 }

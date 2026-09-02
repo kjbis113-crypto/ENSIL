@@ -124,31 +124,8 @@ export function FluidVeil() {
     const onResize = () => {
       fit();
       sim.resize();
-      updateMask();
     };
-
-    // 허브([data-fluid-window]) 원 위에서는 베일을 마스크로 비운다 —
-    // 그 영역은 허브 자체 유체(민트 발색)가 담당한다
-    const updateMask = () => {
-      const hole = document.querySelector('[data-fluid-window]');
-      if (!hole) {
-        for (const el of [canvas, tint]) {
-          el.style.removeProperty('mask-image');
-          el.style.removeProperty('-webkit-mask-image');
-        }
-        return;
-      }
-      const r = hole.getBoundingClientRect();
-      const radius = r.width / 2;
-      const mask = `radial-gradient(circle ${radius}px at ${r.left + radius}px ${r.top + radius}px, transparent ${radius - 1}px, black ${radius}px)`;
-      for (const el of [canvas, tint]) {
-        el.style.setProperty('mask-image', mask);
-        el.style.setProperty('-webkit-mask-image', mask);
-      }
-    };
-    updateMask();
-    const maskTimer = window.setInterval(updateMask, 1500);
-    window.addEventListener('hashchange', updateMask);
+    // (허브 마스크 홀 제거 — 허브도 같은 흑백 유체라 겹침이 곧 섞임 표현이 된다)
 
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerout', onLeave, { passive: true });
@@ -157,9 +134,7 @@ export function FluidVeil() {
 
     return () => {
       cancelAnimationFrame(raf);
-      window.clearInterval(maskTimer);
       window.removeEventListener('hashchange', updateTintEnabled);
-      window.removeEventListener('hashchange', updateMask);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerout', onLeave);
       window.removeEventListener('resize', onResize);
