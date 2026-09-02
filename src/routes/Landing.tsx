@@ -1,11 +1,11 @@
 import { IndexVideoCarousel } from '../components/landing/IndexVideoCarousel';
-import { FluidCursor } from '../components/landing/FluidCursor';
+import { LiquidCursor } from '../components/landing/LiquidCursor';
 
 export function Landing() {
   return (
-    <main className="landing-page">
+    <main className="landing-page landing-page--liquid-cursor">
       <IndexVideoCarousel />
-      <FluidCursor />
+      <LiquidCursor />
     </main>
   );
 }

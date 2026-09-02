@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { CREATURE_RECORDS, type CreatureRecord } from '../../data/creatureRecords';
 import { InteractiveFrameBackground } from './InteractiveFrameBackground';
-import { HubFrameTexture } from './HubFrameTexture';
+import { FluidHub } from './FluidHub';
 
 const VIDEO_SOURCES = [
   '/media/index/no-01.mp4',
@@ -377,7 +377,9 @@ export function IndexVideoCarousel() {
         <a href="#/field">ENTER FIELD ↗</a>
       </nav>
 
-      <div className="index-dial__hub" aria-hidden />
+      <div className="index-dial__hub" aria-hidden>
+        <FluidHub />
+      </div>
 
       <div className="index-dial__nodes">
         {DIAL_ITEMS.map((item, index) => {
@@ -430,9 +432,6 @@ export function IndexVideoCarousel() {
         })}
       </div>
 
-      <div className="index-dial__pointer-effect" aria-hidden="true">
-        <HubFrameTexture />
-      </div>
       </div>
 
       <p className="sr-only" aria-live="polite">Item {activeIndex + 1} of 12. {activeItem.title}</p>

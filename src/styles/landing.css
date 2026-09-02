@@ -714,14 +714,41 @@
 }
 .vitrine-links a:hover { opacity: 1; text-decoration: underline; }
 
-/* Fluid cursor overlay - glows over content, never blocks input */
-.fluid-cursor {
+/* ── 액체 커서 + 허브 유체 ─────────────────────────────────── */
+.landing-page--liquid-cursor,
+.landing-page--liquid-cursor * { cursor: none !important; }
+
+.liquid-cursor {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 130;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.liquid-cursor__goo {
+  position: absolute;
+  inset: 0;
+  filter: url(#ensil-goo) drop-shadow(0 0 1px rgba(0, 41, 40, 0.45));
+}
+.liquid-cursor__dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 50%;
+  background: #d9d9d9;
+  will-change: transform;
+}
+
+/* 허브(회전축) 안에 갇힌 유체 — multiply라 흰 구 위에 틸 물감처럼 스민다 */
+.fluid-hub {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  mix-blend-mode: screen;
+  mix-blend-mode: multiply;
+  opacity: 0.85;
 }
 
