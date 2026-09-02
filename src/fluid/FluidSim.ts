@@ -8,15 +8,20 @@
  * React를 모른다 — FluidCursor 컴포넌트에서만 사용.
  */
 
-const SIM_RES = 96;
+// 레퍼런스 패널 값 반영: sim 128 / density diffusion 1.8 / velocity diffusion 2 /
+// pressure 1 / vorticity 0 / splat radius 0.41 / shading + bloom on
+const SIM_RES = 128;
 const DYE_RES = 512;
 const PRESSURE_ITERATIONS = 18;
-const VELOCITY_DISSIPATION = 0.32; // 1/s
-const DYE_DISSIPATION = 1.15; // 1/s — 흔적이 몇 초 안에 사라진다
-const PRESSURE_DECAY = 0.82;
-const CURL_STRENGTH = 22;
-const SPLAT_RADIUS = 0.0032;
+const VELOCITY_DISSIPATION = 2.0; // 1/s
+const DYE_DISSIPATION = 1.8; // 1/s
+const PRESSURE_DECAY = 1.0;
+const CURL_STRENGTH = 0; // 0이면 curl/vorticity 패스 자체를 건너뛴다
+const SPLAT_RADIUS = 0.0041;
 const SPLAT_FORCE = 5200;
+const BLOOM_INTENSITY = 0.26;
+const BLOOM_THRESHOLD = 0.62;
+const BLOOM_KNEE = 0.7;
 
 const BASE_VERT = `
 precision highp float;
@@ -151,12 +156,55 @@ void main () {
   gl_FragColor = vec4(velocity, 0.0, 1.0);
 }`;
 
+const BLOOM_PREFILTER_FRAG = `
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D uTexture;
+uniform vec3 uCurve;
+uniform float uThreshold;
+void main () {
+  vec3 c = texture2D(uTexture, vUv).rgb;
+  float br = max(c.r, max(c.g, c.b));
+  float rq = clamp(br - uCurve.x, 0.0, uCurve.y);
+  rq = uCurve.z * rq * rq;
+  c *= max(rq, br - uThreshold) / max(br, 0.0001);
+  gl_FragColor = vec4(c, 0.0);
+}`;
+
+const BLOOM_BLUR_FRAG = `
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D uTexture;
+uniform vec2 uTexelSize;
+void main () {
+  vec4 sum = vec4(0.0);
+  sum += texture2D(uTexture, vUv - uTexelSize);
+  sum += texture2D(uTexture, vUv + uTexelSize);
+  sum += texture2D(uTexture, vUv + vec2(uTexelSize.x, -uTexelSize.y));
+  sum += texture2D(uTexture, vUv - vec2(uTexelSize.x, -uTexelSize.y));
+  gl_FragColor = sum * 0.25;
+}`;
+
 const DISPLAY_FRAG = `
 precision highp float;
 varying vec2 vUv;
 uniform sampler2D uTexture;
+uniform sampler2D uBloom;
+uniform vec2 uTexelSize;
+uniform float uBloomIntensity;
 void main () {
   vec3 c = texture2D(uTexture, vUv).rgb;
+  /* shading — 밀도 기울기를 법선 삼은 확산광, 연기의 입체감 */
+  vec3 lc = texture2D(uTexture, vUv - vec2(uTexelSize.x, 0.0)).rgb;
+  vec3 rc = texture2D(uTexture, vUv + vec2(uTexelSize.x, 0.0)).rgb;
+  vec3 bc = texture2D(uTexture, vUv - vec2(0.0, uTexelSize.y)).rgb;
+  vec3 tc = texture2D(uTexture, vUv + vec2(0.0, uTexelSize.y)).rgb;
+  float dx = length(rc) - length(lc);
+  float dy = length(tc) - length(bc);
+  vec3 n = normalize(vec3(dx, dy, 0.3));
+  float diffuse = clamp(dot(n, vec3(0.0, 0.0, 1.0)) + 0.7, 0.7, 1.0);
+  c *= diffuse;
+  c += texture2D(uBloom, vUv).rgb * uBloomIntensity;
   float alpha = clamp(max(c.r, max(c.g, c.b)), 0.0, 1.0);
   gl_FragColor = vec4(c * alpha, alpha); /* premultiplied */
 }`;
@@ -201,6 +249,7 @@ export class FluidSim {
   private pressure!: DoubleFBO;
   private divergence!: FBO;
   private curl!: FBO;
+  private bloomLevels: FBO[] = [];
   private linearFiltering: boolean;
   private ownedTextures: WebGLTexture[] = [];
   private ownedFramebuffers: WebGLFramebuffer[] = [];
@@ -249,6 +298,8 @@ export class FluidSim {
     makeProgram('clear', CLEAR_FRAG);
     makeProgram('pressure', PRESSURE_FRAG);
     makeProgram('gradientSubtract', GRADIENT_SUBTRACT_FRAG);
+    makeProgram('bloomPrefilter', BLOOM_PREFILTER_FRAG);
+    makeProgram('bloomBlur', BLOOM_BLUR_FRAG);
     makeProgram('display', DISPLAY_FRAG);
 
     // 풀스크린 쿼드
@@ -306,6 +357,12 @@ export class FluidSim {
 
   private allocate() {
     const gl = this.gl;
+    // 리사이즈 재할당 시 이전 타깃 정리 (GPU 메모리 누수 방지)
+    this.ownedFramebuffers.forEach((fbo) => gl.deleteFramebuffer(fbo));
+    this.ownedTextures.forEach((texture) => gl.deleteTexture(texture));
+    this.ownedFramebuffers = [];
+    this.ownedTextures = [];
+
     const filter = this.linearFiltering ? gl.LINEAR : gl.NEAREST;
     const aspect = Math.max(1e-6, this.canvas.width / Math.max(1, this.canvas.height));
     const simW = aspect >= 1 ? Math.round(SIM_RES * aspect) : SIM_RES;
@@ -317,6 +374,10 @@ export class FluidSim {
     this.pressure = this.createDoubleFBO(simW, simH, gl.R16F, gl.RED, gl.NEAREST);
     this.divergence = this.createFBO(simW, simH, gl.R16F, gl.RED, gl.NEAREST);
     this.curl = this.createFBO(simW, simH, gl.R16F, gl.RED, gl.NEAREST);
+    // 블룸 피라미드 (1/2, 1/4, 1/8) — 선형 필터링이 없으면 블룸 생략
+    this.bloomLevels = this.linearFiltering
+      ? [2, 4, 8].map((d) => this.createFBO(Math.max(2, Math.round(dyeW / d)), Math.max(2, Math.round(dyeH / d)), gl.RGBA16F, gl.RGBA, filter))
+      : [];
   }
 
   resize() {
@@ -363,19 +424,21 @@ export class FluidSim {
     const p = this.programs;
     const velTexel: [number, number] = [this.velocity.texelX, this.velocity.texelY];
 
-    gl.useProgram(p.curl.program);
-    gl.uniform2f(p.curl.uniforms.uTexelSize, velTexel[0], velTexel[1]);
-    gl.uniform1i(p.curl.uniforms.uVelocity, this.velocity.read.attach(gl, 0));
-    this.blit(this.curl);
+    if (CURL_STRENGTH > 0) {
+      gl.useProgram(p.curl.program);
+      gl.uniform2f(p.curl.uniforms.uTexelSize, velTexel[0], velTexel[1]);
+      gl.uniform1i(p.curl.uniforms.uVelocity, this.velocity.read.attach(gl, 0));
+      this.blit(this.curl);
 
-    gl.useProgram(p.vorticity.program);
-    gl.uniform2f(p.vorticity.uniforms.uTexelSize, velTexel[0], velTexel[1]);
-    gl.uniform1i(p.vorticity.uniforms.uVelocity, this.velocity.read.attach(gl, 0));
-    gl.uniform1i(p.vorticity.uniforms.uCurl, this.curl.attach(gl, 1));
-    gl.uniform1f(p.vorticity.uniforms.uCurlStrength, CURL_STRENGTH);
-    gl.uniform1f(p.vorticity.uniforms.uDt, dt);
-    this.blit(this.velocity.write);
-    this.velocity.swap();
+      gl.useProgram(p.vorticity.program);
+      gl.uniform2f(p.vorticity.uniforms.uTexelSize, velTexel[0], velTexel[1]);
+      gl.uniform1i(p.vorticity.uniforms.uVelocity, this.velocity.read.attach(gl, 0));
+      gl.uniform1i(p.vorticity.uniforms.uCurl, this.curl.attach(gl, 1));
+      gl.uniform1f(p.vorticity.uniforms.uCurlStrength, CURL_STRENGTH);
+      gl.uniform1f(p.vorticity.uniforms.uDt, dt);
+      this.blit(this.velocity.write);
+      this.velocity.swap();
+    }
 
     gl.useProgram(p.divergence.program);
     gl.uniform2f(p.divergence.uniforms.uTexelSize, velTexel[0], velTexel[1]);
@@ -420,12 +483,50 @@ export class FluidSim {
     this.dye.swap();
   }
 
+  private applyBloom() {
+    const gl = this.gl;
+    const p = this.programs;
+    const levels = this.bloomLevels;
+    if (levels.length === 0) return null;
+
+    // 밝은 영역만 추출 (soft knee)
+    gl.useProgram(p.bloomPrefilter.program);
+    const knee = BLOOM_THRESHOLD * BLOOM_KNEE + 0.0001;
+    gl.uniform3f(p.bloomPrefilter.uniforms.uCurve, BLOOM_THRESHOLD - knee, knee * 2, 0.25 / knee);
+    gl.uniform1f(p.bloomPrefilter.uniforms.uThreshold, BLOOM_THRESHOLD);
+    gl.uniform1i(p.bloomPrefilter.uniforms.uTexture, this.dye.read.attach(gl, 0));
+    this.blit(levels[0]);
+
+    // 다운샘플 블러
+    gl.useProgram(p.bloomBlur.program);
+    for (let i = 0; i < levels.length - 1; i += 1) {
+      gl.uniform2f(p.bloomBlur.uniforms.uTexelSize, levels[i].texelX, levels[i].texelY);
+      gl.uniform1i(p.bloomBlur.uniforms.uTexture, levels[i].attach(gl, 0));
+      this.blit(levels[i + 1]);
+    }
+
+    // 업샘플 가산 합성
+    gl.blendFunc(gl.ONE, gl.ONE);
+    gl.enable(gl.BLEND);
+    for (let i = levels.length - 1; i > 0; i -= 1) {
+      gl.uniform2f(p.bloomBlur.uniforms.uTexelSize, levels[i].texelX, levels[i].texelY);
+      gl.uniform1i(p.bloomBlur.uniforms.uTexture, levels[i].attach(gl, 0));
+      this.blit(levels[i - 1]);
+    }
+    gl.disable(gl.BLEND);
+    return levels[0];
+  }
+
   render() {
     if (!this.supported) return;
     const gl = this.gl;
+    const bloom = this.applyBloom();
     const { display } = this.programs;
     gl.useProgram(display.program);
     gl.uniform1i(display.uniforms.uTexture, this.dye.read.attach(gl, 0));
+    gl.uniform2f(display.uniforms.uTexelSize, this.dye.texelX, this.dye.texelY);
+    gl.uniform1i(display.uniforms.uBloom, (bloom ?? this.dye.read).attach(gl, 1));
+    gl.uniform1f(display.uniforms.uBloomIntensity, bloom ? BLOOM_INTENSITY : 0);
     this.blit(null);
   }
 

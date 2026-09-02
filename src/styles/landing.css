@@ -104,12 +104,20 @@
   filter: url(#ensil-interface-duotone);
 }
 
-.index-frame-bg > video {
+.index-frame-bg {
+  /* 트라이톤 팔레트의 최암부 — 비디오 프레임이 뜨기 전에도 같은 톤 유지 */
+  background: #002928;
+}
+.index-frame-bg > video.index-frame-bg__video {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
+  inset: -2.5%;
+  width: 105%;
+  height: 105%;
+  object-fit: cover;
+  opacity: .98;
   pointer-events: none;
+  filter: url(#ensil-tritone);
+  will-change: transform;
 }
 
 .index-frame-bg__canvas {
@@ -322,10 +330,11 @@
   animation: pointerFluidRotation 28s linear infinite;
 }
 
-.index-dial__pointer-effect .index-dial__hub-texture canvas {
+.index-dial__pointer-effect .index-dial__hub-texture canvas,
+.index-dial__pointer-effect .index-dial__hub-texture video.hub-texture__video {
   opacity: .96;
-  mix-blend-mode: normal;
-  filter: contrast(1.3);
+  mix-blend-mode: screen;
+  filter: grayscale(1) brightness(1.1) contrast(1.7);
 }
 
 @keyframes pointerFluidRotation {
@@ -428,11 +437,16 @@
   pointer-events: none;
 }
 
-.index-dial__hub-texture video {
+.index-dial__hub-texture video.hub-texture__video {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .9;
+  /* 밝은 곳=흰색, 어두운 곳=투명 — 이전 픽셀 루프와 같은 룩을 블렌드로 */
+  mix-blend-mode: screen;
+  filter: grayscale(1) brightness(1.1) contrast(1.55);
 }
 
 .index-dial__hub-texture canvas {
@@ -628,7 +642,8 @@
   .index-dial__node.is-active { --node-scale: 2.02; }
   .index-dial__node.is-active:hover,
   .index-dial__node.is-active:focus-visible { --node-scale: 2.12; }
-  .index-frame-bg__canvas { inset: -4% -18%; width: 136%; height: 108%; }
+  .index-frame-bg__canvas,
+  .index-frame-bg > video.index-frame-bg__video { inset: -4% -18%; width: 136%; height: 108%; }
   .index-about { padding: 18px 16px; }
   .index-about__lead,
   .index-about__body { grid-template-columns: 1fr; gap: 18px; }

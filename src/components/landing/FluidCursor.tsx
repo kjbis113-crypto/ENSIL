@@ -9,13 +9,21 @@ import { FluidSim, type SplatInput } from '../../fluid/FluidSim';
 
 const IDLE_STOP_MS = 3500;
 const MAX_DPR = 1.5;
-// 브랜드 톤의 염료 — 실버/페일 틸을 오가며 은은하게
-const DYE_COLORS: Array<[number, number, number]> = [
-  [0.34, 0.4, 0.38],
-  [0.5, 0.56, 0.54],
-  [0.2, 0.44, 0.4],
-  [0.42, 0.52, 0.49],
-];
+
+/** colorful — 틸~시안~바이올렛 대역을 천천히 순환 (브랜드 톤 안의 컬러풀) */
+function dyeColor(t: number): [number, number, number] {
+  const hue = 165 + 55 * Math.sin(t * 0.21) + 28 * Math.sin(t * 0.067);
+  const h = (((hue % 360) + 360) % 360) / 60;
+  const s = 0.65;
+  const i = Math.floor(h);
+  const f = h - i;
+  const p = 1 - s;
+  const q = 1 - s * f;
+  const u = 1 - s * (1 - f);
+  const table: Array<[number, number, number]> = [[1, u, p], [q, 1, p], [p, 1, u], [p, q, 1], [u, p, 1], [1, p, q]];
+  const rgb = table[i % 6];
+  return [rgb[0] * 0.24, rgb[1] * 0.24, rgb[2] * 0.24];
+}
 
 export function FluidCursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -74,7 +82,7 @@ export function FluidCursor() {
         const dy = (y - last.y) * Math.min(3, 16 / dt) * 1.4;
         if (Math.abs(dx) + Math.abs(dy) > 0.0001) {
           const speed = Math.min(1, Math.hypot(dx, dy) * 9);
-          const base = DYE_COLORS[colorIndex % DYE_COLORS.length];
+          const base = dyeColor(event.timeStamp / 1000 + colorIndex * 5.3);
           pending.push({
             x, y, dx, dy,
             color: [base[0] * (0.4 + speed), base[1] * (0.4 + speed), base[2] * (0.4 + speed)],
