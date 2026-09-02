@@ -100,8 +100,8 @@
    - 콘솔(#/field) focus/pulse → 스테이지 `HabitatWorld.activate`, 스테이지 snapshot(1s) → 콘솔 라벨 `STAGE / …`
    - `EcosystemCanvas`에 `stimulus`/`ambient` prop, `HabitatWorld`에 `ambient`(카메라 3분/바퀴) 옵션 — 협업자 파일이라 최소 추가
    - 검증: 스크래치패드 `link-test.mjs` (같은 브라우저 컨텍스트 두 페이지, 배경 탭은 rAF가 멈추므로 bringToFront 필요)
-3. **주의**: 이 세션 중 다른 프로세스가 `FluidHub.tsx`·`LiquidCursor.tsx`·`landing.css`(허브 `#ensil-hub-liquid` 필터)를
-   동시에 수정하고 있었음 — 내 커밋에서 제외했으니 그쪽 작업이 끝나면 따로 커밋할 것
+3. **주의**: 이 세션과 병렬로 다른 세션이 같은 작업트리에서 `FluidHub.tsx`·`LiquidCursor.tsx`·`landing.css`를
+   수정·커밋했음(0589a66 허브 액체 테두리 + 커서 청록 그라데이션). 두 세션을 동시에 돌릴 때는 파일이 겹치지 않게 나눌 것
 
 ## 다음 단계 (우선순위순)
 
