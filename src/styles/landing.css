@@ -716,8 +716,8 @@
   height: 170%;
   pointer-events: none;
   mix-blend-mode: difference;
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 52%, transparent 74%);
-  mask-image: radial-gradient(circle at 50% 50%, black 52%, transparent 74%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 56%, transparent 70%);
+  mask-image: radial-gradient(circle at 50% 50%, black 56%, transparent 70%);
 }
 
 /* 전면 유체 베일 — difference라 어느 면 위에서든 모노톤 반전으로 읽힌다 */

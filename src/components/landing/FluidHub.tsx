@@ -53,41 +53,46 @@ export function FluidHub() {
       prevFrame = now;
       const t = now / 1000;
 
-      // ① 코어 충전 — 중심부(안쪽 50%)를 매 틱 포화시켜 threshold가 꽉 찬 원을 만든다.
-      //    바깥으로 갈수록 주입이 없어 자연히 유체 밴드가 된다
+      // ① 코어 충전 — 허브 원 전체(캔버스 반지름 약 0.30 = 노미널 허브 원)를 매 틱
+      //    포화시켜 꽉 찬 원을 만든다. 링 3겹 + 중심 (무속도 스플랫이라 저렴)
       const base = dyeColor(t);
-      pending.push({ x: 0.5, y: 0.5, dx: 0, dy: 0, color: [base[0] * 0.6, base[1] * 0.6, base[2] * 0.6] });
-      for (let k = 0; k < 4; k += 1) {
-        const ca = t * 0.25 + (k * Math.PI) / 2;
-        pending.push({
-          x: 0.5 + Math.cos(ca) * 0.085,
-          y: 0.5 + Math.sin(ca) * 0.085,
-          dx: 0,
-          dy: 0,
-          color: [base[0] * 0.4, base[1] * 0.4, base[2] * 0.4],
-        });
-      }
+      const fill = (r: number, count: number, strength: number, phase: number) => {
+        for (let k = 0; k < count; k += 1) {
+          const a = phase + (k * Math.PI * 2) / count;
+          pending.push({
+            x: 0.5 + Math.cos(a) * r,
+            y: 0.5 + Math.sin(a) * r,
+            dx: 0,
+            dy: 0,
+            color: [base[0] * strength, base[1] * strength, base[2] * strength],
+          });
+        }
+      };
+      pending.push({ x: 0.5, y: 0.5, dx: 0, dy: 0, color: [base[0] * 0.5, base[1] * 0.5, base[2] * 0.5] });
+      fill(0.1, 4, 0.45, t * 0.23);
+      fill(0.19, 6, 0.42, -t * 0.19);
+      fill(0.26, 10, 0.38, t * 0.15);
 
-      // ② 림 젓개 — 유체 밴드에 얕은 염료와 소용돌이를 공급 (동적인 바깥 50%)
+      // ② 림 젓개 — 원 가장자리 바깥 밴드에 얕은 염료와 소용돌이를 공급
       for (let k = 0; k < 3; k += 1) {
         const oa = t * 0.55 + (k * Math.PI * 2) / 3;
         pending.push({
-          x: 0.5 + Math.cos(oa) * 0.17,
-          y: 0.5 + Math.sin(oa * 1.15) * 0.17,
-          dx: -Math.sin(oa) * 0.01,
-          dy: Math.cos(oa * 1.15) * 0.01,
-          color: [base[0] * 0.1, base[1] * 0.1, base[2] * 0.1],
+          x: 0.5 + Math.cos(oa) * 0.3,
+          y: 0.5 + Math.sin(oa * 1.15) * 0.3,
+          dx: -Math.sin(oa) * 0.011,
+          dy: Math.cos(oa * 1.15) * 0.011,
+          color: [base[0] * 0.09, base[1] * 0.09, base[2] * 0.09],
         });
       }
 
-      // ③ 컨파인먼트 링 — 무염료 스플랫 5개가 안쪽으로 밀어 전체 원형을 유지한다
-      for (let k = 0; k < 5; k += 1) {
-        const a = t * 0.4 + (k * Math.PI * 2) / 5;
+      // ③ 컨파인먼트 링 — 무염료 스플랫 6개가 안쪽으로 밀어 전체 원형을 유지한다
+      for (let k = 0; k < 6; k += 1) {
+        const a = t * 0.4 + (k * Math.PI * 2) / 6;
         pending.push({
-          x: 0.5 + Math.cos(a) * 0.34,
-          y: 0.5 + Math.sin(a) * 0.34,
-          dx: -Math.cos(a) * 0.06,
-          dy: -Math.sin(a) * 0.06,
+          x: 0.5 + Math.cos(a) * 0.42,
+          y: 0.5 + Math.sin(a) * 0.42,
+          dx: -Math.cos(a) * 0.065,
+          dy: -Math.sin(a) * 0.065,
           color: [0, 0, 0],
         });
       }

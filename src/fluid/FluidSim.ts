@@ -414,10 +414,13 @@ export class FluidSim {
     gl.uniform2f(splat.uniforms.uPoint, input.x, input.y);
     gl.uniform1f(splat.uniforms.uRadius, SPLAT_RADIUS);
 
-    gl.uniform1i(splat.uniforms.uTarget, this.velocity.read.attach(gl, 0));
-    gl.uniform3f(splat.uniforms.uColor, input.dx * SPLAT_FORCE, input.dy * SPLAT_FORCE, 0);
-    this.blit(this.velocity.write);
-    this.velocity.swap();
+    // 무속도 스플랫(염료 충전용)은 속도 패스를 건너뛴다 — 허브 코어 충전 비용 절반
+    if (input.dx !== 0 || input.dy !== 0) {
+      gl.uniform1i(splat.uniforms.uTarget, this.velocity.read.attach(gl, 0));
+      gl.uniform3f(splat.uniforms.uColor, input.dx * SPLAT_FORCE, input.dy * SPLAT_FORCE, 0);
+      this.blit(this.velocity.write);
+      this.velocity.swap();
+    }
 
     gl.uniform1i(splat.uniforms.uTarget, this.dye.read.attach(gl, 0));
     gl.uniform3f(splat.uniforms.uColor, input.color[0], input.color[1], input.color[2]);
