@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "figma": {
+    "fileKey": "6nzADsXjhKnyHGDQoZ4NGL",
+    "fileUrl": "https://www.figma.com/design/6nzADsXjhKnyHGDQoZ4NGL",
+    "team": "정빈강's team",
+    "fontNote": "Production uses Helvetica Neue. Figma uses Inter as an editable fallback until Helvetica is available to the team."
+  },
+  "production": {
+    "url": "https://ensil-kjb3.vercel.app/",
+    "repository": "https://github.com/kjbis113-crypto/ENSIL.git",
+    "branch": "main",
+    "vercelProject": "ensil",
+    "vercelScope": "kjb3"
+  },
+  "screens": {
+    "index": {
+      "nodeId": "6:2",
+      "url": "https://www.figma.com/design/6nzADsXjhKnyHGDQoZ4NGL?node-id=6-2",
+      "code": [
+        "src/routes/Landing.tsx",
+        "src/styles/landing.css",
+        "src/styles/carousel.css"
+      ]
+    },
+    "field": {
+      "nodeId": "7:2",
+      "url": "https://www.figma.com/design/6nzADsXjhKnyHGDQoZ4NGL?node-id=7-2",
+      "code": [
+        "src/routes/Field.tsx",
+        "src/components/field/PanoramaViewer.tsx",
+        "src/styles/field.css"
+      ]
+    },
+    "archive": {
+      "nodeId": "8:2",
+      "url": "https://www.figma.com/design/6nzADsXjhKnyHGDQoZ4NGL?node-id=8-2",
+      "code": [
+        "src/routes/Archive.tsx",
+        "src/components/archive/CircularArchiveCarousel.tsx",
+        "src/styles/archive.css",
+        "src/styles/carousel.css"
+      ]
+    }
+  },
+  "components": {
+    "siteNavigation": {
+      "nodeId": "5:27",
+      "code": "src/components/navigation/SiteNavigation.tsx"
+    },
+    "portalAction": {
+      "nodeId": "5:33",
+      "code": "src/routes/Landing.tsx"
+    },
+    "archiveRow": {
+      "nodeId": "5:38",
+      "code": "src/routes/Archive.tsx"
+    },
+    "specimenNode": {
+      "nodeId": "5:45",
+      "code": "src/components/archive/CircularArchiveCarousel.tsx"
+    }
+  },
+  "foundations": {
+    "nodeId": "5:2",
+    "code": "src/styles/tokens.css",
+    "colors": {
+      "green": "#5FA48D",
+      "grey": "#545756",
+      "white": "#FFFFFF"
+    },
+    "spacing": [5, 10, 18, 28, 44],
+    "radius": 0
+  }
+}

@@ -17,7 +17,7 @@ export default function App() {
 
   return (
     <div className={`site-shell site-shell--${route.name}`}>
-      <SiteNavigation route={route} />
+      {route.name !== 'landing' ? <SiteNavigation route={route} /> : null}
       <Suspense fallback={<div className="route-loading">ENSIL / LOADING MODULE</div>}>
         {route.name === 'landing' && <Landing />}
         {route.name === 'field' && <Field />}

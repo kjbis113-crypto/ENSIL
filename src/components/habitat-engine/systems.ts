@@ -67,9 +67,9 @@ export type HabitatSystems = {
 };
 
 const MINERAL = new THREE.Color(0xffffff);
-const MINERAL_SHADOW = new THREE.Color(0xdfe8e4);
-const CHARCOAL = new THREE.Color(0x545756);
-const BIOFILM = new THREE.Color(0x5fa48d);
+const MINERAL_SHADOW = new THREE.Color(0xd9d9d9);
+const CHARCOAL = new THREE.Color(0x002928);
+const BIOFILM = new THREE.Color(0xd9d9d9);
 
 export function terrainHeight(context: HabitatBuildContext, x: number, z: number) {
   const { config, state, terrainWidth, terrainDepth } = context;
@@ -119,10 +119,10 @@ export function createMaterials(context: HabitatBuildContext): HabitatMaterials 
       roughness: 0.48,
       metalness: 0.12,
     }),
-    wire: new THREE.LineBasicMaterial({ color: 0x545756, transparent: true, opacity: 0.62 }),
-    contour: new THREE.LineBasicMaterial({ color: 0x171818, transparent: true, opacity: 0.46 }),
+    wire: new THREE.LineBasicMaterial({ color: 0x002928, transparent: true, opacity: 0.62 }),
+    contour: new THREE.LineBasicMaterial({ color: 0x002928, transparent: true, opacity: 0.46 }),
     membrane: new THREE.MeshPhysicalMaterial({
-      color: 0x73d2be,
+      color: 0xffffff,
       transparent: true,
       opacity: 0.3,
       roughness: 0.52,
@@ -131,7 +131,7 @@ export function createMaterials(context: HabitatBuildContext): HabitatMaterials 
       side: THREE.DoubleSide,
       depthWrite: false,
     }),
-    errorGreen: new THREE.LineBasicMaterial({ color: 0x5fa48d, transparent: true, opacity: 0.1, depthWrite: false }),
+    errorGreen: new THREE.LineBasicMaterial({ color: 0xd9d9d9, transparent: true, opacity: 0.1, depthWrite: false }),
     errorMagenta: new THREE.LineBasicMaterial({ color: context.config.errorColor, transparent: true, opacity: 0.05, depthWrite: false }),
   };
 }
@@ -334,7 +334,7 @@ function buildSignals(context: HabitatBuildContext, materials: HabitatMaterials)
   return { ...field, material: materials.signal, seams, bead };
 }
 
-function makeLabelSprite(text: string, colour = '#171818') {
+function makeLabelSprite(text: string, colour = '#002928') {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 56;
@@ -375,7 +375,7 @@ function buildAnnotations(context: HabitatBuildContext) {
   });
   const probeGeometry = new THREE.BufferGeometry();
   probeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(probePositions, 3));
-  group.add(new THREE.LineSegments(probeGeometry, new THREE.LineBasicMaterial({ color: 0x545756, transparent: true, opacity: 0.42 })));
+  group.add(new THREE.LineSegments(probeGeometry, new THREE.LineBasicMaterial({ color: 0x002928, transparent: true, opacity: 0.42 })));
   context.group.add(group);
   return group;
 }

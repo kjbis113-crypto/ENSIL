@@ -48,8 +48,8 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
   const position = terrainGeometry.getAttribute('position') as THREE.BufferAttribute;
   const colours = new Float32Array(position.count * 3);
   const pale = new THREE.Color(0xffffff);
-  const grey = new THREE.Color(0xe0e8e5);
-  const dark = new THREE.Color(0x545756);
+  const grey = new THREE.Color(0xd9d9d9);
+  const dark = new THREE.Color(0x002928);
   const colour = new THREE.Color();
   for (let index = 0; index < position.count; index += 1) {
     const x = position.getX(index);
@@ -100,7 +100,7 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
     dummy.scale.set(scale * (0.6 + seeded(index, 29)), scale * (0.3 + seeded(index, 31) * 0.8), scale);
     dummy.updateMatrix();
     fragments.setMatrixAt(index, dummy.matrix);
-    fragmentColour.set(index % 4 === 0 ? 0x73d2be : 0x545756);
+    fragmentColour.set(index % 4 === 0 ? 0xd9d9d9 : 0x002928);
     fragments.setColorAt(index, fragmentColour);
   }
   group.add(fragments);
@@ -126,13 +126,13 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
     dummy.scale.set(0.38 + seeded(index, 47) * 0.9, height, 0.38 + seeded(index, 49) * 0.9);
     dummy.updateMatrix();
     ghostStructures.setMatrixAt(index, dummy.matrix);
-    fragmentColour.set(index % 3 === 0 ? 0x545756 : 0x73d2be);
+    fragmentColour.set(index % 3 === 0 ? 0x002928 : 0xd9d9d9);
     ghostStructures.setColorAt(index, fragmentColour);
   }
   group.add(ghostStructures);
 
   const biofilmCount = mobile ? 210 : 680;
-  const biofilmMaterial = new THREE.MeshStandardMaterial({ color: 0x5fa48d, roughness: 0.97, flatShading: true });
+  const biofilmMaterial = new THREE.MeshStandardMaterial({ color: 0xd9d9d9, roughness: 0.97, flatShading: true });
   const biofilm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.13, 0), biofilmMaterial, biofilmCount);
   for (let index = 0; index < biofilmCount; index += 1) {
     const cluster = index % 23;
@@ -174,9 +174,9 @@ export function buildCommonFieldLandscape(scene: THREE.Scene, mobile: boolean): 
   }
   const cableGeometry = new THREE.BufferGeometry();
   cableGeometry.setAttribute('position', new THREE.Float32BufferAttribute(cablePositions, 3));
-  group.add(new THREE.LineSegments(cableGeometry, new THREE.LineBasicMaterial({ color: 0x545756, transparent: true, opacity: 0.52 })));
+  group.add(new THREE.LineSegments(cableGeometry, new THREE.LineBasicMaterial({ color: 0x002928, transparent: true, opacity: 0.52 })));
 
-  const contourMaterial = new THREE.LineBasicMaterial({ color: 0x171818, transparent: true, opacity: 0.34 });
+  const contourMaterial = new THREE.LineBasicMaterial({ color: 0x002928, transparent: true, opacity: 0.34 });
   for (let ringIndex = 0; ringIndex < (mobile ? 11 : 22); ringIndex += 1) {
     const points: THREE.Vector3[] = [];
     const radius = 5 + ringIndex * 2.05;
