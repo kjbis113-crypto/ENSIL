@@ -11,6 +11,8 @@ import { FluidSim, type SplatInput } from '../../fluid/FluidSim';
 
 const IDLE_STOP_MS = 3500;
 const MAX_DPR = 1.5;
+const TINT_DPR = 0.6; // 민트 글레이즈는 색만 입히므로 저해상도로 충분
+const KEY_COLOR = '#58d6c3'; // 키컬러 — 민트~청록
 
 /** 근백색 실버-틸 염료 — difference에서 모노톤 반전으로 읽힌다 */
 function dyeColor(t: number): [number, number, number] {
@@ -20,10 +22,12 @@ function dyeColor(t: number): [number, number, number] {
 
 export function FluidVeil() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const tintRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const tint = tintRef.current;
+    if (!canvas || !tint) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (window.matchMedia('(pointer: coarse)').matches) return;
 
@@ -31,11 +35,25 @@ export function FluidVeil() {
     const fit = () => {
       canvas.width = Math.max(2, Math.round(window.innerWidth * dpr));
       canvas.height = Math.max(2, Math.round(window.innerHeight * dpr));
+      tint.width = Math.max(2, Math.round(window.innerWidth * TINT_DPR));
+      tint.height = Math.max(2, Math.round(window.innerHeight * TINT_DPR));
     };
     fit();
 
     const sim = new FluidSim(canvas);
     if (!sim.supported) return;
+    const tintCtx = tint.getContext('2d');
+
+    // difference 결과 위에 유체 모양 그대로 키컬러를 입힌다 (color 블렌드 글레이즈)
+    const paintTint = () => {
+      if (!tintCtx) return;
+      tintCtx.globalCompositeOperation = 'copy';
+      tintCtx.drawImage(canvas, 0, 0, tint.width, tint.height);
+      tintCtx.globalCompositeOperation = 'source-in';
+      tintCtx.fillStyle = KEY_COLOR;
+      tintCtx.fillRect(0, 0, tint.width, tint.height);
+      tintCtx.globalCompositeOperation = 'source-over';
+    };
 
     const pending: SplatInput[] = [];
     let last = { x: 0, y: 0, t: 0, has: false };
@@ -50,6 +68,7 @@ export function FluidVeil() {
       while (pending.length) sim.splat(pending.shift()!);
       sim.step(dt);
       sim.render();
+      paintTint();
       if (now - lastActive > IDLE_STOP_MS) {
         running = false;
         return;
@@ -103,15 +122,19 @@ export function FluidVeil() {
     const updateMask = () => {
       const hole = document.querySelector('[data-fluid-window]');
       if (!hole) {
-        canvas.style.removeProperty('mask-image');
-        canvas.style.removeProperty('-webkit-mask-image');
+        for (const el of [canvas, tint]) {
+          el.style.removeProperty('mask-image');
+          el.style.removeProperty('-webkit-mask-image');
+        }
         return;
       }
       const r = hole.getBoundingClientRect();
       const radius = r.width / 2;
       const mask = `radial-gradient(circle ${radius}px at ${r.left + radius}px ${r.top + radius}px, transparent ${radius - 1}px, black ${radius}px)`;
-      canvas.style.setProperty('mask-image', mask);
-      canvas.style.setProperty('-webkit-mask-image', mask);
+      for (const el of [canvas, tint]) {
+        el.style.setProperty('mask-image', mask);
+        el.style.setProperty('-webkit-mask-image', mask);
+      }
     };
     updateMask();
     const maskTimer = window.setInterval(updateMask, 1500);
@@ -134,5 +157,10 @@ export function FluidVeil() {
     };
   }, []);
 
-  return <canvas className="fluid-veil" ref={canvasRef} aria-hidden />;
+  return (
+    <>
+      <canvas className="fluid-veil" ref={canvasRef} aria-hidden />
+      <canvas className="fluid-veil-tint" ref={tintRef} aria-hidden />
+    </>
+  );
 }
