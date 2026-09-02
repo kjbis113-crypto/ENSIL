@@ -16,9 +16,11 @@ export function IndexStrip({
         <button
           key={c.id}
           className={`slot ${c.id === selectedId ? 'selected' : ''}`}
+          data-species={c.species}
+          aria-label={`${c.code} ${c.name}`}
           onClick={() => onSelect(c.id)}
         >
-          <span className="thumb">▨</span>
+          <span className="thumb" aria-hidden>▨</span>
           <span className="code">{c.code.replace('EO-', '')}</span>
         </button>
       ))}

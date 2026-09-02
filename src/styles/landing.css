@@ -1,0 +1,147 @@
+.landing-page {
+  position: relative;
+  height: 100dvh;
+  min-height: 680px;
+  overflow: hidden;
+  color: var(--ensil-grey);
+  background: var(--ensil-white);
+}
+
+.landing-page::before,
+.landing-page::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  background: color-mix(in srgb, var(--ensil-grey) 18%, transparent);
+  pointer-events: none;
+}
+.landing-page::before { top: 48px; bottom: 0; left: 64%; width: 1px; }
+.landing-page::after { right: 0; bottom: 21%; left: 0; height: 1px; }
+
+.landing-register {
+  position: absolute;
+  top: 63px;
+  right: 18px;
+  left: 18px;
+  z-index: 8;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--ensil-grey);
+  font-size: 8px;
+  letter-spacing: .09em;
+}
+
+.landing-carousel {
+  position: absolute;
+  top: 50%;
+  left: 33%;
+  z-index: 4;
+  transform: translate(-50%, -48%);
+}
+
+.landing-active-glyph {
+  position: absolute;
+  top: 23%;
+  left: 47.5%;
+  z-index: 2;
+  width: 18vw;
+  max-width: 290px;
+  aspect-ratio: 1;
+  opacity: .14;
+  pointer-events: none;
+  transform: rotate(13deg);
+}
+
+.landing-title {
+  position: absolute;
+  bottom: -2.2vw;
+  left: 1.2vw;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  pointer-events: none;
+}
+.landing-title h1 {
+  font-size: clamp(94px, 15vw, 290px);
+  font-weight: 400;
+  letter-spacing: -.08em;
+  line-height: .74;
+}
+.landing-title__logo {
+  width: clamp(64px, 7vw, 130px);
+  margin-bottom: 2.2vw;
+  color: var(--ensil-green);
+  pointer-events: auto;
+}
+
+.landing-manifesto {
+  position: absolute;
+  top: 92px;
+  right: 18px;
+  z-index: 7;
+  display: flex;
+  width: calc(36% - 36px);
+  height: calc(58% - 68px);
+  flex-direction: column;
+  padding: 12px 0 0;
+  background: var(--ensil-white);
+}
+.landing-manifesto > header { display: flex; justify-content: space-between; font-size: 8px; letter-spacing: .08em; }
+.landing-manifesto h2 {
+  margin: 8vh 0 4vh;
+  font-size: clamp(52px, 7vw, 126px);
+  font-weight: 400;
+  letter-spacing: -.07em;
+  line-height: .82;
+}
+.landing-manifesto dl { border-top: 1px solid var(--ensil-grey); }
+.landing-manifesto dl div { display: grid; grid-template-columns: 78px 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--ensil-grey) 26%, transparent); }
+.landing-manifesto dt { font-size: 8px; letter-spacing: .08em; }
+.landing-manifesto dd { font-size: 11px; }
+.landing-manifesto > p { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--ensil-grey); font-size: 14px; line-height: 1.15; }
+
+.landing-portals {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 8;
+  width: calc(36% - 36px);
+  border-top: 1px solid var(--ensil-grey);
+  background: var(--ensil-white);
+}
+.landing-portals a { display: grid; grid-template-columns: 1fr 2fr 24px; align-items: center; min-height: 68px; border-bottom: 1px solid var(--ensil-grey); transition: padding var(--motion-ui), color var(--motion-ui), background-color var(--motion-ui); }
+.landing-portals a > span { font-size: 8px; letter-spacing: .08em; }
+.landing-portals strong { font-size: clamp(25px, 3.1vw, 58px); font-weight: 400; letter-spacing: -.06em; line-height: .85; }
+.landing-portals i { font-size: 19px; font-style: normal; text-align: right; }
+.landing-portals a:hover { padding: 0 10px; color: var(--ensil-white); background: var(--ensil-grey); }
+
+@media (max-width: 900px) {
+  .landing-page { height: auto; min-height: 1200px; overflow: hidden; }
+  .landing-page::before { display: none; }
+  .landing-register span:last-child { display: none; }
+  .landing-carousel { top: 39%; left: 50%; }
+  .landing-active-glyph { top: 16%; left: 67%; width: 28vw; }
+  .landing-title { top: 78px; bottom: auto; }
+  .landing-title h1 { font-size: 20vw; line-height: .82; }
+  .landing-title__logo { display: none; }
+  .landing-manifesto { top: 760px; right: 14px; left: 14px; width: auto; height: 230px; border-top: 1px solid var(--ensil-grey); }
+  .landing-manifesto h2 { margin: 28px 0 20px; font-size: 12vw; }
+  .landing-manifesto dl { display: none; }
+  .landing-portals { right: 14px; bottom: 24px; left: 14px; width: auto; }
+}
+
+@media (max-width: 560px) {
+  .landing-page { min-height: 1030px; }
+  .landing-register { top: 56px; right: 12px; left: 12px; }
+  .landing-title { top: 73px; }
+  .landing-carousel { top: 36%; }
+  .landing-manifesto { top: 650px; height: 195px; }
+  .landing-portals a { min-height: 70px; }
+  .landing-portals strong { font-size: 8vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-portals a { transition: none; }
+}

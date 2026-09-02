@@ -1,2 +1,5 @@
-bridge
-firmware
+.vinext
+.wrangler
+dist
+outputs
+work

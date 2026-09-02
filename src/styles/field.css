@@ -1,0 +1,66 @@
+.field-page { position: relative; height: 100dvh; overflow: hidden; color: var(--ensil-grey); background: var(--ensil-grey); }
+.panorama-viewer, .panorama-viewer__canvas { position: absolute; inset: 0; }
+.panorama-viewer { top: 48px; overflow: hidden; background: var(--ensil-grey); }
+.panorama-viewer__canvas canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.panorama-viewer__canvas canvas:active { cursor: grabbing; }
+.panorama-loading, .panorama-error { position: absolute; inset: 0; z-index: 10; display: grid; place-content: center; gap: 14px; color: var(--ensil-white); background: var(--ensil-grey); font-size: 9px; letter-spacing: .12em; text-align: center; }
+.panorama-loading strong { font-size: clamp(52px, 10vw, 148px); font-weight: 400; letter-spacing: -.07em; }
+.panorama-hotspots { position: absolute; inset: 0; z-index: 7; pointer-events: none; }
+.panorama-hotspot { --hotspot-x: 50%; --hotspot-y: 50%; position: absolute; top: var(--hotspot-y); left: var(--hotspot-x); display: grid; grid-template-columns: 18px auto; align-items: start; gap: 8px; transform: translate(-9px, -9px) scale(.88); opacity: 0; color: var(--ensil-white); pointer-events: none; text-align: left; transition: opacity var(--motion-ui) ease, transform var(--motion-ui) ease; }
+.panorama-hotspot[data-visible='true'] { transform: translate(-9px, -9px) scale(1); opacity: 1; pointer-events: auto; }
+.panorama-hotspot > i { width: 18px; height: 18px; border: 1px solid var(--ensil-white); border-radius: 50%; background: var(--ensil-green); box-shadow: 0 0 0 5px color-mix(in srgb, var(--ensil-green) 24%, transparent); }
+.panorama-hotspot > span { display: grid; min-width: 116px; padding: 4px 7px 6px; border-top: 1px solid var(--ensil-white); background: color-mix(in srgb, var(--ensil-grey) 82%, transparent); }
+.panorama-hotspot b { font-size: 10px; font-weight: 400; letter-spacing: .08em; }
+.panorama-hotspot small { margin-top: 5px; font-size: 7px; line-height: 1.35; letter-spacing: .08em; text-transform: uppercase; }
+.panorama-hotspot:hover > i, .panorama-hotspot:focus-visible > i { background: var(--ensil-white); box-shadow: 0 0 0 8px color-mix(in srgb, var(--ensil-white) 24%, transparent); }
+.panorama-viewer__mode { position: absolute; bottom: 18px; left: 24px; z-index: 9; display: flex; align-items: center; gap: 12px; color: var(--ensil-white); font-size: 8px; letter-spacing: .08em; }
+.panorama-viewer__mode button { padding: 7px 9px; border: 1px solid var(--ensil-white); color: inherit; background: color-mix(in srgb, var(--ensil-grey) 72%, transparent); }
+.panorama-viewer__mode button:hover, .panorama-viewer__mode button[aria-pressed='true'] { color: var(--ensil-grey); background: var(--ensil-white); }
+.panorama-vr-button { right: 24px !important; bottom: 66px !important; width: auto !important; height: auto !important; padding: 8px 10px !important; border: 1px solid var(--ensil-white) !important; border-radius: 0 !important; opacity: 1 !important; color: var(--ensil-white) !important; background: color-mix(in srgb, var(--ensil-grey) 72%, transparent) !important; font-family: var(--font) !important; font-size: 8px !important; }
+.field-index, .field-environment, .field-panorama-help, .field-controls, .observation-layer, .encounter-card, .field-proximity { position: absolute; z-index: 12; }
+.field-index { top: 66px; left: 24px; display: grid; gap: 3px; color: var(--ensil-white); font-size: 8px; letter-spacing: .1em; pointer-events: none; }
+.field-index span:last-child { opacity: .7; }
+.field-environment { top: 66px; right: 24px; display: flex; gap: 18px; color: var(--ensil-white); font-size: 8px; letter-spacing: .08em; pointer-events: none; }
+.field-panorama-help { right: 24px; bottom: 22px; margin: 0; color: var(--ensil-white); font-size: 8px; letter-spacing: .09em; pointer-events: none; }
+.field-controls { right: 24px; bottom: 46px; display: flex; border: 1px solid var(--ensil-white); color: var(--ensil-white); background: color-mix(in srgb, var(--ensil-grey) 72%, transparent); }
+.field-controls button { padding: 9px 12px; border-right: 1px solid var(--ensil-white); color: inherit; font-size: 8px; letter-spacing: .08em; }
+.field-controls button:last-child { border-right: 0; }
+.field-controls button:hover, .field-controls button[aria-pressed='true'] { color: var(--ensil-grey); background: var(--ensil-white); }
+.field-proximity { top: 50%; left: 50%; display: grid; grid-template-columns: 12px auto; gap: 3px 8px; transform: translate(-50%, 54px); color: var(--ensil-white); font-size: 8px; letter-spacing: .08em; pointer-events: none; }
+.field-proximity i { grid-row: 1 / 4; width: 12px; height: 12px; border-radius: 50%; background: var(--ensil-green); }
+.field-proximity strong { font-weight: 400; text-transform: uppercase; }
+.field-proximity small { opacity: .7; }
+.encounter-card { top: 84px; right: 24px; width: min(340px, calc(100vw - 48px)); padding: 14px; border: 1px solid var(--ensil-grey); color: var(--ensil-grey); background: var(--ensil-white); animation: encounterIn var(--motion-panel) var(--ease-enter) both; }
+.encounter-card__close { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; font-size: 20px; }
+.encounter-card > span { font-size: 8px; letter-spacing: .09em; }
+.encounter-card h1 { margin: 34px 0 26px; font-size: clamp(54px, 5vw, 84px); font-weight: 400; letter-spacing: -.08em; line-height: .8; }
+.encounter-card dl { border-top: 1px solid var(--ensil-grey); }
+.encounter-card dl div { display: grid; grid-template-columns: 70px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid color-mix(in srgb, var(--ensil-grey) 34%, transparent); font-size: 9px; }
+.encounter-card dd { text-align: right; }
+.encounter-card__actions { display: grid; grid-template-columns: 1fr 1fr; margin-top: 22px; border: 1px solid var(--ensil-grey); }
+.encounter-card__actions a { display: flex; justify-content: space-between; padding: 10px; border-right: 1px solid var(--ensil-grey); font-size: 8px; letter-spacing: .06em; }
+.encounter-card__actions a:last-child { border: 0; }
+.encounter-card__actions a:hover { color: var(--ensil-white); background: var(--ensil-grey); }
+.observation-layer { top: 102px; left: 24px; width: min(410px, calc(100vw - 48px)); border: 1px solid var(--ensil-grey); color: var(--ensil-grey); background: var(--ensil-white); }
+.observation-layer header, .observation-layer button { display: grid; width: 100%; grid-template-columns: 104px 1fr; gap: 12px; padding: 10px 12px; border-bottom: 1px solid color-mix(in srgb, var(--ensil-grey) 34%, transparent); font-size: 8px; letter-spacing: .07em; text-align: left; text-transform: uppercase; }
+.observation-layer header { color: var(--ensil-white); background: var(--ensil-grey); }
+.observation-layer button span:first-child { display: flex; align-items: center; gap: 8px; }
+.observation-layer button i { width: 8px; height: 8px; border-radius: 50%; background: var(--ensil-green); }
+.observation-layer button:hover { color: var(--ensil-white); background: var(--ensil-green); }
+.observation-layer footer { padding: 8px 12px; font-size: 7px; letter-spacing: .08em; }
+@keyframes encounterIn { from { opacity: 0; transform: translateX(24px); clip-path: inset(0 0 0 100%); } to { opacity: 1; transform: translateX(0); clip-path: inset(0); } }
+@media (max-width: 760px) {
+  .panorama-viewer { top: 44px; }
+  .field-index { top: 58px; left: 14px; }
+  .field-environment { top: 58px; right: 14px; }
+  .field-environment span:not(:first-child) { display: none; }
+  .field-panorama-help { right: 14px; bottom: 14px; max-width: 170px; text-align: right; }
+  .field-controls { right: 14px; bottom: 44px; }
+  .panorama-viewer__mode { bottom: 14px; left: 14px; }
+  .panorama-viewer__mode > span { display: none; }
+  .encounter-card { top: auto; right: 14px; bottom: 86px; left: 14px; width: auto; }
+  .encounter-card h1 { margin: 25px 0 18px; font-size: 52px; }
+  .observation-layer { top: 88px; left: 14px; width: calc(100vw - 28px); }
+  .panorama-hotspot > span { min-width: 92px; }
+}
+@media (prefers-reduced-motion: reduce) { .panorama-hotspot, .encounter-card { transition: none; animation: none; } }

@@ -21,8 +21,8 @@ export function AnnotationLayer({
   visualRef,
 }: {
   annotations: Annotation[];
-  containerRef: React.RefObject<HTMLElement>;
-  visualRef: React.RefObject<HTMLElement>;
+  containerRef: React.RefObject<HTMLElement | null>;
+  visualRef: React.RefObject<HTMLElement | null>;
 }) {
   const [layout, setLayout] = useState<Layout | null>(null);
 

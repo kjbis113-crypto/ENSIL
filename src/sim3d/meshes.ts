@@ -3,18 +3,34 @@ import type { Species } from '../types/creature';
 
 /**
  * 종(전자부품)별 3D 목업 — 실제 에셋이 나오기 전의 프리미티브 조합.
- * 모노톤: 밝은 회색 면 + 검정 엣지 라인 (와이어프레임 룩).
+ * ENSIL live palette: paper-white bodies, black technical edges, living signal accents.
  * 에셋이 나오면 buildSpeciesMesh의 케이스만 GLTF 로드로 교체한다.
  * React를 모른다 — 렌더러(ThreeStage)에서만 사용.
  */
 
-const BODY = 0xe4e4e4;
-const DARK = 0x555555;
-const EDGE = 0x111111;
+const BODY = 0x5fa48d;
+const DARK = 0x171818;
+const EDGE = 0x73d2be;
+const SIGNAL: Record<Species, number> = {
+  mcu: 0x73d2be,
+  led: 0x73d2be,
+  transistor: 0x5fa48d,
+  resistor: 0x545756,
+  capacitor: 0x5fa48d,
+  switch: 0x545756,
+};
 
 function part(geo: THREE.BufferGeometry, color = BODY): THREE.Group {
   const g = new THREE.Group();
-  const mat = new THREE.MeshLambertMaterial({ color, transparent: true });
+  const isSignal = color !== BODY && color !== DARK;
+  const mat = new THREE.MeshStandardMaterial({
+    color,
+    emissive: isSignal ? color : 0x000000,
+    emissiveIntensity: isSignal ? 0.34 : 0,
+    metalness: isSignal ? 0.28 : 0.62,
+    roughness: isSignal ? 0.42 : 0.58,
+    transparent: true,
+  });
   g.add(new THREE.Mesh(geo, mat));
   const edges = new THREE.LineSegments(
     new THREE.EdgesGeometry(geo, 25),
@@ -33,10 +49,11 @@ function at(obj: THREE.Object3D, x: number, y: number, z: number, ry = 0, rz = 0
 
 export function buildSpeciesMesh(species: Species): THREE.Group {
   const g = new THREE.Group();
+  const signal = SIGNAL[species];
   switch (species) {
     case 'mcu': {
       g.add(at(part(new THREE.BoxGeometry(4, 0.7, 3)), 0, 0.35, 0));
-      g.add(at(part(new THREE.BoxGeometry(1.6, 0.5, 1.6), DARK), 0, 0.95, 0));
+      g.add(at(part(new THREE.BoxGeometry(1.6, 0.5, 1.6), signal), 0, 0.95, 0));
       // 핀 4개
       for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
         g.add(at(part(new THREE.BoxGeometry(0.25, 0.5, 0.25), DARK), sx * 1.6, 0.25, sz * 1.1));
@@ -45,7 +62,7 @@ export function buildSpeciesMesh(species: Species): THREE.Group {
     }
     case 'led': {
       g.add(at(part(new THREE.CylinderGeometry(0.85, 0.85, 1.1, 16)), 0, 1.4, 0));
-      g.add(at(part(new THREE.SphereGeometry(0.85, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2)), 0, 1.95, 0));
+      g.add(at(part(new THREE.SphereGeometry(0.85, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), signal), 0, 1.95, 0));
       // 다리 2개
       g.add(at(part(new THREE.CylinderGeometry(0.09, 0.09, 1.5, 6), DARK), -0.35, 0.55, 0));
       g.add(at(part(new THREE.CylinderGeometry(0.09, 0.09, 1.1, 6), DARK), 0.35, 0.4, 0));
@@ -54,7 +71,7 @@ export function buildSpeciesMesh(species: Species): THREE.Group {
     case 'transistor': {
       // TO-92 몸통 (원통 + 평면 컷 느낌은 박스로)
       g.add(at(part(new THREE.CylinderGeometry(1.1, 1.1, 1.9, 20)), 0, 1.6, 0));
-      g.add(at(part(new THREE.BoxGeometry(2.2, 1.9, 0.5)), 0, 1.6, -0.85));
+      g.add(at(part(new THREE.BoxGeometry(2.2, 1.9, 0.5), signal), 0, 1.6, -0.85));
       for (const sx of [-0.7, 0, 0.7]) {
         g.add(at(part(new THREE.CylinderGeometry(0.09, 0.09, 1.3, 6), DARK), sx, 0.45, 0));
       }
@@ -70,7 +87,7 @@ export function buildSpeciesMesh(species: Species): THREE.Group {
       g.add(at(wire, 0, 0.9, 0));
       // 밴드 2개
       for (const sx of [-0.6, 0.4]) {
-        const band = part(new THREE.CylinderGeometry(0.74, 0.74, 0.3, 12), DARK);
+        const band = part(new THREE.CylinderGeometry(0.74, 0.74, 0.3, 12), signal);
         band.rotation.z = Math.PI / 2;
         g.add(at(band, sx, 0.9, 0));
       }
@@ -78,7 +95,7 @@ export function buildSpeciesMesh(species: Species): THREE.Group {
     }
     case 'capacitor': {
       g.add(at(part(new THREE.CylinderGeometry(1, 1, 2.6, 18)), 0, 1.8, 0));
-      g.add(at(part(new THREE.CylinderGeometry(1.02, 1.02, 0.35, 18), DARK), 0, 2.85, 0));
+      g.add(at(part(new THREE.CylinderGeometry(1.02, 1.02, 0.35, 18), signal), 0, 2.85, 0));
       g.add(at(part(new THREE.CylinderGeometry(0.09, 0.09, 1, 6), DARK), -0.4, 0.25, 0));
       g.add(at(part(new THREE.CylinderGeometry(0.09, 0.09, 1, 6), DARK), 0.4, 0.25, 0));
       break;
@@ -86,7 +103,7 @@ export function buildSpeciesMesh(species: Species): THREE.Group {
     case 'switch': {
       g.add(at(part(new THREE.BoxGeometry(2.6, 1, 1.6)), 0, 0.5, 0));
       // 레버
-      const lever = part(new THREE.CylinderGeometry(0.16, 0.22, 1.6, 8), DARK);
+      const lever = part(new THREE.CylinderGeometry(0.16, 0.22, 1.6, 8), signal);
       lever.rotation.z = -0.5;
       g.add(at(lever, 0.4, 1.6, 0));
       break;
@@ -98,7 +115,12 @@ export function buildSpeciesMesh(species: Species): THREE.Group {
 export function buildNodeMesh(): THREE.Group {
   // 에너지 노드 ⊙ — 납작한 링 + 중심점 (엣지 없이 가볍게)
   const g = new THREE.Group();
-  const mat = new THREE.MeshLambertMaterial({ color: 0x999999 });
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x73d2be,
+    emissive: 0x73d2be,
+    emissiveIntensity: 0.72,
+    roughness: 0.36,
+  });
   const ring = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.14, 8, 28), mat);
   ring.rotation.x = -Math.PI / 2;
   g.add(at(ring, 0, 0.15, 0));
@@ -108,7 +130,7 @@ export function buildNodeMesh(): THREE.Group {
 
 export function buildSelectRing(): THREE.Mesh {
   const geo = new THREE.RingGeometry(2.6, 3.0, 32);
-  const mat = new THREE.MeshBasicMaterial({ color: EDGE, side: THREE.DoubleSide });
+  const mat = new THREE.MeshBasicMaterial({ color: 0x73d2be, side: THREE.DoubleSide });
   const m = new THREE.Mesh(geo, mat);
   m.rotation.x = -Math.PI / 2;
   m.position.y = 0.06;
@@ -143,10 +165,10 @@ export function makeLabelSprite(): { sprite: THREE.Sprite; setText: (t: string) 
     if (t === last) return;
     last = t;
     ctx.clearRect(0, 0, 256, 64);
-    ctx.font = '500 26px "KoPub World Dotum", sans-serif';
+    ctx.font = '400 24px "Arial Narrow", Arial, "KoPub World Dotum", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#777';
+    ctx.fillStyle = '#73D2BE';
     ctx.fillText(t, 128, 32);
     tex.needsUpdate = true;
   };

@@ -15,7 +15,10 @@ export function SystemBar({ physicalConnected }: { physicalConnected: boolean })
 
   return (
     <header className="sysbar">
-      <span>{COPY.systemTitle}</span>
+      <span className="brand-lockup">
+        <strong>ENSIL</strong>
+        <span>{COPY.systemTitle}</span>
+      </span>
       <span className="status">
         {/* M10: Supabase 동기화 상태가 여기 반영됨 */}
         <span>{physicalConnected ? COPY.physicalConnected : COPY.physicalWaiting}</span>
