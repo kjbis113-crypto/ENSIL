@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { SiteNavigation } from './components/navigation/SiteNavigation';
+import { FluidVeil } from './components/shell/FluidVeil';
+import { LiquidCursor } from './components/landing/LiquidCursor';
 import { useSiteRoute } from './state/useSiteRoute';
 
 const Landing = lazy(() => import('./routes/Landing').then((module) => ({ default: module.Landing })));
@@ -25,6 +27,9 @@ export default function App() {
         {route.name === 'archive' && <Archive />}
         {route.name === 'creature' && <CreatureRecordPage id={route.id} />}
       </Suspense>
+      {/* 사이트 전역 유체 베일 + 액체 커서 (터치·reduced-motion에선 자체 비활성) */}
+      <FluidVeil />
+      <LiquidCursor />
     </div>
   );
 }

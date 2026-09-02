@@ -7,9 +7,12 @@ import { useEffect, useRef } from 'react';
  * transform만 갱신(리플로 0), 멈추면 2.5초 후 rAF 정지.
  */
 
-const SIZES = [22, 18, 15, 12, 9, 7];
-const HEAD_FOLLOW = 0.5;
-const TAIL_FOLLOW = 0.34;
+const SIZES = [22, 20, 18, 16, 14, 12, 10, 9, 8, 7];
+const HEAD_FOLLOW = 0.55;
+const TAIL_FOLLOW = 0.52;
+/** 인접 점 사이 최대 간격(각 점 지름 대비) — 이 이상 벌어지면 끌어당겨서
+    아무리 빨라도 구이 필터 안에서 항상 한 덩어리로 붙어 있게 한다 */
+const MAX_GAP_RATIO = 0.75;
 const IDLE_STOP_MS = 2500;
 
 export function LiquidCursor() {
@@ -46,6 +49,16 @@ export function LiquidCursor() {
       for (let i = 1; i < pos.length; i += 1) {
         pos[i].x += (pos[i - 1].x - pos[i].x) * TAIL_FOLLOW;
         pos[i].y += (pos[i - 1].y - pos[i].y) * TAIL_FOLLOW;
+        // 간격 하드 클램프 — 빠른 이동에도 사슬이 절대 끊기지 않는다
+        const gx = pos[i].x - pos[i - 1].x;
+        const gy = pos[i].y - pos[i - 1].y;
+        const gap = Math.hypot(gx, gy);
+        const maxGap = SIZES[i] * scale * MAX_GAP_RATIO;
+        if (gap > maxGap) {
+          const k = maxGap / gap;
+          pos[i].x = pos[i - 1].x + gx * k;
+          pos[i].y = pos[i - 1].y + gy * k;
+        }
       }
       scaleTarget = pressed ? 0.72 : hovering ? 1.65 : 1;
       scale += (scaleTarget - scale) * 0.2;

@@ -714,9 +714,11 @@
 }
 .vitrine-links a:hover { opacity: 1; text-decoration: underline; }
 
-/* ── 액체 커서 + 허브 유체 ─────────────────────────────────── */
-.landing-page--liquid-cursor,
-.landing-page--liquid-cursor * { cursor: none !important; }
+/* ── 액체 커서 + 전면 유체 베일 (사이트 전역) ───────────────── */
+@media (pointer: fine) {
+  .site-shell,
+  .site-shell * { cursor: none !important; }
+}
 
 .liquid-cursor {
   position: fixed;
@@ -741,14 +743,14 @@
   will-change: transform;
 }
 
-/* 허브(회전축) 안에 갇힌 유체 — multiply라 흰 구 위에 틸 물감처럼 스민다 */
-.fluid-hub {
-  position: absolute;
+/* 전면 유체 베일 — difference라 어느 면 위에서든 모노톤 반전으로 읽힌다 */
+.fluid-veil {
+  position: fixed;
   inset: 0;
+  z-index: 120;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  mix-blend-mode: multiply;
-  opacity: 0.85;
+  mix-blend-mode: difference;
 }
 

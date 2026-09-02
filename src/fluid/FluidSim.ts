@@ -19,9 +19,12 @@ const PRESSURE_DECAY = 1.0;
 const CURL_STRENGTH = 0; // 0이면 curl/vorticity 패스 자체를 건너뛴다
 const SPLAT_RADIUS = 0.0041;
 const SPLAT_FORCE = 5200;
-const BLOOM_INTENSITY = 0.26;
+const BLOOM_INTENSITY = 0; // 0 = 블룸 생략 (연기 대신 액체 룩)
 const BLOOM_THRESHOLD = 0.62;
 const BLOOM_KNEE = 0.7;
+// 액체 경계 — 좁은 밴드의 알파 threshold가 가스(연기)를 물방울로 바꾼다
+const EDGE_LOW = 0.16;
+const EDGE_HIGH = 0.4;
 
 const BASE_VERT = `
 precision highp float;
@@ -192,21 +195,25 @@ uniform sampler2D uTexture;
 uniform sampler2D uBloom;
 uniform vec2 uTexelSize;
 uniform float uBloomIntensity;
+uniform vec2 uEdge; /* (low, high) — 좁을수록 경계가 또렷한 액체 */
 void main () {
   vec3 c = texture2D(uTexture, vUv).rgb;
-  /* shading — 밀도 기울기를 법선 삼은 확산광, 연기의 입체감 */
+  float lum = max(c.r, max(c.g, c.b));
+  /* 액체 경계: threshold 알파 + 색 정규화(내부는 균일한 물감 농도) */
+  float alpha = smoothstep(uEdge.x, uEdge.y, lum);
+  vec3 body = c / max(lum, 0.0001);
+  /* shading — 밀도 기울기 확산광 (가볍게, 표면감만) */
   vec3 lc = texture2D(uTexture, vUv - vec2(uTexelSize.x, 0.0)).rgb;
   vec3 rc = texture2D(uTexture, vUv + vec2(uTexelSize.x, 0.0)).rgb;
   vec3 bc = texture2D(uTexture, vUv - vec2(0.0, uTexelSize.y)).rgb;
   vec3 tc = texture2D(uTexture, vUv + vec2(0.0, uTexelSize.y)).rgb;
   float dx = length(rc) - length(lc);
   float dy = length(tc) - length(bc);
-  vec3 n = normalize(vec3(dx, dy, 0.3));
-  float diffuse = clamp(dot(n, vec3(0.0, 0.0, 1.0)) + 0.7, 0.7, 1.0);
-  c *= diffuse;
-  c += texture2D(uBloom, vUv).rgb * uBloomIntensity;
-  float alpha = clamp(max(c.r, max(c.g, c.b)), 0.0, 1.0);
-  gl_FragColor = vec4(c * alpha, alpha); /* premultiplied */
+  vec3 n = normalize(vec3(dx, dy, 0.45));
+  float diffuse = clamp(dot(n, vec3(0.0, 0.0, 1.0)) + 0.82, 0.82, 1.0);
+  body *= diffuse;
+  body += texture2D(uBloom, vUv).rgb * uBloomIntensity;
+  gl_FragColor = vec4(body * alpha, alpha); /* premultiplied */
 }`;
 
 interface FBO {
@@ -520,11 +527,12 @@ export class FluidSim {
   render() {
     if (!this.supported) return;
     const gl = this.gl;
-    const bloom = this.applyBloom();
+    const bloom = BLOOM_INTENSITY > 0 ? this.applyBloom() : null;
     const { display } = this.programs;
     gl.useProgram(display.program);
     gl.uniform1i(display.uniforms.uTexture, this.dye.read.attach(gl, 0));
     gl.uniform2f(display.uniforms.uTexelSize, this.dye.texelX, this.dye.texelY);
+    gl.uniform2f(display.uniforms.uEdge, EDGE_LOW, EDGE_HIGH);
     gl.uniform1i(display.uniforms.uBloom, (bloom ?? this.dye.read).attach(gl, 1));
     gl.uniform1f(display.uniforms.uBloomIntensity, bloom ? BLOOM_INTENSITY : 0);
     this.blit(null);
