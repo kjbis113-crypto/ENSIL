@@ -8,16 +8,16 @@ import type { Species } from '../types/creature';
  * React를 모른다 — 렌더러(ThreeStage)에서만 사용.
  */
 
-const BODY = 0x5fa48d;
-const DARK = 0x171818;
-const EDGE = 0x73d2be;
+const BODY = 0xd9d9d9;
+const DARK = 0x002928;
+const EDGE = 0xffffff;
 const SIGNAL: Record<Species, number> = {
-  mcu: 0x73d2be,
-  led: 0x73d2be,
-  transistor: 0x5fa48d,
-  resistor: 0x545756,
-  capacitor: 0x5fa48d,
-  switch: 0x545756,
+  mcu: 0xffffff,
+  led: 0xffffff,
+  transistor: 0xd9d9d9,
+  resistor: 0xd9d9d9,
+  capacitor: 0xd9d9d9,
+  switch: 0x002928,
 };
 
 function part(geo: THREE.BufferGeometry, color = BODY): THREE.Group {
@@ -116,8 +116,8 @@ export function buildNodeMesh(): THREE.Group {
   // 에너지 노드 ⊙ — 납작한 링 + 중심점 (엣지 없이 가볍게)
   const g = new THREE.Group();
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x73d2be,
-    emissive: 0x73d2be,
+    color: 0xffffff,
+    emissive: 0xd9d9d9,
     emissiveIntensity: 0.72,
     roughness: 0.36,
   });
@@ -130,7 +130,7 @@ export function buildNodeMesh(): THREE.Group {
 
 export function buildSelectRing(): THREE.Mesh {
   const geo = new THREE.RingGeometry(2.6, 3.0, 32);
-  const mat = new THREE.MeshBasicMaterial({ color: 0x73d2be, side: THREE.DoubleSide });
+  const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
   const m = new THREE.Mesh(geo, mat);
   m.rotation.x = -Math.PI / 2;
   m.position.y = 0.06;
@@ -168,7 +168,7 @@ export function makeLabelSprite(): { sprite: THREE.Sprite; setText: (t: string) 
     ctx.font = '400 24px "Arial Narrow", Arial, "KoPub World Dotum", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#73D2BE';
+    ctx.fillStyle = '#D9D9D9';
     ctx.fillText(t, 128, 32);
     tex.needsUpdate = true;
   };

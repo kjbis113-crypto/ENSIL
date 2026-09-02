@@ -63,6 +63,15 @@ body {
   height: 22px;
 }
 
+.site-navigation__brand-text {
+  display: block;
+  color: var(--ensil-grey);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1;
+}
+
 .site-navigation nav {
   justify-self: center;
   display: flex;

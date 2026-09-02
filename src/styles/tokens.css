@@ -1,15 +1,18 @@
-/* ENSIL identity system — neutral paper with aqueous signal colours. */
+/* ENSIL identity system — black, silver and white. */
 :root {
   color-scheme: light;
 
-  --ensil-green: #5FA48D;
-  --ensil-grey: #545756;
+  --ensil-black: #002928;
+  --ensil-silver: #D9D9D9;
   --ensil-white: #FFFFFF;
+  /* Compatibility aliases used by existing field/archive components. */
+  --ensil-green: var(--ensil-silver);
+  --ensil-grey: var(--ensil-black);
 
-  --brand-primary: var(--ensil-green);
-  --brand-secondary: var(--ensil-grey);
-  --brand-structure: var(--ensil-grey);
-  --brand-dark: var(--ensil-grey);
+  --brand-primary: var(--ensil-black);
+  --brand-secondary: var(--ensil-silver);
+  --brand-structure: var(--ensil-black);
+  --brand-dark: var(--ensil-black);
   --brand-white: #FFFFFF;
   --brand-off-white: #FFFFFF;
 
@@ -21,9 +24,9 @@
   --ink: var(--brand-dark);
   --ink-mute: var(--brand-structure);
   --ink-soft: var(--brand-structure);
-  --line: rgba(23, 24, 24, 0.1);
-  --line-2: rgba(23, 24, 24, 0.28);
-  --line-strong: rgba(23, 24, 24, 0.66);
+  --line: rgba(0, 41, 40, 0.1);
+  --line-2: rgba(0, 41, 40, 0.28);
+  --line-strong: rgba(0, 41, 40, 0.66);
 
   /* Biotechnical signal palette */
   --lime: var(--brand-primary);
@@ -36,7 +39,7 @@
   --sensor: var(--brand-structure);
 
   /* Ambient interaction field */
-  --cursor-blob: rgba(23, 24, 24, 0.12);
+  --cursor-blob: rgba(0, 41, 40, 0.12);
   --cursor-blob-size: 96px;
 
   --motion-fast: 160ms;

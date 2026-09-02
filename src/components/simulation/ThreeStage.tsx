@@ -58,8 +58,8 @@ export function ThreeStage({
 
     // ── 씬 기본 ──────────────────────────────
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x171818);
-    scene.fog = new THREE.Fog(0x171818, 105, 215);
+    scene.background = new THREE.Color(0x002928);
+    scene.fog = new THREE.Fog(0x002928, 105, 215);
 
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 500);
     camera.position.set(0, 62, 74);
@@ -78,11 +78,11 @@ export function ThreeStage({
     controls.maxDistance = 160;
     controls.enableDamping = true;
 
-    scene.add(new THREE.AmbientLight(0x5fa48d, 0.58));
-    const sun = new THREE.DirectionalLight(0x73d2be, 1.28);
+    scene.add(new THREE.AmbientLight(0xd9d9d9, 0.58));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.28);
     sun.position.set(40, 80, 30);
     scene.add(sun);
-    const rim = new THREE.DirectionalLight(0x545756, 0.58);
+    const rim = new THREE.DirectionalLight(0xd9d9d9, 0.58);
     rim.position.set(-45, 28, -36);
     scene.add(rim);
 
@@ -91,11 +91,11 @@ export function ThreeStage({
     scene.add(worldGroup);
 
     // 바닥
-    const grid = new THREE.GridHelper(100, 20, 0x73d2be, 0x545756);
+    const grid = new THREE.GridHelper(100, 20, 0xd9d9d9, 0x002928);
     worldGroup.add(grid);
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(100, 100),
-      new THREE.MeshStandardMaterial({ color: 0x171818, roughness: 0.94, metalness: 0.08 }),
+      new THREE.MeshStandardMaterial({ color: 0x002928, roughness: 0.94, metalness: 0.08 }),
     );
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.05;
@@ -129,7 +129,7 @@ export function ThreeStage({
       const trailGeo = new THREE.BufferGeometry();
       const trail = new THREE.Line(
         trailGeo,
-        new THREE.LineBasicMaterial({ color: 0x73d2be, transparent: true, opacity: 0.38 }),
+        new THREE.LineBasicMaterial({ color: 0xd9d9d9, transparent: true, opacity: 0.38 }),
       );
       worldGroup.add(trail);
 
