@@ -8,8 +8,9 @@ import { useEffect, useRef } from 'react';
  */
 
 const BACKGROUND_VIDEO = '/media/index/ensil-geometric-fractals.m4v';
-const SEEK_INTERVAL_MS = 80; // 이동 중 초당 최대 12.5회 — 빠른 스크럽 체감
-const SEEK_EPSILON = 0.025;
+const SEEK_INTERVAL_MS = 25; // 안전 하한 — 실제 속도는 seeked 연쇄(디코더 한계)가 정한다
+const SEEK_EPSILON = 0.02;
+const SEEK_MAX_STEP = 0.09; // 시킹 1회당 최대 전진(초) — 점프 대신 프레임이 드르륵 이어진다
 const TRAVEL_GAIN = 0.28; // 커서 이동거리(화면 대각선 비율)당 재생 진행량 — 빠르게 움직일수록 빨리 재생
 
 export function InteractiveFrameBackground() {
@@ -31,10 +32,15 @@ export function InteractiveFrameBackground() {
     const trySeek = () => {
       seekTimer = 0;
       if (!ready || video.seeking || !Number.isFinite(video.duration)) return;
-      const targetTime = Math.max(0, video.duration - 0.04) * targetProgress;
-      if (Math.abs(video.currentTime - targetTime) < SEEK_EPSILON) return;
+      const span = Math.max(0.04, video.duration - 0.04);
+      const targetTime = span * targetProgress;
+      // 순환 고려 최단 방향 차이
+      let diff = ((targetTime - video.currentTime) % span + span * 1.5) % span - span * 0.5;
+      if (Math.abs(diff) < SEEK_EPSILON) return;
+      // 목표로 순간이동하지 않고 한 스텝씩 — 프레임이 연속으로 드르륵 넘어간다
+      diff = Math.max(-SEEK_MAX_STEP, Math.min(SEEK_MAX_STEP, diff));
       lastSeek = performance.now();
-      video.currentTime = targetTime;
+      video.currentTime = (video.currentTime + diff + span) % span;
     };
     const scheduleSeek = () => {
       if (seekTimer) return;
