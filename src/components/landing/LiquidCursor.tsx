@@ -35,6 +35,18 @@ export function LiquidCursor() {
     const dots = Array.from(root.querySelectorAll<HTMLElement>('.liquid-cursor__dot'));
     const pos = SIZES.map(() => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
     const target = { x: pos[0].x, y: pos[0].y };
+
+    // 허브 유체([data-fluid-window])와의 접착 — 가까우면 꼬리가 허브 가장자리로 끌린다
+    let hub: { cx: number; cy: number; r: number } | null = null;
+    const measureHub = () => {
+      const el = document.querySelector('[data-fluid-window]');
+      if (!el) { hub = null; return; }
+      const rect = el.getBoundingClientRect();
+      hub = { cx: rect.left + rect.width / 2, cy: rect.top + rect.height / 2, r: rect.width / 2 };
+    };
+    measureHub();
+    const hubTimer = window.setInterval(measureHub, 1500);
+    window.addEventListener('hashchange', measureHub);
     let scale = 1;
     let scaleTarget = 1;
     let pressed = false;
@@ -58,6 +70,25 @@ export function LiquidCursor() {
           const k = maxGap / gap;
           pos[i].x = pos[i - 1].x + gx * k;
           pos[i].y = pos[i - 1].y + gy * k;
+        }
+      }
+      // 허브 접착: 가장자리 근처(150px)에서 꼬리 절반이 허브 림 쪽으로 끌려
+      // 두 유체가 목을 늘여 맞닿는 듯한 브릿지를 만든다
+      if (hub) {
+        const hx = pos[0].x - hub.cx;
+        const hy = pos[0].y - hub.cy;
+        const d = Math.hypot(hx, hy);
+        const edgeDist = d - hub.r;
+        if (d > 1 && edgeDist < 150) {
+          const pull = edgeDist <= 0 ? 1 : 1 - edgeDist / 150;
+          const ex = hub.cx + (hx / d) * hub.r;
+          const ey = hub.cy + (hy / d) * hub.r;
+          const half = Math.floor(pos.length / 2);
+          for (let i = half; i < pos.length; i += 1) {
+            const w = pull * 0.22 * ((i - half + 1) / (pos.length - half));
+            pos[i].x += (ex - pos[i].x) * w;
+            pos[i].y += (ey - pos[i].y) * w;
+          }
         }
       }
       scaleTarget = pressed ? 0.72 : hovering ? 1.65 : 1;
@@ -103,6 +134,8 @@ export function LiquidCursor() {
 
     return () => {
       cancelAnimationFrame(raf);
+      window.clearInterval(hubTimer);
+      window.removeEventListener('hashchange', measureHub);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointerup', onUp);

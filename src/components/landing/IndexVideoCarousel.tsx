@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { CREATURE_RECORDS, type CreatureRecord } from '../../data/creatureRecords';
 import { InteractiveFrameBackground } from './InteractiveFrameBackground';
+import { FluidHub } from './FluidHub';
 
 const VIDEO_SOURCES = [
   '/media/index/no-01.mp4',
@@ -376,7 +377,9 @@ export function IndexVideoCarousel() {
         <a href="#/field">ENTER FIELD ↗</a>
       </nav>
 
-      <div className="index-dial__hub" aria-hidden />
+      <div className="index-dial__hub" aria-hidden data-fluid-window>
+        <FluidHub />
+      </div>
 
       <div className="index-dial__nodes">
         {DIAL_ITEMS.map((item, index) => {
