@@ -53,25 +53,27 @@ export function FluidHub() {
       prevFrame = now;
       const t = now / 1000;
 
-      // ① 코어 방출 — 느린 궤도를 도는 염료 주입이 덩어리 몸통과 일렁임을 만든다
+      // ① 코어 방출 — 넓은 궤도의 주입구 3개가 얕게 뿌려 크고 부드러운 몸통을 만든다
       const base = dyeColor(t);
-      const oa = t * 0.7;
-      pending.push({
-        x: 0.5 + Math.cos(oa) * 0.07,
-        y: 0.5 + Math.sin(oa * 1.3) * 0.07,
-        dx: -Math.sin(oa) * 0.012,
-        dy: Math.cos(oa * 1.3) * 0.012,
-        color: [base[0] * 0.5, base[1] * 0.5, base[2] * 0.5],
-      });
-
-      // ② 컨파인먼트 링 — 무염료 스플랫이 안쪽으로 밀어 코어에 뭉치게 한다
       for (let k = 0; k < 3; k += 1) {
-        const a = t * 0.35 + (k * Math.PI * 2) / 3;
+        const oa = t * 0.55 + (k * Math.PI * 2) / 3;
         pending.push({
-          x: 0.5 + Math.cos(a) * 0.36,
-          y: 0.5 + Math.sin(a) * 0.36,
-          dx: -Math.cos(a) * 0.045,
-          dy: -Math.sin(a) * 0.045,
+          x: 0.5 + Math.cos(oa) * 0.12,
+          y: 0.5 + Math.sin(oa * 1.15) * 0.12,
+          dx: -Math.sin(oa) * 0.008,
+          dy: Math.cos(oa * 1.15) * 0.008,
+          color: [base[0] * 0.14, base[1] * 0.14, base[2] * 0.14],
+        });
+      }
+
+      // ② 컨파인먼트 링 — 무염료 스플랫 5개가 안쪽으로 밀어 원형을 유지한다
+      for (let k = 0; k < 5; k += 1) {
+        const a = t * 0.4 + (k * Math.PI * 2) / 5;
+        pending.push({
+          x: 0.5 + Math.cos(a) * 0.38,
+          y: 0.5 + Math.sin(a) * 0.38,
+          dx: -Math.cos(a) * 0.06,
+          dy: -Math.sin(a) * 0.06,
           color: [0, 0, 0],
         });
       }

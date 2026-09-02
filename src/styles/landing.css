@@ -707,7 +707,8 @@
   will-change: transform;
 }
 
-/* 허브(회전축) 유체 — 베일과 같은 흑백 difference. 덩어리 일렁임이 잘리지 않게 여유 영역 */
+/* 허브(회전축) 유체 — 베일과 같은 흑백 difference. 덩어리 일렁임이 잘리지 않게 여유 영역.
+   넓은 방사 페이드 마스크로 캔버스 사각 경계를 지운다 (52→74% 그라데이션 — 원 경계로 안 읽힘) */
 .fluid-hub {
   position: absolute;
   inset: -35%;
@@ -715,6 +716,8 @@
   height: 170%;
   pointer-events: none;
   mix-blend-mode: difference;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 52%, transparent 74%);
+  mask-image: radial-gradient(circle at 50% 50%, black 52%, transparent 74%);
 }
 
 /* 전면 유체 베일 — difference라 어느 면 위에서든 모노톤 반전으로 읽힌다 */
