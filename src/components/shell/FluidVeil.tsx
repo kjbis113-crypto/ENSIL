@@ -13,6 +13,9 @@ const IDLE_STOP_MS = 3500;
 const MAX_DPR = 1.5;
 const TINT_DPR = 0.6; // 민트 글레이즈는 색만 입히므로 저해상도로 충분
 const KEY_COLOR = '#58d6c3'; // 키컬러 — 민트~청록
+const CORE_COLOR = '#d5d9d7'; // 커서 가까이의 유체 — 연한 회색
+const CORE_RADIUS = 60; // 회색 코어 반경(px)
+const BLEND_RADIUS = 300; // 이 거리에서 완전히 키컬러로
 
 /** 근백색 실버-틸 염료 — difference에서 모노톤 반전으로 읽힌다 */
 function dyeColor(t: number): [number, number, number] {
@@ -43,14 +46,21 @@ export function FluidVeil() {
     const sim = new FluidSim(canvas);
     if (!sim.supported) return;
     const tintCtx = tint.getContext('2d');
+    const pointerPx = { x: -9999, y: -9999 };
 
-    // difference 결과 위에 유체 모양 그대로 키컬러를 입힌다 (color 블렌드 글레이즈)
+    // difference 결과 위에 유체 모양 그대로 색을 입힌다 (color 블렌드 글레이즈).
+    // 커서 주변은 연한 회색, 멀어질수록 키컬러 청록 — 방사형 그라데이션이라 경계가 자연스럽다
     const paintTint = () => {
       if (!tintCtx) return;
       tintCtx.globalCompositeOperation = 'copy';
       tintCtx.drawImage(canvas, 0, 0, tint.width, tint.height);
       tintCtx.globalCompositeOperation = 'source-in';
-      tintCtx.fillStyle = KEY_COLOR;
+      const cx = pointerPx.x * TINT_DPR;
+      const cy = pointerPx.y * TINT_DPR;
+      const grad = tintCtx.createRadialGradient(cx, cy, CORE_RADIUS * TINT_DPR, cx, cy, BLEND_RADIUS * TINT_DPR);
+      grad.addColorStop(0, CORE_COLOR);
+      grad.addColorStop(1, KEY_COLOR);
+      tintCtx.fillStyle = grad;
       tintCtx.fillRect(0, 0, tint.width, tint.height);
       tintCtx.globalCompositeOperation = 'source-over';
     };
@@ -85,6 +95,8 @@ export function FluidVeil() {
     };
 
     const onPointerMove = (event: PointerEvent) => {
+      pointerPx.x = event.clientX;
+      pointerPx.y = event.clientY;
       const x = event.clientX / window.innerWidth;
       const y = 1 - event.clientY / window.innerHeight;
       if (last.has) {
