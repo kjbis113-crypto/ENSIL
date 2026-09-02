@@ -73,8 +73,43 @@
   --chrome-shadow: 0 1px 10px rgba(0, 41, 40, .18);
 }
 
+/* ── 목업(하드웨어) 신호 칩 + 브릿지 상태 — 상단 중앙 한 자리 ── */
+.hardware-signal {
+  position: fixed;
+  top: var(--chrome-top);
+  left: 50%;
+  z-index: 82;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  color: var(--chrome-ink);
+  text-shadow: var(--chrome-shadow);
+  font-size: var(--fs-nano);
+  letter-spacing: .09em;
+  white-space: nowrap;
+  opacity: .5;
+  pointer-events: none;
+}
+.hardware-signal i { width: 8px; height: 8px; border-radius: 50%; background: var(--key); }
+.hardware-signal[data-connected='false'] { opacity: .28; }
+.hardware-signal[data-connected='false'] i { background: currentColor; }
+
+.hardware-signal.is-signal {
+  gap: 12px;
+  font-size: var(--fs-ui);
+  letter-spacing: var(--ls-ui);
+  opacity: 1;
+  animation: hardwareSignalIn var(--motion-ui) var(--ease-enter) both;
+}
+.hardware-signal.is-signal i { animation: hardwareSignalDot 1.2s ease-in-out infinite; }
+.hardware-signal.is-signal span + span { opacity: .6; }
+@keyframes hardwareSignalIn { from { opacity: 0; transform: translate(-50%, -6px); } }
+@keyframes hardwareSignalDot { 50% { transform: scale(1.8); opacity: .6; } }
+
 @media (max-width: 700px) {
   :root { --chrome-top: 18px; --chrome-x: 16px; --chrome-row2: 50px; }
+  .hardware-signal span + span { display: none; }
   .site-chrome__utility,
   .index-dial__utility { gap: 14px; font-size: 8px; }
 }

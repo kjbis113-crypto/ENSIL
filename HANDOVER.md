@@ -103,6 +103,15 @@
 3. **주의**: 이 세션과 병렬로 다른 세션이 같은 작업트리에서 `FluidHub.tsx`·`LiquidCursor.tsx`·`landing.css`를
    수정·커밋했음(0589a66 허브 액체 테두리 + 커서 청록 그라데이션). 두 세션을 동시에 돌릴 때는 파일이 겹치지 않게 나눌 것
 
+4. **하드웨어 목업(ESP32) 연동** — `docs/EXHIBITION_SETUP.md` §6. 현장에 2.4GHz 망이 없어 unit1이 SoftAP,
+   도서관 노트북이 브릿지+사이트 서버(`node bridge/index.js`, ws 7777 + http 8080), 아이맥은 Chrome만.
+   - 브릿지: 받은 JSON을 보낸 쪽 빼고 전부 중계(목업↔웹↔창). `--demo`는 15초마다 가짜 trigger. `--no-serial`
+   - 웹: `useHardwareLink`(App) — trigger → 유휴면 즉시 `#/creature/:id`, 조작 중이면 칩 후 유휴 시 이동, 90초 후 랜딩 복귀,
+     같은 목업 8초 쿨다운, 스테이지에 pulse. `Shift+1~4`가 키보드 목업. 브릿지 주소는 페이지 호스트 → `?bridge=` → localStorage
+   - 펌웨어 `firmware/esp32-unit`(PlatformIO): unit1 스위치→네오픽셀, unit2 PIR→서보, unit3 카메라→앰프(sense/act 이식 자리)
+   - 검증: 스크래치패드 `hw-test.mjs`(가짜 목업 ws 클라이언트 + puppeteer). 스테이지 창은 브릿지에 붙지 않음(enabled=false)
+   - 미해결: 구형 아이맥의 Chrome 버전(116+ 필요) 확인, unit4 무선 LED, 웹→목업 act 버튼 UI
+
 ## 다음 단계 (우선순위순)
 
 0. **스테이지 전용 연출** — 지금은 3D 공용 필드에서 크롬만 뺀 것. 프로젝터용 씬은 `Stage.tsx`의 캔버스만 교체

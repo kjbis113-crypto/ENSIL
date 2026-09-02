@@ -4,6 +4,8 @@ import { FluidVeil } from './components/shell/FluidVeil';
 import { LiquidCursor } from './components/landing/LiquidCursor';
 import { useSiteRoute } from './state/useSiteRoute';
 import { useStageWindow } from './state/useStageWindow';
+import { useHardwareLink } from './state/useHardwareLink';
+import { HardwareSignal } from './components/shell/HardwareSignal';
 
 const Landing = lazy(() => import('./routes/Landing').then((module) => ({ default: module.Landing })));
 const Field = lazy(() => import('./routes/Field').then((module) => ({ default: module.Field })));
@@ -15,6 +17,8 @@ const CreatureRecordPage = lazy(() => import('./routes/CreatureRecord').then((mo
 export default function App() {
   const { route } = useSiteRoute();
   useStageWindow(); // Ctrl+Alt+Shift+O → 빔프로젝터 창(#/stage)
+  // 목업(ESP32) trigger → 개체 아카이브 띄우기. 스테이지 창은 콘솔이 아니므로 제외
+  const hardware = useHardwareLink(route.name !== 'stage');
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -32,6 +36,7 @@ export default function App() {
         {route.name === 'archive' && <Archive />}
         {route.name === 'creature' && <CreatureRecordPage id={route.id} />}
       </Suspense>
+      {route.name !== 'stage' && <HardwareSignal signal={hardware.signal} connected={hardware.connected} unitCount={hardware.units.length} />}
       {/* 사이트 전역 유체 베일 + 액체 커서 (터치·reduced-motion에선 자체 비활성) */}
       <FluidVeil />
       <LiquidCursor />

@@ -95,13 +95,14 @@ function openRelay(url: string, onEnvelope: (envelope: Envelope) => void): Trans
   };
 }
 
-export function useFieldLink(role: FieldLinkRole, onMessage?: (msg: FieldLinkMessage) => void) {
+export function useFieldLink(role: FieldLinkRole, onMessage?: (msg: FieldLinkMessage) => void, enabled = true) {
   const [peerAlive, setPeerAlive] = useState(false);
   const transportsRef = useRef<Transport[]>([]);
   const onMessageRef = useRef(onMessage);
   onMessageRef.current = onMessage;
 
   useEffect(() => {
+    if (!enabled) return undefined;
     let lastSeen = 0;
     const other: FieldLinkRole = role === 'panel' ? 'stage' : 'panel';
 
@@ -131,7 +132,7 @@ export function useFieldLink(role: FieldLinkRole, onMessage?: (msg: FieldLinkMes
       transports.forEach((transport) => transport.close());
       transportsRef.current = [];
     };
-  }, [role]);
+  }, [role, enabled]);
 
   const send = useCallback((msg: FieldLinkMessage) => {
     transportsRef.current.forEach((transport) => transport.send({ role, msg }));
