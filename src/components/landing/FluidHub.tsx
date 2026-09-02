@@ -43,6 +43,7 @@ export function FluidHub() {
 
     const pending: SplatInput[] = [];
     let last = { x: 0, y: 0, has: false };
+    const pointerPx = { x: -9999, y: -9999 };
     let raf = 0;
     let prevFrame = 0;
     let lastTick = 0;
@@ -58,12 +59,29 @@ export function FluidHub() {
       // 보이지 않는 젓개 — 느린 궤도를 돌며 상시 일렁임을 만든다
       const t = now / 1000;
 
-      // 허브 원의 이글이글 — 노이즈 패턴 자체를 feOffset으로 출렁이게 흘려보낸다 (30fps)
+      // 허브 원의 이글이글 — 노이즈 패턴을 feOffset으로 출렁이게 흘려보내고,
+      // 커서가 림에 다가오면 그쪽으로 패턴이 몰리며 요동친다 (섞이는 느낌)
       wobbleTick += 1;
       if (offsetRef.current && dispRef.current) {
-        offsetRef.current.setAttribute('dx', (26 * Math.sin(t * 0.72) + 11 * Math.sin(t * 1.9)).toFixed(2));
-        offsetRef.current.setAttribute('dy', (26 * Math.cos(t * 0.58) + 11 * Math.sin(t * 1.45 + 1.2)).toFixed(2));
-        dispRef.current.setAttribute('scale', (24 + 9 * Math.sin(t * 0.95)).toFixed(2));
+        let dx = 30 * Math.sin(t * 1.1) + 13 * Math.sin(t * 2.7);
+        let dy = 30 * Math.cos(t * 0.9) + 13 * Math.sin(t * 2.1 + 1.2);
+        let scale = 24 + 9 * Math.sin(t * 1.4);
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const px = pointerPx.x - cx;
+        const py = pointerPx.y - cy;
+        const d = Math.hypot(px, py);
+        const edge = Math.abs(d - rect.width / 2);
+        const near = Math.max(0, 1 - edge / 200); // 림 200px 근처에서 반응
+        if (near > 0 && d > 1) {
+          const pulse = 0.6 + 0.4 * Math.sin(t * 4.2);
+          dx += (px / d) * 40 * near * pulse;
+          dy += (py / d) * 40 * near * pulse;
+          scale += 24 * near;
+        }
+        offsetRef.current.setAttribute('dx', dx.toFixed(2));
+        offsetRef.current.setAttribute('dy', dy.toFixed(2));
+        dispRef.current.setAttribute('scale', scale.toFixed(2));
       }
       if (wobbleTick % 6 === 0 && turbRef.current) {
         turbRef.current.setAttribute(
@@ -88,6 +106,8 @@ export function FluidHub() {
     };
 
     const onPointerMove = (event: PointerEvent) => {
+      pointerPx.x = event.clientX;
+      pointerPx.y = event.clientY;
       if (rect.width < 4) return;
       const lx = (event.clientX - rect.left) / rect.width;
       const ly = 1 - (event.clientY - rect.top) / rect.height;
