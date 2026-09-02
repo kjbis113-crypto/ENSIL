@@ -4,7 +4,11 @@ export function SiteNavigation({ route }: { route: SiteRoute }) {
   return (
     <header className="site-navigation">
       <a className="site-navigation__brand" href="#/" aria-label="ENSIL home">
-        <img src="/brand/ensil-figma-mark.svg" alt="" width="20" height="22" />
+        {route.name === 'landing' ? (
+          <span className="site-navigation__brand-text">ENSIL</span>
+        ) : (
+          <img src="/brand/ensil-figma-mark.svg" alt="" width="20" height="22" />
+        )}
       </a>
       <nav aria-label="Primary">
         <a href="#/" aria-current={route.name === 'landing' ? 'page' : undefined}>INDEX</a>

@@ -64,7 +64,7 @@ export function PanoramaViewer({ paused, onSelect, onProximity, onModeChange }: 
     }
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x545756);
+    scene.background = new THREE.Color(0x002928);
     const camera = new THREE.PerspectiveCamera(62, 1, 0.01, 80);
     camera.rotation.order = 'YXZ';
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));

@@ -67,7 +67,7 @@ export function LogoCloud() {
     };
 
     // 잉크색 소프트 스프라이트 (토큰에서 색을 읽는다)
-    const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink-mute').trim() || '#545756';
+    const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink-mute').trim() || '#002928';
     const sprite = makeSprite(32, ink);
 
     sampleLogoPoints(logoUrl).then((r) => {

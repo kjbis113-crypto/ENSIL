@@ -80,7 +80,7 @@ function snapshotState(state: HabitatWorldState): CreatureState {
 function buildPlaceholder(runtime: Pick<HabitatRuntime, 'context'>) {
   const { config } = runtime.context;
   const group = new THREE.Group();
-  const dark = new THREE.MeshStandardMaterial({ color: 0x171818, roughness: 0.78, metalness: 0.08 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x002928, roughness: 0.78, metalness: 0.08 });
   const mineral = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.92, metalness: 0.02 });
   if (config.id === 'accretion') {
     for (let index = 0; index < 7; index += 1) {
@@ -112,7 +112,7 @@ function buildPlaceholder(runtime: Pick<HabitatRuntime, 'context'>) {
 
 function buildWorldScaffold(scene: THREE.Scene, mobile: boolean, mode: HabitatWorldOptions['mode']) {
   if (mode === 'single') {
-    const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xf4f6f3, roughness: 0.94, metalness: 0.01, flatShading: true });
+    const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, metalness: 0.01, flatShading: true });
     const base = new THREE.Mesh(new THREE.PlaneGeometry(118, 86, 8, 6), baseMaterial);
     base.rotation.x = -Math.PI / 2;
     base.position.y = -2.85;
@@ -133,7 +133,7 @@ function buildWorldScaffold(scene: THREE.Scene, mobile: boolean, mode: HabitatWo
   }
   const gridGeometry = new THREE.BufferGeometry();
   gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridPositions, 3));
-  scene.add(new THREE.LineSegments(gridGeometry, new THREE.LineBasicMaterial({ color: 0x545756, transparent: true, opacity: 0.18 })));
+  scene.add(new THREE.LineSegments(gridGeometry, new THREE.LineBasicMaterial({ color: 0x002928, transparent: true, opacity: 0.18 })));
 
   const measurePositions: number[] = [];
   const lineCount = mobile ? 4 : 7;
@@ -145,7 +145,7 @@ function buildWorldScaffold(scene: THREE.Scene, mobile: boolean, mode: HabitatWo
   }
   const measureGeometry = new THREE.BufferGeometry();
   measureGeometry.setAttribute('position', new THREE.Float32BufferAttribute(measurePositions, 3));
-  scene.add(new THREE.LineSegments(measureGeometry, new THREE.LineBasicMaterial({ color: 0x171818, transparent: true, opacity: 0.28 })));
+  scene.add(new THREE.LineSegments(measureGeometry, new THREE.LineBasicMaterial({ color: 0x002928, transparent: true, opacity: 0.28 })));
 }
 
 export class HabitatWorld {
@@ -252,7 +252,7 @@ export class HabitatWorld {
   }
 
   private setupLighting() {
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x545756, 1.35));
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x002928, 1.35));
     const overhead = new THREE.DirectionalLight(0xffffff, 1.65);
     overhead.position.set(-22, 48, 18);
     overhead.castShadow = this.renderer.shadowMap.enabled;
@@ -262,7 +262,7 @@ export class HabitatWorld {
     overhead.shadow.camera.top = 28;
     overhead.shadow.camera.bottom = -28;
     this.scene.add(overhead);
-    const coolFill = new THREE.DirectionalLight(0x5fa48d, 0.3);
+    const coolFill = new THREE.DirectionalLight(0xd9d9d9, 0.3);
     coolFill.position.set(35, 17, -24);
     this.scene.add(coolFill);
   }
@@ -371,9 +371,9 @@ export class HabitatWorld {
         const model = gltf.scene;
         model.name = 'GREEN_CIRCUIT_RUINS';
         const paper = new THREE.Color(0xffffff);
-        const mineral = new THREE.Color(0xe0e8e5);
-        const primary = new THREE.Color(0x73d2be);
-        const structure = new THREE.Color(0x545756);
+        const mineral = new THREE.Color(0xd9d9d9);
+        const primary = new THREE.Color(0xffffff);
+        const structure = new THREE.Color(0x002928);
         let meshCount = 0;
         model.traverse((child) => {
           if (!(child instanceof THREE.Mesh)) return;
