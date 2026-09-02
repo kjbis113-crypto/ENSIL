@@ -19,7 +19,7 @@ export function Archive() {
     <main className="archive-page archive-page--editorial" style={paletteStyle}>
       <section className="archive-workstation" aria-label="ENSIL living archive">
         <aside className="archive-specimen-index" aria-label="Specimen index">
-          <header><span>ENSIL / LIVING RECORDS</span><span>01—04</span></header>
+          <header><span>LIVING RECORDS</span><span>01—04</span></header>
           <div className="archive-specimen-index__grid">
             {CREATURE_RECORDS.map((record, index) => (
               <button type="button" className={activeIndex === index ? 'is-active' : ''} aria-pressed={activeIndex === index} onClick={() => setActiveIndex(index)} key={record.id}>

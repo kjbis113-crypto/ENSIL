@@ -242,42 +242,7 @@
   100% { transform: translate3d(1.8%, -2%, 0) scale(1.04, 1.1); }
 }
 
-.index-dial__identity,
-.index-dial__utility {
-  position: absolute;
-  top: 24px;
-  z-index: 20;
-  color: #FFFFFF;
-  text-shadow: 0 1px 10px rgba(0, 41, 40, .18);
-}
-
-.index-dial__identity { left: 28px; }
-.index-dial__identity strong {
-  font-size: 18px;
-  letter-spacing: -.04em;
-  line-height: 1;
-}
-
-.index-dial__utility {
-  right: 28px;
-  display: flex;
-  gap: 24px;
-  font-size: 9px;
-  letter-spacing: .08em;
-  pointer-events: auto;
-}
-
-.index-dial__utility button,
-.index-dial__utility a {
-  padding: 0 0 3px;
-  border: 0;
-  border-bottom: 1px solid currentColor;
-  color: inherit;
-  background: transparent;
-  font: inherit;
-  letter-spacing: inherit;
-  cursor: pointer;
-}
+/* .index-dial__identity / __utility 스타일은 chrome.css (사이트 공통 크롬)에서 관리 */
 
 .index-dial__hub {
   position: absolute;
@@ -637,8 +602,6 @@
     --node-size: clamp(74px, 24vw, 102px);
     --hub-size: min(68vw, 44vh);
   }
-  .index-dial__identity { top: 18px; left: 16px; }
-  .index-dial__utility { top: 18px; right: 16px; gap: 14px; font-size: 8px; }
   .index-dial__node.is-active { --node-scale: 2.02; }
   .index-dial__node.is-active:hover,
   .index-dial__node.is-active:focus-visible { --node-scale: 2.12; }

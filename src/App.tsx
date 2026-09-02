@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { SiteNavigation } from './components/navigation/SiteNavigation';
+import { SiteChrome } from './components/shell/SiteChrome';
 import { FluidVeil } from './components/shell/FluidVeil';
 import { LiquidCursor } from './components/landing/LiquidCursor';
 import { useSiteRoute } from './state/useSiteRoute';
@@ -19,7 +19,8 @@ export default function App() {
 
   return (
     <div className={`site-shell site-shell--${route.name}`}>
-      {route.name !== 'landing' ? <SiteNavigation route={route} /> : null}
+      {/* 랜딩은 IndexVideoCarousel 자체 아이덴티티/유틸리티를 쓴다 — 그 외 화면은 같은 룩의 공통 크롬 */}
+      {route.name !== 'landing' ? <SiteChrome route={route} /> : null}
       <Suspense fallback={<div className="route-loading">ENSIL / LOADING MODULE</div>}>
         {route.name === 'landing' && <Landing />}
         {route.name === 'field' && <Field />}

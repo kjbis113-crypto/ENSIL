@@ -204,8 +204,10 @@ export function PanoramaViewer({ paused, onSelect, onProximity, onModeChange }: 
         if (visible) {
           const rawX = 50 + (deltaYaw / (horizontalFov / 2)) * 50;
           const y = 50 - (deltaPitch / (verticalFov / 2)) * 50;
-          const leftMargin = (10 / Math.max(mount.clientWidth, 1)) * 100;
-          const rightLimit = 100 - ((element.offsetWidth + 10) / Math.max(mount.clientWidth, 1)) * 100;
+          // 핫스팟은 가로 중앙 정렬(translateX(-50%))이라 절반 폭 + 여백만큼 안쪽으로 클램프
+          const halfWidth = element.offsetWidth / 2 + 10;
+          const leftMargin = (halfWidth / Math.max(mount.clientWidth, 1)) * 100;
+          const rightLimit = 100 - leftMargin;
           const x = THREE.MathUtils.clamp(rawX, leftMargin, Math.max(leftMargin, rightLimit));
           element.style.setProperty('--hotspot-x', `${x}%`);
           element.style.setProperty('--hotspot-y', `${y}%`);
@@ -306,8 +308,8 @@ export function PanoramaViewer({ paused, onSelect, onProximity, onModeChange }: 
             aria-label={`Observe ${record.name}, ${record.sensor}`}
             key={record.id}
           >
-            <i aria-hidden />
-            <span><b>{record.code}</b><small>{record.sensor}<br />{HOTSPOTS[index].distance.toFixed(1)}M / SIGNAL</small></span>
+            <i aria-hidden><b>{record.code}</b></i>
+            <span><small>{record.sensor}</small><small>{HOTSPOTS[index].distance.toFixed(1)}M / SIGNAL</small></span>
           </button>
         ))}
       </div>

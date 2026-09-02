@@ -1,16 +1,16 @@
+/* 원형 아카이브 캐러셀 — 랜딩 다이얼 노드와 같은 흰 원(테두리 없음), 활성=실버, 궤도는 헤어라인 */
 .circular-archive {
   --carousel-size: min(68vw, 820px);
   --carousel-radius: calc(var(--carousel-size) * .43);
   position: relative;
   width: var(--carousel-size);
   aspect-ratio: 1;
-  color: var(--ensil-grey);
+  color: var(--ensil-black);
   user-select: none;
   touch-action: pan-y;
 }
 
-.circular-archive.is-interactive { cursor: grab; touch-action: none; }
-.circular-archive.is-interactive:active { cursor: grabbing; }
+.circular-archive.is-interactive { touch-action: none; }
 
 .circular-archive__orbit {
   position: absolute;
@@ -21,12 +21,12 @@
 
 .circular-archive__ring {
   position: absolute;
-  border: 1px solid color-mix(in srgb, var(--ensil-grey) 54%, transparent);
+  border: 1px solid var(--hairline);
   border-radius: 50%;
   pointer-events: none;
 }
 .circular-archive__ring--outer { inset: 4%; }
-.circular-archive__ring--inner { inset: 17%; border-style: dashed; opacity: .54; }
+.circular-archive__ring--inner { inset: 17%; border-style: dashed; opacity: .6; }
 .circular-archive__ring--outer::before,
 .circular-archive__ring--outer::after {
   content: '';
@@ -35,7 +35,7 @@
   left: -4%;
   width: 108%;
   height: 1px;
-  background: color-mix(in srgb, var(--ensil-grey) 22%, transparent);
+  background: var(--hairline);
 }
 .circular-archive__ring--outer::after { transform: rotate(90deg); }
 
@@ -62,10 +62,12 @@
     rotate(calc(-1 * var(--node-angle)))
     rotate(calc(-1 * var(--carousel-rotation)));
   overflow: visible;
-  border: 1px solid var(--ensil-grey);
+  border: 0;
   border-radius: 50%;
-  color: var(--ensil-grey);
+  color: var(--ensil-black);
   background: var(--ensil-white);
+  font-size: var(--fs-nano);
+  letter-spacing: .07em;
   pointer-events: auto;
   transition: color var(--motion-ui), background-color var(--motion-ui), transform var(--motion-panel) var(--ease-enter);
 }
@@ -81,18 +83,17 @@
   top: calc(100% + 7px);
   left: 50%;
   transform: translateX(-50%);
-  font-size: 8px;
+  font-size: var(--fs-micro);
   letter-spacing: .08em;
   white-space: nowrap;
 }
 .circular-archive__nodes > button:hover,
 .circular-archive__nodes > button.is-active {
-  color: var(--ensil-white);
-  background: var(--ensil-green);
+  background: var(--ensil-silver);
 }
 .circular-archive__nodes > button.is-active { transform: translate(-50%, -50%) rotate(var(--node-angle)) translateY(calc(-1 * var(--carousel-radius))) rotate(calc(-1 * var(--node-angle))) rotate(calc(-1 * var(--carousel-rotation))) scale(1.12); }
 .circular-archive__nodes > button.is-active .specimen-glyph { filter: grayscale(1) contrast(1.25); }
-.circular-archive__nodes > button:focus-visible { outline: 2px solid var(--ensil-green); outline-offset: 5px; }
+.circular-archive__nodes > button:focus-visible { outline: 1px solid var(--ensil-black); outline-offset: 5px; }
 
 .circular-archive__center {
   position: relative;
@@ -101,7 +102,7 @@
   width: 52%;
   aspect-ratio: 1;
   place-items: center;
-  border: 1px solid var(--ensil-grey);
+  border: 1px solid var(--hairline);
   border-radius: 50%;
   background: var(--ensil-white);
   overflow: hidden;
@@ -126,25 +127,22 @@
   display: none;
 }
 
+/* 이전/다음 — 상자 없이 화살표 + 카운터 */
 .circular-archive__controls {
   position: absolute;
   bottom: 4%;
   left: 50%;
   z-index: 8;
-  display: grid;
-  grid-template-columns: 44px auto 44px;
+  display: flex;
   align-items: center;
+  gap: 14px;
   transform: translateX(-50%);
-  border: 1px solid var(--ensil-grey);
-  background: var(--ensil-white);
-  font-size: 9px;
-  letter-spacing: .08em;
+  font-size: var(--fs-ui);
+  letter-spacing: var(--ls-ui);
 }
-.circular-archive__controls button { width: 44px; height: 38px; color: inherit; }
-.circular-archive__controls button:first-child { border-right: 1px solid var(--ensil-grey); }
-.circular-archive__controls button:last-child { border-left: 1px solid var(--ensil-grey); }
-.circular-archive__controls button:hover { color: var(--ensil-white); background: var(--ensil-grey); }
-.circular-archive__controls span { min-width: 76px; text-align: center; }
+.circular-archive__controls button { width: 32px; height: 32px; color: inherit; font-size: 12px; transition: opacity var(--motion-fast) ease; }
+.circular-archive__controls button:hover { opacity: .6; }
+.circular-archive__controls span { min-width: 48px; text-align: center; }
 
 .circular-archive--stage {
   --carousel-size: min(52vw, 640px);
@@ -152,8 +150,7 @@
   pointer-events: none;
 }
 .circular-archive--stage .circular-archive__center { width: 70%; border: 0; background: transparent; pointer-events: auto; }
-.circular-archive--stage .circular-archive__nodes > button { width: 38px; color: var(--ensil-grey); background: var(--ensil-white); pointer-events: auto; }
-.circular-archive--stage .circular-archive__nodes > button.is-active { color: var(--ensil-white); background: var(--ensil-green); }
+.circular-archive--stage .circular-archive__nodes > button { width: 38px; pointer-events: auto; }
 .circular-archive--stage .circular-archive__nodes > button > small { display: none; }
 .circular-archive--stage .circular-archive__controls { bottom: -3%; pointer-events: auto; }
 
@@ -181,4 +178,3 @@
 /* Drag performance: while dragging, rotation follows the pointer directly - no transitions */
 .circular-archive.is-dragging .circular-archive__nodes,
 .circular-archive.is-dragging .circular-archive__nodes > button { transition: none; }
-
