@@ -8,6 +8,15 @@ import { useEffect, useRef } from 'react';
  */
 
 const SIZES = [22, 20, 18, 16, 14, 12, 10, 9, 8, 7];
+/** 머리(연회색) → 꼬리(키컬러 청록) 그라데이션 — 구이 블러가 중간색을 만들어
+    베일 유체와 만나는 경계가 자연스럽다 */
+const HEAD_RGB = [217, 217, 217] as const;
+const TAIL_RGB = [88, 214, 195] as const;
+const dotColor = (i: number) => {
+  const k = Math.pow(i / (SIZES.length - 1), 1.35); // 머리 쪽은 회색을 더 오래 유지
+  const mix = (a: number, b: number) => Math.round(a + (b - a) * k);
+  return `rgb(${mix(HEAD_RGB[0], TAIL_RGB[0])}, ${mix(HEAD_RGB[1], TAIL_RGB[1])}, ${mix(HEAD_RGB[2], TAIL_RGB[2])})`;
+};
 const HEAD_FOLLOW = 0.55;
 const TAIL_FOLLOW = 0.52;
 /** 인접 점 사이 최대 간격(각 점 지름 대비) — 이 이상 벌어지면 끌어당겨서
@@ -153,7 +162,11 @@ export function LiquidCursor() {
       </svg>
       <div className="liquid-cursor__goo">
         {SIZES.map((size, i) => (
-          <i className="liquid-cursor__dot" key={i} style={{ width: size, height: size }} />
+          <i
+            className="liquid-cursor__dot"
+            key={i}
+            style={{ width: size, height: size, background: dotColor(i) }}
+          />
         ))}
       </div>
     </div>

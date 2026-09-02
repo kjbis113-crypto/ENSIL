@@ -19,6 +19,8 @@ function dyeColor(t: number): [number, number, number] {
 
 export function FluidHub() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const turbRef = useRef<SVGFETurbulenceElement>(null);
+  const dispRef = useRef<SVGFEDisplacementMapElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -44,6 +46,7 @@ export function FluidHub() {
     let prevFrame = 0;
     let lastTick = 0;
 
+    let wobbleTick = 0;
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
       if (now - lastTick < FRAME_MS) return;
@@ -53,6 +56,16 @@ export function FluidHub() {
 
       // 보이지 않는 젓개 — 느린 궤도를 돌며 상시 일렁임을 만든다
       const t = now / 1000;
+
+      // 허브 원 자체의 액체 테두리 — 디스플레이스먼트를 10fps로 천천히 숨쉬게 한다
+      wobbleTick += 1;
+      if (wobbleTick % 3 === 0 && dispRef.current && turbRef.current) {
+        dispRef.current.setAttribute('scale', (17 + 7 * Math.sin(t * 0.6)).toFixed(2));
+        turbRef.current.setAttribute(
+          'baseFrequency',
+          `${(0.011 + 0.0035 * Math.sin(t * 0.21)).toFixed(5)} ${(0.015 + 0.0035 * Math.cos(t * 0.17)).toFixed(5)}`,
+        );
+      }
       const a = t * 0.55;
       const wob = 0.2 + 0.07 * Math.sin(t * 0.9);
       const base = dyeColor(t);
@@ -121,5 +134,16 @@ export function FluidHub() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fluid-hub" aria-hidden />;
+  return (
+    <>
+      {/* 허브 원의 액체 테두리 — .index-dial__hub 전체에 CSS filter로 적용된다 */}
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden focusable="false">
+        <filter id="ensil-hub-liquid" x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence ref={turbRef} type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="2" seed="4" result="noise" />
+          <feDisplacementMap ref={dispRef} in="SourceGraphic" in2="noise" scale="20" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
+      <canvas ref={canvasRef} className="fluid-hub" aria-hidden />
+    </>
+  );
 }

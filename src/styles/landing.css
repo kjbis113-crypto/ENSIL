@@ -254,6 +254,8 @@
   overflow: hidden;
   border: 0;
   border-radius: 50%;
+  /* 솔리드 원 → 액체 덩어리: 테두리가 터뷸런스 디스플레이스먼트로 일렁인다 (FluidHub가 구동) */
+  filter: url(#ensil-hub-liquid);
   background: #FFFFFF;
   box-shadow: none;
   backdrop-filter: none;
