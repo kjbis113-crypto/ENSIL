@@ -8,8 +8,9 @@ import { useEffect, useRef } from 'react';
  */
 
 const BACKGROUND_VIDEO = '/media/index/ensil-geometric-fractals.m4v';
-const SEEK_INTERVAL_MS = 150;
-const SEEK_EPSILON = 0.06;
+const SEEK_INTERVAL_MS = 80; // 이동 중 초당 최대 12.5회 — 빠른 스크럽 체감
+const SEEK_EPSILON = 0.025;
+const TRAVEL_GAIN = 0.28; // 커서 이동거리(화면 대각선 비율)당 재생 진행량 — 빠르게 움직일수록 빨리 재생
 
 export function InteractiveFrameBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -21,6 +22,8 @@ export function InteractiveFrameBackground() {
     if (!root || !video) return undefined;
 
     let targetProgress = 0.36;
+    let travel = 0; // 누적 이동량 — 위치 매핑에 더해져 움직일수록 앞으로 재생된다
+    let lastPointer: { x: number; y: number } | null = null;
     let ready = false;
     let lastSeek = 0;
     let seekTimer = 0;
@@ -42,7 +45,12 @@ export function InteractiveFrameBackground() {
     const onPointerMove = (event: PointerEvent) => {
       const x = Math.min(1, Math.max(0, event.clientX / window.innerWidth));
       const y = Math.min(1, Math.max(0, event.clientY / window.innerHeight));
-      targetProgress = (x * 0.58 + y * 0.29 + x * y * 0.21 + 0.06) % 1;
+      // 위치 매핑 + 이동량 누적: 커서가 빨리 움직일수록 영상이 빨리 재생된다
+      if (lastPointer) {
+        travel += Math.hypot(x - lastPointer.x, y - lastPointer.y) * TRAVEL_GAIN;
+      }
+      lastPointer = { x, y };
+      targetProgress = (x * 0.58 + y * 0.29 + x * y * 0.21 + 0.06 + travel) % 1;
       video.style.transform = `translate3d(${(x - 0.5) * 14}px, ${(y - 0.5) * 10}px, 0) scale(${1.045 + Math.abs(y - 0.5) * 0.015})`;
       scheduleSeek();
     };
