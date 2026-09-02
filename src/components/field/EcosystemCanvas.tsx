@@ -3,8 +3,6 @@ import { CREATURE_RECORDS } from '../../data/creatureRecords';
 import { HabitatWorld } from '../habitat-engine/HabitatWorld';
 import type { HabitatSnapshot } from '../habitat-engine/types';
 
-export type EcosystemApi = { dropCharge: (id?: string) => void };
-
 type Props = {
   selectedId: string | null;
   observation: boolean;
@@ -13,17 +11,15 @@ type Props = {
   onEnter: (id: string) => void;
   onProximity: (id: string | null) => void;
   onSnapshot: (snapshot: HabitatSnapshot[]) => void;
-  /** 외부 조작 API (아카이브 패널의 전하 던지기 등) — 마운트 시 전달, 언마운트 시 null */
-  bindApi?: (api: EcosystemApi | null) => void;
+  onImmersiveChange: (active: boolean) => void;
+  entryRequest: number;
 };
 
-export function EcosystemCanvas({ selectedId, observation, paused, onSelect, onEnter, onProximity, onSnapshot, bindApi }: Props) {
+export function EcosystemCanvas({ selectedId, observation, paused, onSelect, onEnter, onProximity, onSnapshot, onImmersiveChange, entryRequest }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<HabitatWorld | null>(null);
-  const callbacksRef = useRef({ onSelect, onEnter, onProximity, onSnapshot });
-  callbacksRef.current = { onSelect, onEnter, onProximity, onSnapshot };
-  const bindApiRef = useRef(bindApi);
-  bindApiRef.current = bindApi;
+  const callbacksRef = useRef({ onSelect, onEnter, onProximity, onSnapshot, onImmersiveChange });
+  callbacksRef.current = { onSelect, onEnter, onProximity, onSnapshot, onImmersiveChange };
   const [loading, setLoading] = useState({ loaded: 0, total: CREATURE_RECORDS.length });
 
   useEffect(() => {
@@ -41,11 +37,10 @@ export function EcosystemCanvas({ selectedId, observation, paused, onSelect, onE
       onEnter: (id) => callbacksRef.current.onEnter(id),
       onProximity: (id) => callbacksRef.current.onProximity(id),
       onSnapshot: (snapshot) => callbacksRef.current.onSnapshot(snapshot),
+      onImmersiveChange: (active) => callbacksRef.current.onImmersiveChange(active),
     });
     worldRef.current = world;
-    bindApiRef.current?.({ dropCharge: (id) => worldRef.current?.dropCharge(id) });
     return () => {
-      bindApiRef.current?.(null);
       world.dispose();
       worldRef.current = null;
     };
@@ -54,6 +49,10 @@ export function EcosystemCanvas({ selectedId, observation, paused, onSelect, onE
   useEffect(() => {
     worldRef.current?.setOptions({ selectedId, observation, paused });
   }, [selectedId, observation, paused]);
+
+  useEffect(() => {
+    if (entryRequest > 0) worldRef.current?.enterFirstPerson();
+  }, [entryRequest]);
 
   return (
     <div className="ecosystem-canvas" ref={mountRef}>

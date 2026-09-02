@@ -1,32 +1,52 @@
-/* ENSIL identity system — electric lime, spectral lavender and carbon. */
+/* ENSIL identity system — neutral paper with aqueous signal colours. */
 :root {
   color-scheme: light;
 
-  /* Deep-culture surfaces */
-  --paper: #D5FB4E;
-  --paper-bright: #FFFFFF;
-  --bg: var(--paper-bright);
-  --surface: var(--paper);
-  --ink: #111111;
-  --ink-mute: #33333a;
-  --ink-soft: #202025;
-  --line: rgba(17, 17, 17, 0.1);
-  --line-2: rgba(17, 17, 17, 0.28);
-  --line-strong: rgba(17, 17, 17, 0.66);
+  --ensil-green: #5FA48D;
+  --ensil-grey: #545756;
+  --ensil-white: #FFFFFF;
+
+  --brand-primary: var(--ensil-green);
+  --brand-secondary: var(--ensil-grey);
+  --brand-structure: var(--ensil-grey);
+  --brand-dark: var(--ensil-grey);
+  --brand-white: #FFFFFF;
+  --brand-off-white: #FFFFFF;
+
+  /* White is the field; brand colours remain signals rather than page fills. */
+  --paper: var(--brand-white);
+  --paper-bright: var(--brand-white);
+  --bg: var(--brand-white);
+  --surface: var(--brand-off-white);
+  --ink: var(--brand-dark);
+  --ink-mute: var(--brand-structure);
+  --ink-soft: var(--brand-structure);
+  --line: rgba(23, 24, 24, 0.1);
+  --line-2: rgba(23, 24, 24, 0.28);
+  --line-strong: rgba(23, 24, 24, 0.66);
 
   /* Biotechnical signal palette */
-  --lime: #D5FB4E;
-  --blue: #7F86F7;
-  --cyan: #111111;
-  --magenta: #7F86F7;
-  --violet: #7F86F7;
-  --amber: #D5FB4E;
-  --accent: #111111;
-  --sensor: #111111;
+  --lime: var(--brand-primary);
+  --blue: var(--brand-secondary);
+  --cyan: var(--brand-secondary);
+  --magenta: var(--brand-structure);
+  --violet: var(--brand-structure);
+  --amber: var(--brand-primary);
+  --accent: var(--brand-dark);
+  --sensor: var(--brand-structure);
 
   /* Ambient interaction field */
-  --cursor-blob: rgba(17, 17, 17, 0.12);
+  --cursor-blob: rgba(23, 24, 24, 0.12);
   --cursor-blob-size: 96px;
+
+  --motion-fast: 160ms;
+  --motion-ui: 280ms;
+  --motion-panel: 520ms;
+  --motion-page: 760ms;
+  --motion-spatial: 760ms;
+  --ease-precise: cubic-bezier(.22, .8, .24, 1);
+  --ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --ease-exit: cubic-bezier(.7, 0, .84, 0);
 
   /* Spacing */
   --sp-1: 5px;
@@ -38,9 +58,9 @@
   /* Square, technical geometry */
   --radius: 0;
 
-  --font: Helvetica, 'Helvetica Neue', Arial, sans-serif;
-  --font-display: Helvetica, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --fw-md: 400;
   --fw-bd: 700;
   --lh-tight: 0.93;

@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-// meshopt 디코더는 정적 import 금지 — wasm-rollup 빌드가 네이티브 크래시한다 (debug.md #1).
-// 런타임 로드하는 공용 팩토리(sim3d/gltf.ts)를 쓴다.
+// GLB는 압축(EXT_meshopt_compression)돼 있으므로 meshopt 디코더가 연결된
+// 공용 로더(sim3d/gltf.ts)로 로드한다. 디코더 정적 import는 wasm-rollup 크래시(debug.md #1).
 import { getGLTFLoader } from '../../sim3d/gltf';
 import type { CreatureRecord, CreatureState } from '../../data/creatureRecords';
+import { FirstPersonFieldController } from '../field/FirstPersonFieldController';
 import { getBiomeConfig } from './biomes';
 import { buildHabitatSystems, terrainHeight, updateHabitatSystems, type HabitatSystems } from './systems';
 import {
@@ -27,6 +28,7 @@ export type HabitatWorldOptions = {
   onEnter?: (id: string) => void;
   onProximity?: (id: string | null) => void;
   onSnapshot?: (snapshot: HabitatSnapshot[]) => void;
+  onImmersiveChange?: (active: boolean) => void;
 };
 
 type HabitatRuntime = {
@@ -50,20 +52,11 @@ type HabitatRuntime = {
   loaded: boolean;
 };
 
-type FieldReferencePart = {
-  object: THREE.Object3D;
-  basePosition: THREE.Vector3;
-  baseQuaternion: THREE.Quaternion;
-  separationDirection: THREE.Vector3;
-  rotationAxis: THREE.Vector3;
-  amplitude: number;
-  phase: number;
-};
-
 type FieldReferenceLandscape = {
   model: THREE.Group;
-  parts: FieldReferencePart[];
-  separation: number;
+  basePosition: THREE.Vector3;
+  baseRotation: THREE.Euler;
+  baseScale: THREE.Vector3;
   pointerEnergy: number;
 };
 
@@ -87,8 +80,8 @@ function snapshotState(state: HabitatWorldState): CreatureState {
 function buildPlaceholder(runtime: Pick<HabitatRuntime, 'context'>) {
   const { config } = runtime.context;
   const group = new THREE.Group();
-  const dark = new THREE.MeshStandardMaterial({ color: 0x313331, roughness: 0.78, metalness: 0.08 });
-  const mineral = new THREE.MeshStandardMaterial({ color: 0xd7d7d0, roughness: 0.92, metalness: 0.02 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x171818, roughness: 0.78, metalness: 0.08 });
+  const mineral = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.92, metalness: 0.02 });
   if (config.id === 'accretion') {
     for (let index = 0; index < 7; index += 1) {
       const fragment = new THREE.Mesh(new THREE.BoxGeometry(0.75 + index * 0.08, 0.28, 0.48), index % 3 ? dark : mineral);
@@ -119,7 +112,7 @@ function buildPlaceholder(runtime: Pick<HabitatRuntime, 'context'>) {
 
 function buildWorldScaffold(scene: THREE.Scene, mobile: boolean, mode: HabitatWorldOptions['mode']) {
   if (mode === 'single') {
-    const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xe0e0da, roughness: 0.94, metalness: 0.01, flatShading: true });
+    const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xf4f6f3, roughness: 0.94, metalness: 0.01, flatShading: true });
     const base = new THREE.Mesh(new THREE.PlaneGeometry(118, 86, 8, 6), baseMaterial);
     base.rotation.x = -Math.PI / 2;
     base.position.y = -2.85;
@@ -140,7 +133,7 @@ function buildWorldScaffold(scene: THREE.Scene, mobile: boolean, mode: HabitatWo
   }
   const gridGeometry = new THREE.BufferGeometry();
   gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridPositions, 3));
-  scene.add(new THREE.LineSegments(gridGeometry, new THREE.LineBasicMaterial({ color: 0x50524f, transparent: true, opacity: 0.12 })));
+  scene.add(new THREE.LineSegments(gridGeometry, new THREE.LineBasicMaterial({ color: 0x545756, transparent: true, opacity: 0.18 })));
 
   const measurePositions: number[] = [];
   const lineCount = mobile ? 4 : 7;
@@ -152,7 +145,7 @@ function buildWorldScaffold(scene: THREE.Scene, mobile: boolean, mode: HabitatWo
   }
   const measureGeometry = new THREE.BufferGeometry();
   measureGeometry.setAttribute('position', new THREE.Float32BufferAttribute(measurePositions, 3));
-  scene.add(new THREE.LineSegments(measureGeometry, new THREE.LineBasicMaterial({ color: 0x30322f, transparent: true, opacity: 0.25 })));
+  scene.add(new THREE.LineSegments(measureGeometry, new THREE.LineBasicMaterial({ color: 0x171818, transparent: true, opacity: 0.28 })));
 }
 
 export class HabitatWorld {
@@ -161,23 +154,18 @@ export class HabitatWorld {
   private camera = new THREE.PerspectiveCamera(33, 1, 0.1, 220);
   private renderer: THREE.WebGLRenderer;
   private controls: OrbitControls;
+  private fieldController: FirstPersonFieldController | null = null;
   private runtimes = new Map<string, HabitatRuntime>();
   private pickables: THREE.Object3D[] = [];
   private terrains: THREE.Object3D[] = [];
   private raycaster = new THREE.Raycaster();
   private pointerNdc = new THREE.Vector2(10, 10);
+  private centerNdc = new THREE.Vector2(0, 0);
   private pointerWorld = new THREE.Vector3();
+  private scratchWorld = new THREE.Vector3();
   private pointerBiomeId: string | null = null;
   private hoveredId: string | null = null;
   private frame = 0;
-  private charges: Array<{
-    orb: THREE.Mesh;
-    ring: THREE.Mesh;
-    targetId: string;
-    targetY: number;
-    startAt: number;
-    landed: boolean;
-  }> = [];
   private lastTime = performance.now();
   private lastSnapshot = 0;
   private loaded = 0;
@@ -192,7 +180,6 @@ export class HabitatWorld {
   private desiredCamera = new THREE.Vector3();
   private commonLandscape: CommonFieldLandscape | null = null;
   private fieldReferenceLandscape: FieldReferenceLandscape | null = null;
-  private fieldCursorDirection = new THREE.Vector3();
   private lastPointerClient = new THREE.Vector2();
   private hasPointerClient = false;
 
@@ -218,20 +205,29 @@ export class HabitatWorld {
     this.controls.zoomSpeed = 0.45;
     this.controls.minPolarAngle = 0.48;
     this.controls.maxPolarAngle = options.mode === 'field' ? 1.28 : 1.02;
-    this.controls.autoRotate = !this.reducedMotion;
+    this.controls.autoRotate = options.mode === 'single' && !this.reducedMotion;
     this.controls.autoRotateSpeed = 0.075;
     this.controls.minDistance = options.mode === 'field' ? 40 : 24;
     this.controls.maxDistance = options.mode === 'field' ? 92 : 62;
+    this.controls.enabled = options.mode === 'single';
     this.controls.addEventListener('start', this.handleControlStart);
     this.controls.addEventListener('end', this.handleControlEnd);
 
     this.setupCamera();
+    if (options.mode === 'field') {
+      this.fieldController = new FirstPersonFieldController({
+        camera: this.camera,
+        canvas: this.renderer.domElement,
+        onActiveChange: (active) => this.options.onImmersiveChange?.(active),
+        onInteract: () => this.interactFromView(),
+      });
+    }
     this.setupLighting();
     buildWorldScaffold(this.scene, this.mobile, options.mode);
     if (options.mode === 'field') {
       this.commonLandscape = buildCommonFieldLandscape(this.scene, this.mobile);
       this.terrains.push(this.commonLandscape.terrain);
-      if (!this.mobile) this.loadFieldReferenceLandscape();
+      this.loadFieldReferenceLandscape();
     }
     this.buildRuntimes();
     this.bindEvents();
@@ -244,8 +240,9 @@ export class HabitatWorld {
 
   private setupCamera() {
     if (this.options.mode === 'field') {
-      this.camera.position.set(0, this.mobile ? 65 : 46, this.mobile ? 82 : 105);
-      this.controls.target.set(0, this.mobile ? -0.7 : 10, 0);
+      this.camera.position.set(0, commonFieldHeight(0, 27) + 3.2, 27);
+      this.camera.lookAt(0, 1.5, 0);
+      this.controls.target.set(0, 1.5, 0);
     } else {
       this.camera.position.set(this.mobile ? 19 : 24, this.mobile ? 27 : 22, this.mobile ? 42 : 34);
       this.controls.target.set(0, -0.4, 0);
@@ -255,8 +252,8 @@ export class HabitatWorld {
   }
 
   private setupLighting() {
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xd5fb4e, 1.45));
-    const overhead = new THREE.DirectionalLight(0xffffff, 1.8);
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x545756, 1.35));
+    const overhead = new THREE.DirectionalLight(0xffffff, 1.65);
     overhead.position.set(-22, 48, 18);
     overhead.castShadow = this.renderer.shadowMap.enabled;
     overhead.shadow.mapSize.set(1024, 1024);
@@ -265,7 +262,7 @@ export class HabitatWorld {
     overhead.shadow.camera.top = 28;
     overhead.shadow.camera.bottom = -28;
     this.scene.add(overhead);
-    const coolFill = new THREE.DirectionalLight(0xd5fb4e, 0.32);
+    const coolFill = new THREE.DirectionalLight(0x5fa48d, 0.3);
     coolFill.position.set(35, 17, -24);
     this.scene.add(coolFill);
   }
@@ -296,13 +293,6 @@ export class HabitatWorld {
       systems.terrain.mesh.userData.biomeId = record.id;
       if (this.options.mode === 'field') {
         systems.terrain.mesh.visible = false;
-        systems.contours.group.visible = false;
-        systems.roots.visible = false;
-        systems.features.group.visible = false;
-        systems.biofilm.mesh.visible = false;
-        systems.signals.mesh.visible = false;
-        systems.signals.seams.visible = false;
-        systems.annotations.visible = false;
         group.position.y = commonFieldHeight(layout.x, layout.z) - terrainHeight(context, 0, 0);
       } else {
         this.terrains.push(systems.terrain.mesh);
@@ -354,7 +344,23 @@ export class HabitatWorld {
     this.options.onLoaded?.(0, count);
   }
 
+  private setFieldFallbackVisible(visible: boolean) {
+    if (this.options.mode !== 'field') return;
+    if (this.commonLandscape) this.commonLandscape.group.visible = visible;
+    this.runtimes.forEach((runtime) => {
+      runtime.systems.contours.group.visible = visible;
+      runtime.systems.roots.visible = visible;
+      runtime.systems.features.group.visible = visible;
+      runtime.systems.biofilm.mesh.visible = visible;
+      runtime.systems.signals.mesh.visible = visible;
+      runtime.systems.signals.seams.visible = visible;
+      runtime.systems.annotations.visible = visible;
+    });
+  }
+
   private loadFieldReferenceLandscape() {
+    this.renderer.domElement.dataset.habitatModel = 'LOADING';
+    this.renderer.domElement.dataset.habitatError = 'false';
     getGLTFLoader().then((loader) => loader.load(
       '/models/ensil-green-circuit-ruins.glb',
       (gltf) => {
@@ -364,93 +370,85 @@ export class HabitatWorld {
         }
         const model = gltf.scene;
         model.name = 'GREEN_CIRCUIT_RUINS';
-        const whiteMaterial = new THREE.MeshStandardMaterial({
-          color: 0xf2f2ed,
-          emissive: 0x777772,
-          emissiveIntensity: 0.42,
-          roughness: 0.84,
-          metalness: 0.025,
-          flatShading: true,
-          side: THREE.DoubleSide,
-        });
-        const limeMaterial = new THREE.MeshStandardMaterial({
-          color: 0xd5fb4e,
-          emissive: 0x687c22,
-          emissiveIntensity: 0.5,
-          roughness: 0.92,
-          metalness: 0.01,
-          flatShading: true,
-          side: THREE.DoubleSide,
-        });
-        let meshIndex = 0;
+        const paper = new THREE.Color(0xffffff);
+        const mineral = new THREE.Color(0xe0e8e5);
+        const primary = new THREE.Color(0x73d2be);
+        const structure = new THREE.Color(0x545756);
+        let meshCount = 0;
         model.traverse((child) => {
           if (!(child instanceof THREE.Mesh)) return;
+          meshCount += 1;
+          const geometry = child.geometry;
+          geometry.deleteAttribute('color');
+          if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
+          geometry.computeBoundingBox();
+          geometry.computeBoundingSphere();
+          const positions = geometry.getAttribute('position');
+          const colours = new Float32Array(positions.count * 3);
+          const colour = new THREE.Color();
+          for (let index = 0; index < positions.count; index += 1) {
+            const x = positions.getX(index);
+            const y = positions.getY(index);
+            const z = positions.getZ(index);
+            const mineralBand = Math.sin(x * 22 + z * 7.5)
+              + Math.cos(z * 19 - x * 5.5)
+              + Math.sin((x + z) * 31 + y * 8);
+            const signalAmount = Math.pow(THREE.MathUtils.smoothstep(mineralBand, 1.05, 2.2), 1.4) * 0.76;
+            const structureAmount = Math.pow(THREE.MathUtils.smoothstep(-mineralBand, 1.65, 2.7), 1.2) * 0.52;
+            colour.copy(paper).lerp(mineral, 0.34).lerp(primary, signalAmount).lerp(structure, structureAmount);
+            colours[index * 3] = colour.r;
+            colours[index * 3 + 1] = colour.g;
+            colours[index * 3 + 2] = colour.b;
+          }
+          geometry.setAttribute('color', new THREE.BufferAttribute(colours, 3));
+          child.material = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            vertexColors: true,
+            roughness: 0.91,
+            metalness: 0.015,
+            flatShading: true,
+            side: THREE.DoubleSide,
+          });
           child.castShadow = false;
           child.receiveShadow = true;
+          child.frustumCulled = false;
           child.userData.isCommonField = true;
           this.terrains.push(child);
-          const sourceMaterials = Array.isArray(child.material) ? child.material : [child.material];
-          sourceMaterials.forEach((source) => {
-            Object.values(source).forEach((value) => { if (value instanceof THREE.Texture) value.dispose(); });
-            source.dispose();
-          });
-          child.material = (meshIndex % 5 === 0 || meshIndex % 7 === 2) ? limeMaterial : whiteMaterial;
-          meshIndex += 1;
         });
+        model.updateMatrixWorld(true);
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
         const horizontal = Math.max(size.x, size.z) || 1;
-        const modelCentre = bounds.getCenter(new THREE.Vector3());
-        const partObjects: THREE.Object3D[] = [];
-        model.traverse((child) => {
-          if (/^model_part\d+$/.test(child.name)) partObjects.push(child);
-        });
-        const parts: FieldReferencePart[] = partObjects.map((part, index) => {
-          const partCentre = new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3());
-          const separationDirection = partCentre.sub(modelCentre);
-          separationDirection.y = 0.48 + ((index * 7) % 11) * 0.035;
-          if (separationDirection.lengthSq() < 0.0001) {
-            separationDirection.set(Math.cos(index * 2.399), 0.22, Math.sin(index * 2.399));
-          }
-          separationDirection.normalize();
-          const rotationAxis = new THREE.Vector3(
-            Math.sin(index * 1.7),
-            0.35 + Math.cos(index * 0.91) * 0.2,
-            Math.cos(index * 1.31),
-          ).normalize();
-          return {
-            object: part,
-            basePosition: part.position.clone(),
-            baseQuaternion: part.quaternion.clone(),
-            separationDirection,
-            rotationAxis,
-            amplitude: horizontal * (0.035 + (index % 9) * 0.004),
-            phase: index * 0.73,
-          };
-        });
-        const baseScale = 104 / horizontal;
-        model.scale.set(baseScale, baseScale * 2.15, baseScale);
+        const baseScale = 100 / horizontal;
+        model.scale.set(baseScale, baseScale * 0.62, baseScale);
         const fitted = new THREE.Box3().setFromObject(model);
         const centre = fitted.getCenter(new THREE.Vector3());
-        model.position.set(-centre.x, -1.8 - fitted.min.y, -centre.z - 1.5);
-        model.rotation.set(-0.035, -0.055, 0.01);
+        model.position.set(-centre.x, -2.15 - fitted.min.y, -centre.z - 1.5);
+        model.rotation.set(0, -0.055, 0);
         this.scene.add(model);
-        if (this.commonLandscape) this.commonLandscape.group.visible = false;
+        this.setFieldFallbackVisible(false);
         this.fieldReferenceLandscape = {
           model,
-          parts,
-          separation: 0,
+          basePosition: model.position.clone(),
+          baseRotation: model.rotation.clone(),
+          baseScale: model.scale.clone(),
           pointerEnergy: 0,
         };
         this.renderer.domElement.dataset.habitatModel = model.name;
-        this.renderer.domElement.dataset.habitatParts = String(parts.length);
-        this.renderer.domElement.dataset.habitatInteractive = String(parts.length > 1);
+        this.renderer.domElement.dataset.habitatParts = String(meshCount);
+        this.renderer.domElement.dataset.habitatInteractive = 'true';
+        this.renderer.domElement.dataset.habitatError = 'false';
         model.updateMatrixWorld(true);
         this.raiseEcologiesToReferenceSurface(model);
       },
       undefined,
-      () => {
-        // The procedural common ground remains a complete mobile/failure fallback.
+      (error) => {
+        this.setFieldFallbackVisible(true);
+        this.renderer.domElement.dataset.habitatModel = 'PROCEDURAL_FALLBACK';
+        this.renderer.domElement.dataset.habitatParts = '0';
+        this.renderer.domElement.dataset.habitatInteractive = 'false';
+        this.renderer.domElement.dataset.habitatError = 'true';
+        console.warn('ENSIL habitat GLB could not be loaded; using procedural fallback.', error);
       },
     ));
   }
@@ -476,8 +474,9 @@ export class HabitatWorld {
       this.completeLoad(runtime);
       return;
     }
+    const modelUrl = runtime.record.modelUrl;
     getGLTFLoader().then((loader) => loader.load(
-      runtime.record.modelUrl!,
+      modelUrl,
       (gltf) => {
         if (this.disposed) {
           this.disposeObject(gltf.scene);
@@ -527,7 +526,9 @@ export class HabitatWorld {
     const canvas = this.renderer.domElement;
     canvas.tabIndex = 0;
     const habitatLabel = this.options.records.length === 1 ? 'habitat' : 'habitats';
-    canvas.setAttribute('aria-label', `${this.options.records.length} autonomous electronic ${habitatLabel}. Drag to orbit, move to disturb contours, and select a creature to activate its ecology.`);
+    canvas.setAttribute('aria-label', this.options.mode === 'field'
+      ? `${this.options.records.length} autonomous electronic ${habitatLabel}. Enter the field, move with W A S D, look with the pointer, and press E to inspect a creature.`
+      : `${this.options.records.length} autonomous electronic ${habitatLabel}. Drag to orbit, move to disturb contours, and select a creature to activate its ecology.`);
     canvas.addEventListener('pointermove', this.handlePointerMove);
     canvas.addEventListener('pointerleave', this.handlePointerLeave);
     canvas.addEventListener('pointerdown', this.handlePointerDown);
@@ -601,6 +602,7 @@ export class HabitatWorld {
   };
 
   private handlePointerUp = (event: PointerEvent) => {
+    if (this.options.mode === 'field' && this.fieldController?.isActive) return;
     if (Math.hypot(event.clientX - this.down.x, event.clientY - this.down.y) > 7) return;
     this.updatePointer(event);
     if (this.hoveredId) {
@@ -619,10 +621,12 @@ export class HabitatWorld {
   };
 
   private handleDoubleClick = () => {
+    if (this.options.mode === 'field' && this.fieldController?.isActive) return;
     if (this.hoveredId) this.options.onEnter?.(this.hoveredId);
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {
+    if (this.options.mode === 'field' && this.fieldController?.isActive) return;
     const records = this.options.records;
     const selectedIndex = Math.max(0, records.findIndex((record) => record.id === this.options.selectedId));
     if (event.key === 'Tab' && this.options.mode === 'field') {
@@ -649,7 +653,7 @@ export class HabitatWorld {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.mobile ? 1.15 : 1.5));
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
-    this.camera.fov = this.mobile ? 39 : 33;
+    this.camera.fov = this.options.mode === 'field' ? (this.mobile ? 64 : 58) : (this.mobile ? 39 : 33);
     this.camera.updateProjectionMatrix();
   };
 
@@ -668,88 +672,55 @@ export class HabitatWorld {
     runtime.state.tension = Math.min(1, runtime.state.tension + 0.16 * strength);
   }
 
-  /** 아카이브 패널에서 던진 전하 — 라임 구체가 개체 위로 떨어지고, 닿는 순간 개체가 반응한다 */
-  dropCharge(id?: string) {
-    const records = this.options.records;
-    const targetId = id && this.runtimes.has(id)
-      ? id
-      : records[Math.floor(Math.random() * records.length)]?.id;
-    const runtime = targetId ? this.runtimes.get(targetId) : null;
-    if (!runtime || !targetId) return;
-
-    const orb = new THREE.Mesh(
-      new THREE.SphereGeometry(0.85, 20, 14),
-      new THREE.MeshStandardMaterial({
-        color: 0xd5fb4e,
-        emissive: 0xd5fb4e,
-        emissiveIntensity: 1.4,
-        roughness: 0.3,
-        transparent: true,
-      }),
-    );
-    const targetY = runtime.group.position.y;
-    orb.position.set(runtime.group.position.x, targetY + 36, runtime.group.position.z);
-    this.scene.add(orb);
-
-    const ring = new THREE.Mesh(
-      new THREE.RingGeometry(1.1, 1.32, 48),
-      new THREE.MeshBasicMaterial({ color: 0xd5fb4e, transparent: true, opacity: 0, side: THREE.DoubleSide }),
-    );
-    ring.rotation.x = -Math.PI / 2;
-    ring.position.set(runtime.group.position.x, targetY + 0.08, runtime.group.position.z);
-    this.scene.add(ring);
-
-    this.charges.push({ orb, ring, targetId, targetY, startAt: performance.now(), landed: false });
+  enterFirstPerson() {
+    this.fieldController?.requestEntry();
   }
 
-  private updateCharges(now: number) {
-    const FALL_MS = 620;
-    const AFTER_MS = 1500;
-    for (let i = this.charges.length - 1; i >= 0; i -= 1) {
-      const c = this.charges[i];
-      const t = (now - c.startAt) / FALL_MS;
-      if (!c.landed) {
-        const k = Math.min(1, t);
-        c.orb.position.y = c.targetY + 36 - 35.2 * k * k; // 자유낙하 느낌
-        if (k >= 1) {
-          c.landed = true;
-          this.activate(c.targetId, 1.25);
-        }
-      } else {
-        const a = Math.min(1, (now - c.startAt - FALL_MS) / AFTER_MS);
-        const orbMat = c.orb.material as THREE.MeshStandardMaterial;
-        orbMat.opacity = 1 - a;
-        c.orb.scale.setScalar(1 + a * 1.6);
-        const ringMat = c.ring.material as THREE.MeshBasicMaterial;
-        ringMat.opacity = a < 0.25 ? a / 0.25 : 1 - (a - 0.25) / 0.75;
-        c.ring.scale.setScalar(1 + a * 5.5);
-        if (a >= 1) {
-          this.scene.remove(c.orb, c.ring);
-          c.orb.geometry.dispose();
-          orbMat.dispose();
-          c.ring.geometry.dispose();
-          ringMat.dispose();
-          this.charges.splice(i, 1);
-        }
+  exitFirstPerson() {
+    this.fieldController?.exit();
+  }
+
+  private inspectViewTarget() {
+    this.raycaster.setFromCamera(this.centerNdc, this.camera);
+    const hit = this.raycaster.intersectObjects(this.pickables, true)[0];
+    let target: THREE.Object3D | null = hit?.object ?? null;
+    while (target && !target.userData.creatureId) target = target.parent;
+    const rayId = (target?.userData.creatureId as string | undefined) ?? null;
+    if (rayId) return rayId;
+
+    let nearestId: string | null = null;
+    let nearestDistance = 13;
+    this.runtimes.forEach((runtime) => {
+      const world = runtime.creatureRoot.getWorldPosition(this.scratchWorld);
+      const distance = world.distanceTo(this.camera.position);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestId = runtime.record.id;
       }
-    }
+    });
+    return nearestId;
+  }
+
+  private interactFromView() {
+    if (this.options.mode !== 'field' || !this.fieldController?.isActive) return;
+    const id = this.inspectViewTarget();
+    if (!id) return;
+    this.activate(id, 1);
+    this.options.onSelect?.(id);
   }
 
   private setFocus(id: string | null | undefined, immediate = false) {
     const runtime = id ? this.runtimes.get(id) : null;
     this.focusStartedAt = performance.now();
     if (runtime && this.options.mode === 'field') {
-      this.desiredTarget.copy(runtime.group.position).add(new THREE.Vector3(0, -0.7, 0));
-      this.desiredCamera.copy(runtime.group.position).add(new THREE.Vector3(0, this.mobile ? 37 : 28, this.mobile ? 48 : 39));
       this.activate(runtime.record.id, 0.45);
     } else if (this.options.mode === 'field') {
-      this.desiredTarget.set(0, this.mobile ? -0.7 : 10, 0);
-      this.desiredCamera.set(0, this.mobile ? 65 : 46, this.mobile ? 82 : 105);
+      this.desiredTarget.set(0, 1.5, 0);
     } else {
       this.desiredTarget.set(0, -0.4, 0);
       this.desiredCamera.set(this.mobile ? 19 : 24, this.mobile ? 27 : 22, this.mobile ? 42 : 34);
     }
-    if (immediate) {
+    if (immediate && this.options.mode === 'single') {
       this.controls.target.copy(this.desiredTarget);
       this.camera.position.copy(this.desiredCamera);
     }
@@ -818,23 +789,46 @@ export class HabitatWorld {
   private updateFieldReferenceLandscape(now: number, dt: number) {
     const reference = this.fieldReferenceLandscape;
     if (!reference) return;
-    reference.pointerEnergy = damp(reference.pointerEnergy, 0, 2.6, dt);
-    const idlePulse = (Math.sin(now * 0.00072) + Math.sin(now * 0.00031 + 1.7)) * 0.1 + 0.15;
-    const targetSeparation = this.reducedMotion
-      ? 0
-      : clamp(idlePulse + reference.pointerEnergy * 0.92, 0.025, 1);
-    reference.separation = damp(reference.separation, targetSeparation, targetSeparation > reference.separation ? 5.8 : 1.55, dt);
-
-    this.fieldCursorDirection.set(this.pointerNdc.x, -this.pointerNdc.y * 0.18, -this.pointerNdc.y).normalize();
-    reference.parts.forEach((part) => {
-      const localWave = 0.68 + Math.sin(now * 0.0011 + part.phase) * 0.22;
-      const distance = part.amplitude * reference.separation * localWave;
-      part.object.position.copy(part.basePosition)
-        .addScaledVector(part.separationDirection, distance)
-        .addScaledVector(this.fieldCursorDirection, distance * reference.pointerEnergy * 0.22);
-      part.object.quaternion.copy(part.baseQuaternion);
-      part.object.rotateOnAxis(part.rotationAxis, reference.separation * Math.sin(now * 0.0008 + part.phase) * 0.075);
-    });
+    reference.pointerEnergy = damp(reference.pointerEnergy, 0, 2.15, dt);
+    const motion = this.reducedMotion ? 0 : reference.pointerEnergy;
+    const idleLift = this.reducedMotion ? 0 : Math.sin(now * 0.00038) * 0.045;
+    reference.model.position.x = damp(
+      reference.model.position.x,
+      reference.basePosition.x + this.pointerNdc.x * motion * 0.16,
+      1.9,
+      dt,
+    );
+    reference.model.position.y = damp(
+      reference.model.position.y,
+      reference.basePosition.y + idleLift + motion * 0.06,
+      1.4,
+      dt,
+    );
+    reference.model.position.z = damp(
+      reference.model.position.z,
+      reference.basePosition.z - this.pointerNdc.y * motion * 0.12,
+      1.9,
+      dt,
+    );
+    reference.model.rotation.x = damp(
+      reference.model.rotation.x,
+      reference.baseRotation.x + this.pointerNdc.y * motion * 0.0025,
+      1.6,
+      dt,
+    );
+    reference.model.rotation.y = damp(
+      reference.model.rotation.y,
+      reference.baseRotation.y + this.pointerNdc.x * motion * 0.0035,
+      1.6,
+      dt,
+    );
+    reference.model.rotation.z = reference.baseRotation.z;
+    const breath = 1 + (this.reducedMotion ? 0 : Math.sin(now * 0.00029 + 0.8) * 0.0015 + motion * 0.001);
+    reference.model.scale.set(
+      reference.baseScale.x * breath,
+      reference.baseScale.y * breath,
+      reference.baseScale.z * breath,
+    );
   }
 
   private applyEmergence(runtime: HabitatRuntime, now: number) {
@@ -885,13 +879,24 @@ export class HabitatWorld {
     this.commonLandscape?.update(now);
     this.updateFieldReferenceLandscape(now, dt);
 
-    if (!this.userInteracting) {
-      const transition = now - this.focusStartedAt < 2200;
-      this.controls.target.lerp(this.desiredTarget, transition ? 0.035 : 0.008);
-      if (transition) this.camera.position.lerp(this.desiredCamera, 0.022);
+    if (this.options.mode === 'field') {
+      this.fieldController?.update(dt);
+      if (this.fieldController?.isActive) {
+        const focused = this.inspectViewTarget();
+        if (focused !== this.hoveredId) {
+          this.hoveredId = focused;
+          this.options.onProximity?.(focused);
+        }
+      }
+    } else {
+      if (!this.userInteracting) {
+        const transition = now - this.focusStartedAt < 2200;
+        this.controls.target.lerp(this.desiredTarget, transition ? 0.035 : 0.008);
+        if (transition) this.camera.position.lerp(this.desiredCamera, 0.022);
+      }
+      this.controls.autoRotate = !this.reducedMotion && !this.userInteracting && now - this.focusStartedAt > 2200;
+      this.controls.update();
     }
-    this.controls.autoRotate = !this.reducedMotion && !this.userInteracting && now - this.focusStartedAt > 2200;
-    this.controls.update();
 
     const fog = this.scene.fog as THREE.FogExp2;
     const averageWeather = Array.from(this.runtimes.values()).reduce((sum, runtime) => sum + runtime.state.weatherState, 0) / Math.max(this.runtimes.size, 1);
@@ -907,7 +912,6 @@ export class HabitatWorld {
       })));
     }
 
-    this.updateCharges(now);
     this.renderer.render(this.scene, this.camera);
     this.frame = window.requestAnimationFrame(this.animate);
   };
@@ -946,6 +950,8 @@ export class HabitatWorld {
     this.controls.removeEventListener('start', this.handleControlStart);
     this.controls.removeEventListener('end', this.handleControlEnd);
     this.controls.dispose();
+    this.fieldController?.dispose();
+    this.fieldController = null;
     this.runtimes.forEach((runtime) => saveWorldState(runtime.record.id, runtime.state));
     this.disposeObject(this.scene);
     this.renderer.renderLists.dispose();

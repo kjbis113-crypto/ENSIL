@@ -33,7 +33,7 @@ function SpeciesShape({ index, className }: { index: number; className: string }
 }
 
 export function SpecimenGlyph({ index, live = false, palette, label, code }: Props) {
-  const colors = palette ?? { primary: '#D5FB4E', secondary: '#7F86F7', accent: '#111111', paper: '#7F86F7', ink: '#111111' };
+  const colors = palette ?? { primary: '#5FA48D', secondary: '#545756', accent: '#545756', paper: '#FFFFFF', ink: '#545756' };
   const style = {
     '--riso-primary': colors.primary,
     '--riso-secondary': colors.secondary,

@@ -1,380 +1,179 @@
-/* ── Archive carousel — 원형 다이얼 캐러셀 ───────────────────────
-   기하: 개체 원(orb)들은 화면 아래(--dial-cy)에 중심을 둔 궤도(--ring-r) 위에 있고
-   다이얼과 함께 회전한다. 12시 슬롯 위에 고정 포트레이트(--stage)가 겹친다.
-   조판: 스위스 — 플러시레프트 정보 칼럼, 일관 마진(--page-m), 명확한 크기 위계.
-   모션: 모든 전환은 --spring 하나, transform/opacity만. */
-
-:root {
-  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --cr-ink: #111111;
-  --cr-mute: #77776f;
-  --cr-lime: #d5fb4e;
-  --cr-paper: #f6f6f2;
-
-  --page-m: 40px;
-  --dial-cy: 122dvh;  /* 궤도·다이얼 중심 (뷰포트 아래) */
-  --ring-r: 76dvh;    /* 궤도 반지름 — 활성 슬롯 중심 = 46dvh */
-  --orb-d: min(38vh, 28vw);
-  --stage-d: min(46vh, 36vw);
-}
-
-.carousel-page {
+.circular-archive {
+  --carousel-size: min(68vw, 820px);
+  --carousel-radius: calc(var(--carousel-size) * .43);
   position: relative;
-  height: 100dvh;
-  overflow: hidden;
-  background: var(--cr-paper);
-  color: var(--cr-ink);
-  font-family: var(--font, Arial, sans-serif);
-}
-
-/* 배경 — 은은한 라임 글로우 + 점 그리드 */
-.cr-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(54% 42% at 50% 120%, color-mix(in srgb, var(--cr-lime) 40%, transparent) 0%, transparent 70%),
-    radial-gradient(30% 24% at 84% -6%, color-mix(in srgb, var(--cr-lime) 18%, transparent) 0%, transparent 75%),
-    radial-gradient(circle, rgba(17, 17, 17, 0.045) 0.6px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 28px 28px;
-}
-
-/* ── 좌측 정보 칼럼 (스위스 플러시레프트) ──────────────────── */
-.cr-info {
-  position: absolute;
-  left: var(--page-m);
-  top: 50%;
-  z-index: 4;
-  transform: translateY(-56%); /* 시각 보정: 기하 중앙보다 살짝 위 */
-  max-width: min(340px, 26vw);
-  animation: crRise 0.6s var(--spring);
-}
-@keyframes crRise {
-  from { opacity: 0; transform: translateY(calc(-56% + 16px)); }
-  to { opacity: 1; transform: translateY(-56%); }
-}
-.cr-info__kicker {
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--cr-mute);
-}
-.cr-info__index {
-  margin-top: 6px;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  color: var(--cr-mute);
-}
-.cr-info h1 {
-  margin-top: 18px;
-  font-size: clamp(40px, 4.6vw, 72px);
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 0.98;
-  word-break: keep-all;
-}
-.cr-info ul {
-  margin-top: 28px;
-  list-style: none;
-  padding: 0;
-  border-top: 1px solid rgba(17, 17, 17, 0.16);
-}
-.cr-info li {
-  display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: 14px;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.09);
-  font-size: 14px;
-  line-height: 1.45;
-}
-.cr-info li span {
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--cr-mute);
-  padding-top: 2px;
-}
-.is-open .cr-info { opacity: 0.25; transition: opacity 0.3s ease; }
-
-/* ── 궤도(바퀴) — 8슬롯 완전 원환, 바퀴째 회전 ──────────────── */
-.cr-orbit {
-  position: absolute;
-  left: 50%;
-  top: var(--dial-cy);
-  width: 0;
-  height: 0;
-  transform: rotate(var(--wheel, 0deg));
-  transition: transform 0.72s var(--spring);
-}
-.is-dragging .cr-orbit { transition: none; }
-
-/* 개체 원: 바퀴 안 고정 슬롯(--base). 콘텐츠는 --base+--wheel 역회전으로 항상 수직 —
-   부모와 같은 트랜지션 곡선이라 회전 내내 상쇄가 유지된다. */
-.cr-orb {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: var(--orb-d);
+  width: var(--carousel-size);
   aspect-ratio: 1;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-  background: #ecece6;
-  filter: grayscale(1) contrast(0.85);
-  opacity: 0.6;
-  transform:
-    translate(-50%, -50%)
-    rotate(var(--base))
-    translateY(calc(-1 * var(--ring-r)))
-    rotate(calc(-1 * var(--base) - var(--wheel, 0deg)))
-    scale(0.62);
-  transition: transform 0.72s var(--spring), opacity 0.45s ease, filter 0.45s ease;
-}
-.is-dragging .cr-orb { transition: opacity 0.45s ease, filter 0.45s ease; }
-.cr-orb > :first-child { width: 100%; height: 100%; }
-.cr-orb:hover { opacity: 0.85; }
-.cr-orb.is-active {
-  filter: none;
-  opacity: 1;
-  cursor: default;
-  transform:
-    translate(-50%, -50%)
-    rotate(var(--base))
-    translateY(calc(-1 * var(--ring-r)))
-    rotate(calc(-1 * var(--base) - var(--wheel, 0deg)))
-    scale(0.94);
-}
-.is-open .cr-orb:not(.is-active) { opacity: 0.15; }
-
-/* ── 활성 슬롯의 포트레이트 — 궤도와 같은 수식으로 드래그를 따라 돈다 ── */
-.cr-stage {
-  position: absolute;
-  left: 50%;
-  top: var(--dial-cy);
-  z-index: 3;
-  width: var(--stage-d);
-  aspect-ratio: 1;
-  pointer-events: none;
-  transform:
-    translate(-50%, -50%)
-    rotate(var(--a, 0deg))
-    translateY(calc(-1 * var(--ring-r)))
-    rotate(calc(-1 * var(--a, 0deg)))
-    scale(var(--shrink, 1));
-  transition: transform 0.72s var(--spring);
-}
-.is-dragging .cr-stage { transition: none; }
-.is-open .cr-stage {
-  transform:
-    translate(-50%, -50%)
-    rotate(0deg)
-    translateY(calc(-1 * var(--ring-r) - 6dvh))
-    rotate(0deg)
-    scale(0.82);
-}
-.cr-stage__disc {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  pointer-events: auto;
-  background: radial-gradient(circle at 50% 42%, #ffffff 0%, #eceee6 78%, #e4e6dd 100%);
-  box-shadow:
-    0 30px 70px rgba(17, 17, 17, 0.13),
-    inset 0 0 0 1px rgba(17, 17, 17, 0.05);
-  animation: crPop 0.7s var(--spring);
-}
-@keyframes crPop {
-  from { transform: scale(0.955); }
-  to { transform: scale(1); }
+  color: var(--ensil-grey);
+  user-select: none;
+  touch-action: pan-y;
 }
 
-.portrait-viewer {
+.circular-archive.is-interactive { cursor: grab; touch-action: none; }
+.circular-archive.is-interactive:active { cursor: grabbing; }
+
+.circular-archive__orbit {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
 }
-.portrait-viewer canvas { display: block; }
 
-/* ── 알약 버튼 — 조작의 단일 형태 언어 ─────────────────────── */
-.cr-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 24px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(17, 17, 17, 0.85);
-  color: #f6f6f2;
-  font-family: inherit;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition: transform 0.45s var(--spring), background 0.3s ease;
-}
-.cr-pill:hover { transform: scale(1.06); background: #111111; }
-.cr-pill:active { transform: scale(0.94); }
-.cr-pill--explore {
+.circular-archive__ring {
   position: absolute;
-  left: 50%;
-  top: 60%;
-  transform: translateX(-50%);
-}
-.cr-pill--explore:hover { transform: translateX(-50%) scale(1.06); }
-.cr-pill--explore:active { transform: translateX(-50%) scale(0.94); }
-.cr-pill--explore i {
-  width: 8px;
-  height: 8px;
+  border: 1px solid color-mix(in srgb, var(--ensil-grey) 54%, transparent);
   border-radius: 50%;
-  background: var(--cr-lime);
-}
-
-/* ── 상세 시트 (뎁스 0 모핑) ──────────────────────────────── */
-.cr-sheet {
-  position: absolute;
-  left: 50%;
-  bottom: 20dvh;
-  z-index: 5;
-  width: min(640px, 88vw);
-  padding: 28px 32px 26px;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 24px 60px rgba(17, 17, 17, 0.14), inset 0 0 0 1px rgba(17, 17, 17, 0.05);
-  backdrop-filter: blur(14px);
-  transform: translate(-50%, 24px) scale(0.94);
-  opacity: 0;
   pointer-events: none;
-  transition: transform 0.6s var(--spring), opacity 0.35s ease;
 }
-.cr-sheet.is-open {
-  transform: translate(-50%, 0) scale(1);
-  opacity: 1;
-  pointer-events: auto;
+.circular-archive__ring--outer { inset: 4%; }
+.circular-archive__ring--inner { inset: 17%; border-style: dashed; opacity: .54; }
+.circular-archive__ring--outer::before,
+.circular-archive__ring--outer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -4%;
+  width: 108%;
+  height: 1px;
+  background: color-mix(in srgb, var(--ensil-grey) 22%, transparent);
 }
-.cr-sheet dl {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 32px;
-}
-.cr-sheet dt {
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--cr-mute);
-}
-.cr-sheet dd { margin-top: 5px; font-size: 15px; line-height: 1.5; }
-.cr-sheet__actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-}
-.cr-sheet__actions .cr-pill { padding: 11px 20px; font-size: 13px; }
+.circular-archive__ring--outer::after { transform: rotate(90deg); }
 
-/* ── 다이얼 원판 + 드래그 존 ──────────────────────────────── */
-.cr-dial-zone {
+.circular-archive__nodes {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 24dvh;
-  z-index: 2;
-  cursor: grab;
-  touch-action: none;
+  inset: 0;
+  transform: rotate(var(--carousel-rotation));
+  transition: transform var(--motion-panel) var(--ease-enter);
+  pointer-events: none;
 }
-.is-dragging .cr-dial-zone { cursor: grabbing; }
-.cr-dial__plate {
+
+.circular-archive__nodes > button {
+  --node-angle: 0deg;
   position: absolute;
+  top: 50%;
   left: 50%;
-  top: calc(var(--dial-cy) - 100dvh + 24dvh); /* 존 좌표계 보정 */
-  width: 72dvh;
+  z-index: 4;
+  width: clamp(82px, 10vw, 134px);
   aspect-ratio: 1;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--node-angle))
+    translateY(calc(-1 * var(--carousel-radius)))
+    rotate(calc(-1 * var(--node-angle)))
+    rotate(calc(-1 * var(--carousel-rotation)));
+  overflow: visible;
+  border: 1px solid var(--ensil-grey);
   border-radius: 50%;
-  background: #e3e5dc;
-  box-shadow: inset 0 8px 28px rgba(17, 17, 17, 0.06);
-  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
-  transition: transform 0.72s var(--spring);
-}
-.is-dragging .cr-dial__plate { transition: none; }
-.cr-dial__notch {
-  position: absolute;
-  left: 50%;
-  top: 14px;
-  width: 4px;
-  height: 26px;
-  border-radius: 2px;
-  background: var(--cr-lime);
-  transform: translateX(-50%);
+  color: var(--ensil-grey);
+  background: var(--ensil-white);
+  pointer-events: auto;
+  transition: color var(--motion-ui), background-color var(--motion-ui), transform var(--motion-panel) var(--ease-enter);
 }
 
-/* ── 하단 액션 (전하 + 연동 상태) ──────────────────────────── */
-.cr-actions {
+.circular-archive__nodes > button .specimen-glyph {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.circular-archive__nodes > button > small {
   position: absolute;
+  top: calc(100% + 7px);
   left: 50%;
-  bottom: var(--page-m);
-  z-index: 6;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
   transform: translateX(-50%);
-}
-.cr-pill--charge {
-  background: var(--cr-ink);
-  animation: crChargePulse 0.55s var(--spring);
-}
-.cr-pill--charge:hover { background: #000000; }
-@keyframes crChargePulse {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cr-lime) 90%, transparent); }
-  100% { box-shadow: 0 0 0 28px transparent; }
-}
-.cr-link-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: var(--cr-mute);
+  font-size: 8px;
+  letter-spacing: .08em;
   white-space: nowrap;
 }
-.cr-link-status i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #c2c4bb;
-  transition: background 0.3s ease;
+.circular-archive__nodes > button:hover,
+.circular-archive__nodes > button.is-active {
+  color: var(--ensil-white);
+  background: var(--ensil-green);
 }
-.cr-link-status.is-live i { background: var(--cr-lime); box-shadow: 0 0 8px var(--cr-lime); }
-.cr-link-status.is-live { color: var(--cr-ink); }
+.circular-archive__nodes > button.is-active { transform: translate(-50%, -50%) rotate(var(--node-angle)) translateY(calc(-1 * var(--carousel-radius))) rotate(calc(-1 * var(--node-angle))) rotate(calc(-1 * var(--carousel-rotation))) scale(1.12); }
+.circular-archive__nodes > button.is-active .specimen-glyph { filter: grayscale(1) contrast(1.25); }
+.circular-archive__nodes > button:focus-visible { outline: 2px solid var(--ensil-green); outline-offset: 5px; }
 
-/* ── 좁은 화면 ────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  :root {
-    --page-m: 20px;
-    --orb-d: min(34vh, 44vw);
-    --stage-d: min(42vh, 78vw);
-  }
-  .cr-info {
-    top: auto;
-    bottom: 26dvh;
-    transform: none;
-    max-width: 60vw;
-    animation: none;
-  }
-  .cr-info h1 { font-size: clamp(28px, 8vw, 44px); }
-  .cr-info ul { display: none; }
-  .cr-sheet { bottom: 18dvh; }
-  .cr-sheet dl { grid-template-columns: 1fr; }
+.circular-archive__center {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 52%;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--ensil-grey);
+  border-radius: 50%;
+  background: var(--ensil-white);
+  overflow: hidden;
+}
+
+.circular-archive__identity {
+  display: grid;
+  width: 76%;
+  justify-items: center;
+  text-align: center;
+  animation: carouselIdentityIn var(--motion-panel) var(--ease-enter) both;
+}
+.circular-archive__identity > span,
+.circular-archive__identity > p { font-size: clamp(8px, .7vw, 10px); letter-spacing: .08em; line-height: 1.3; text-transform: uppercase; }
+.circular-archive__identity > strong { margin: 18px 0; font-size: clamp(48px, 7vw, 112px); font-weight: 400; letter-spacing: -.07em; line-height: .82; }
+
+.circular-archive__status {
+  position: absolute;
+  right: 3%;
+  bottom: 4%;
+  z-index: 5;
+  display: none;
+}
+
+.circular-archive__controls {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: 44px auto 44px;
+  align-items: center;
+  transform: translateX(-50%);
+  border: 1px solid var(--ensil-grey);
+  background: var(--ensil-white);
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+.circular-archive__controls button { width: 44px; height: 38px; color: inherit; }
+.circular-archive__controls button:first-child { border-right: 1px solid var(--ensil-grey); }
+.circular-archive__controls button:last-child { border-left: 1px solid var(--ensil-grey); }
+.circular-archive__controls button:hover { color: var(--ensil-white); background: var(--ensil-grey); }
+.circular-archive__controls span { min-width: 76px; text-align: center; }
+
+.circular-archive--stage {
+  --carousel-size: min(52vw, 640px);
+  --carousel-radius: calc(var(--carousel-size) * .46);
+  pointer-events: none;
+}
+.circular-archive--stage .circular-archive__center { width: 70%; border: 0; background: transparent; pointer-events: auto; }
+.circular-archive--stage .circular-archive__nodes > button { width: 38px; color: var(--ensil-grey); background: var(--ensil-white); pointer-events: auto; }
+.circular-archive--stage .circular-archive__nodes > button.is-active { color: var(--ensil-white); background: var(--ensil-green); }
+.circular-archive--stage .circular-archive__nodes > button > small { display: none; }
+.circular-archive--stage .circular-archive__controls { bottom: -3%; pointer-events: auto; }
+
+@keyframes carouselIdentityIn {
+  from { opacity: 0; transform: translateY(18px); clip-path: inset(100% 0 0); }
+  to { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0); }
+}
+
+@media (max-width: 760px) {
+  .circular-archive { --carousel-size: 88vw; --carousel-radius: calc(var(--carousel-size) * .42); }
+  .circular-archive__nodes > button { width: 20vw; max-width: 92px; }
+  .circular-archive__center { width: 57%; }
+  .circular-archive__identity > strong { font-size: 13vw; }
+  .circular-archive__controls { bottom: 1%; }
+  .circular-archive--stage { --carousel-size: 88vw; --carousel-radius: calc(var(--carousel-size) * .45); }
+  .circular-archive--stage .circular-archive__nodes > button { width: 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cr-orb, .cr-stage, .cr-pill, .cr-sheet, .cr-info, .cr-dial__plate {
-    animation: none !important;
-    transition-duration: 0.01ms !important;
-  }
+  .circular-archive__nodes,
+  .circular-archive__nodes > button { transition: none; }
+  .circular-archive__identity { animation: none; }
 }

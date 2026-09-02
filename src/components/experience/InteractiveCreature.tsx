@@ -8,8 +8,8 @@ type ViewerApi = { controls: OrbitControls; pivot: THREE.Group };
 
 function proxyModel(id: string) {
   const group = new THREE.Group();
-  const dark = new THREE.MeshStandardMaterial({ color: 0x222221, roughness: 0.55, metalness: 0.18 });
-  const pale = new THREE.MeshStandardMaterial({ color: 0xc9c9c2, roughness: 0.7, metalness: 0.06 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x171818, roughness: 0.55, metalness: 0.18 });
+  const pale = new THREE.MeshStandardMaterial({ color: 0x5fa48d, roughness: 0.7, metalness: 0.06 });
   const add = (geometry: THREE.BufferGeometry, material: THREE.Material, position?: [number, number, number]) => {
     const mesh = new THREE.Mesh(geometry, material);
     if (position) mesh.position.set(...position);
@@ -88,11 +88,11 @@ export function InteractiveCreature({ record }: { record: CreatureRecord }) {
     controls.autoRotateSpeed = 0.62;
     controls.saveState();
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xc8c8c0, 2.7));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x545756, 2.7));
     const key = new THREE.DirectionalLight(0xffffff, 4.2);
     key.position.set(4, 5, 5);
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0xaab2b6, 1.8);
+    const rim = new THREE.DirectionalLight(0x5fa48d, 1.8);
     rim.position.set(-4, 1, -3);
     scene.add(rim);
 

@@ -51,7 +51,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Click signal / pressure',
     response: 'Directional light emission',
     status: 'LIVE MODEL',
-    palette: { primary: '#D5FB4E', secondary: '#FFFFFF', accent: '#111111', paper: '#FFFFFF', ink: '#111111' },
+    palette: { primary: '#5FA48D', secondary: '#545756', accent: '#545756', paper: '#FFFFFF', ink: '#545756' },
     temperament: { speed: 0.28, curiosity: 0.57, fear: 0.21, sociality: 0.66 },
     ecology: {
       habitat: 'Sealed desk drawers and abandoned input devices.',
@@ -82,7 +82,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Proximity / external stimulus',
     response: 'Tail contraction / inward curl',
     status: 'LIVE MODEL',
-    palette: { primary: '#D5FB4E', secondary: '#FFFFFF', accent: '#111111', paper: '#FFFFFF', ink: '#111111' },
+    palette: { primary: '#5FA48D', secondary: '#545756', accent: '#545756', paper: '#FFFFFF', ink: '#545756' },
     temperament: { speed: 0.34, curiosity: 0.91, fear: 0.18, sociality: 0.82 },
     ecology: {
       habitat: 'The corner of a drawer where cables remained tangled for years.',
@@ -113,7 +113,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Sound / voice / stimulus',
     response: 'Judgement / computation / vocal response',
     status: 'LIVE MODEL',
-    palette: { primary: '#FFFFFF', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
+    palette: { primary: '#5FA48D', secondary: '#545756', accent: '#545756', paper: '#FFFFFF', ink: '#545756' },
     temperament: { speed: 0.44, curiosity: 0.68, fear: 0.3, sociality: 0.72 },
     ecology: {
       habitat: 'A waste pile containing old speakers and desktop CPU fragments.',
@@ -144,7 +144,7 @@ export const CREATURE_RECORDS: CreatureRecord[] = [
     input: 'Collective current / inter-body link',
     response: 'Collective illumination / energy sharing',
     status: 'LIVE MODEL',
-    palette: { primary: '#FFFFFF', secondary: '#D5FB4E', accent: '#111111', paper: '#D5FB4E', ink: '#111111' },
+    palette: { primary: '#5FA48D', secondary: '#545756', accent: '#545756', paper: '#FFFFFF', ink: '#545756' },
     temperament: { speed: 0.88, curiosity: 0.86, fear: 0.64, sociality: 0.39 },
     ecology: {
       habitat: 'Storage rooms and display cabinets where multiple bulbs were abandoned together.',

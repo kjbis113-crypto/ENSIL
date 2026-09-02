@@ -1,142 +1,49 @@
-import { useCallback, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { EcosystemCanvas, type EcosystemApi } from '../components/field/EcosystemCanvas';
-import { useFieldLink } from '../state/useFieldLink';
-import { CREATURE_RECORDS, getCreatureRecord, type CreatureState } from '../data/creatureRecords';
-
-type Snapshot = { id: string; state: CreatureState; energy: number; stress: number };
+import { useState } from 'react';
+import { PanoramaViewer } from '../components/field/PanoramaViewer';
+import { CREATURE_RECORDS, getCreatureRecord } from '../data/creatureRecords';
 
 export function Field() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [proximityId, setProximityId] = useState<string | null>(null);
   const [observation, setObservation] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [snapshot, setSnapshot] = useState<Snapshot[]>([]);
-  const [sensorStatus, setSensorStatus] = useState<'POINTER' | 'MIC ACTIVE' | 'CAMERA ACTIVE'>('POINTER');
-
-  // 스테이지(프로젝터) 역할 — 아카이브 패널 창이 던진 전하를 받아 떨어뜨린다
-  const apiRef = useRef<EcosystemApi | null>(null);
-  useFieldLink('stage', useCallback((id?: string) => apiRef.current?.dropCharge(id), []));
-
-  const activeRecordId = selectedId ?? proximityId;
-  const selected = activeRecordId ? getCreatureRecord(activeRecordId) : null;
-  const selectedRuntime = useMemo(
-    () => snapshot.find((runtime) => runtime.id === activeRecordId),
-    [activeRecordId, snapshot],
-  );
-  const fieldPalette = selected?.palette ?? CREATURE_RECORDS[0].palette;
-  const fieldStyle = {
-    '--field-primary': fieldPalette.primary,
-    '--field-secondary': fieldPalette.secondary,
-    '--field-accent': fieldPalette.accent,
-    '--field-paper': fieldPalette.paper,
-    '--field-ink': fieldPalette.ink,
-  } as CSSProperties;
-
-  const requestSensor = async (kind: 'mic' | 'camera') => {
-    if (!navigator.mediaDevices?.getUserMedia) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(kind === 'mic' ? { audio: true } : { video: true });
-      setSensorStatus(kind === 'mic' ? 'MIC ACTIVE' : 'CAMERA ACTIVE');
-      window.setTimeout(() => stream.getTracks().forEach((track) => track.stop()), 60_000);
-    } catch {
-      setSensorStatus('POINTER');
-    }
-  };
+  const [panoramaMode, setPanoramaMode] = useState<'loading' | 'limited' | '360' | 'error'>('loading');
+  const selected = selectedId ? getCreatureRecord(selectedId) : null;
+  const proximity = !selected && proximityId ? getCreatureRecord(proximityId) : null;
 
   return (
-    <main className="field-page" style={fieldStyle}>
-      <EcosystemCanvas
-        selectedId={selectedId}
-        observation={observation}
-        paused={paused}
-        onSelect={setSelectedId}
-        onEnter={(id) => { window.location.hash = `/habitat/${id}`; }}
-        onProximity={setProximityId}
-        onSnapshot={setSnapshot}
-        bindApi={(api) => { apiRef.current = api; }}
-      />
+    <main className="field-page field-page--panorama">
+      <PanoramaViewer paused={paused} onSelect={setSelectedId} onProximity={setProximityId} onModeChange={setPanoramaMode} />
 
-      <div className="field-index" aria-hidden>
-        <span>FIELD 01</span>
-        <span>04 LIVING RECORDS</span>
+      <div className="field-index" aria-hidden><span>FIELD 01 / LIVING PANORAMA</span><span>04 ELECTRONIC ORGANISMS</span></div>
+      <div className="field-environment" aria-hidden><span>INPUT / POINTER</span><span>{panoramaMode === '360' ? 'VIEW / 360°' : 'VIEW / ±47°'}</span><span>DENSITY 04</span></div>
+      <p className="field-panorama-help">DRAG TO LOOK · SCROLL TO ZOOM · SELECT A SIGNAL</p>
+
+      <div className="field-controls field-controls--compact" aria-label="Field controls">
+        <button type="button" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>{paused ? 'RESUME' : 'PAUSE'}</button>
+        <button type="button" onClick={() => setObservation((value) => !value)} aria-pressed={observation}>{observation ? 'CLOSE INDEX' : 'FIELD INDEX'}</button>
       </div>
 
-      <div className="field-controls" aria-label="Field controls">
-        <button type="button" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>
-          {paused ? 'RESUME' : 'PAUSE'}
-        </button>
-        <button type="button" onClick={() => setObservation((value) => !value)} aria-pressed={observation}>
-          OBSERVATION LAYER
-        </button>
-        <button type="button" onClick={() => requestSensor('mic')}>ENABLE MIC</button>
-        <button type="button" onClick={() => requestSensor('camera')}>ENABLE CAMERA</button>
-      </div>
-
-      <div className="field-environment">
-        <span>INPUT / {sensorStatus}</span>
-        <span>LIGHT 61%</span>
-        <span>DENSITY 04</span>
-      </div>
-
-      <aside className="field-species-rail" aria-label="Electronic organisms">
-        <header><span>SPECIMEN</span><span>STATE</span></header>
-        {CREATURE_RECORDS.map((record) => {
-          const runtime = snapshot.find((item) => item.id === record.id);
-          return (
-            <button
-              type="button"
-              className={activeRecordId === record.id ? 'is-active' : ''}
-              onClick={() => setSelectedId(record.id)}
-              key={record.id}
-            >
-              <i style={{ backgroundColor: record.palette.primary }} />
-              <span>{record.code}</span>
-              <span>{runtime?.state ?? 'loading'}</span>
-            </button>
-          );
-        })}
-      </aside>
-
-      <div className="field-ticker" aria-hidden>
-        <div>
-          <span>CLICK / FORCE / DIRECTIONAL LIGHT</span>
-          <span>CURRENT / PROXIMITY / TAIL RECOIL</span>
-          <span>SOUND / COMPUTATION / RESPONSE</span>
-          <span>COLONY / CURRENT / SHARED LIGHT</span>
-        </div>
-      </div>
+      {proximity && <div className="field-proximity" aria-live="polite"><i /><span>{proximity.code}</span><strong>{proximity.sensor}</strong><small>SIGNAL IN RANGE</small></div>}
 
       {selected && (
-        <aside className={`encounter-card${selectedId ? '' : ' encounter-card--proximity'}`} aria-live="polite">
-          {selectedId && <button className="encounter-card__close" type="button" onClick={() => setSelectedId(null)} aria-label="Close encounter">×</button>}
-          <span>{selected.code} / {selectedId ? (selectedRuntime?.state ?? 'observing') : 'proximity signal'}</span>
-          <h1>{selected.name}</h1>
+        <aside className="encounter-card is-open" aria-live="polite">
+          <button className="encounter-card__close" type="button" onClick={() => setSelectedId(null)} aria-label="Close encounter">×</button>
+          <span>{selected.code} / PANORAMA SIGNAL</span><h1>{selected.name}</h1>
           <dl>
-            <div><dt>SENSES</dt><dd>{selected.input}</dd></div>
-            <div><dt>RESPONDS</dt><dd>{selected.response}</dd></div>
-            <div><dt>ORIGIN</dt><dd>{selected.archive.origin}</dd></div>
+            <div><dt>SENSOR</dt><dd>{selected.sensor}</dd></div>
+            <div><dt>INPUT</dt><dd>{selected.input}</dd></div>
+            <div><dt>RESPONSE</dt><dd>{selected.response}</dd></div>
           </dl>
-          <div className="encounter-card__actions">
-            <a href={`#/habitat/${selected.id}`}>ENTER HABITAT <span>→</span></a>
-            <a href={`#/creature/${selected.id}`}>ARCHIVE RECORD <span>↗</span></a>
-          </div>
-          {!selectedId && <p className="encounter-card__signal">MOVE CLOSER TO OBSERVE · CLICK TO HOLD</p>}
+          <div className="encounter-card__actions"><a href={`#/habitat/${selected.id}`}>ENTER HABITAT <span>→</span></a><a href={`#/creature/${selected.id}`}>ARCHIVE RECORD <span>↗</span></a></div>
         </aside>
       )}
 
       {observation && (
-        <aside className="observation-layer" aria-label="Live organism state">
-          <header><span>PROCESS</span><span>STATE</span><span>ENERGY</span></header>
-          {CREATURE_RECORDS.map((record) => {
-            const runtime = snapshot.find((item) => item.id === record.id);
-            return (
-              <button type="button" key={record.id} onClick={() => setSelectedId(record.id)}>
-                <span>{record.code}</span>
-                <span>{runtime?.state ?? 'entering'}</span>
-                <span>{Math.round((runtime?.energy ?? 0) * 100).toString().padStart(2, '0')}</span>
-              </button>
-            );
-          })}
+        <aside className="observation-layer" aria-label="Living organism index">
+          <header><span>SPECIMEN</span><span>SENSOR</span></header>
+          {CREATURE_RECORDS.map((record) => <button type="button" key={record.id} onClick={() => setSelectedId(record.id)}><span><i />{record.code}</span><span>{record.sensor}</span></button>)}
+          <footer><span>SELECT A RECORD TO OPEN ITS SIGNAL</span></footer>
         </aside>
       )}
     </main>
