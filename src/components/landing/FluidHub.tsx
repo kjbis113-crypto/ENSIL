@@ -36,7 +36,8 @@ export function FluidHub() {
     };
     fit();
 
-    const sim = new FluidSim(canvas);
+    // 빡센 threshold — 얇은 촉수·안개를 잘라내고 경계를 도톰한 액체로
+    const sim = new FluidSim(canvas, { edgeLow: 0.34, edgeHigh: 0.52 });
     if (!sim.supported) return;
 
     const pending: SplatInput[] = [];
@@ -73,15 +74,16 @@ export function FluidHub() {
       fill(0.19, 6, 0.42, -t * 0.19);
       fill(0.26, 10, 0.38, t * 0.15);
 
-      // ② 림 젓개 — 원 가장자리 바깥 밴드에 얕은 염료와 소용돌이를 공급
+      // ② 림 젓개 — 원 가장자리 바깥 밴드에 얕은 염료와 완만한 소용돌이를 공급
+      //    (염료·속도를 낮게 유지 — 얇은 촉수가 생기지 않는 범위)
       for (let k = 0; k < 3; k += 1) {
         const oa = t * 0.55 + (k * Math.PI * 2) / 3;
         pending.push({
           x: 0.5 + Math.cos(oa) * 0.3,
           y: 0.5 + Math.sin(oa * 1.15) * 0.3,
-          dx: -Math.sin(oa) * 0.011,
-          dy: Math.cos(oa * 1.15) * 0.011,
-          color: [base[0] * 0.09, base[1] * 0.09, base[2] * 0.09],
+          dx: -Math.sin(oa) * 0.006,
+          dy: Math.cos(oa * 1.15) * 0.006,
+          color: [base[0] * 0.05, base[1] * 0.05, base[2] * 0.05],
         });
       }
 
@@ -116,9 +118,9 @@ export function FluidHub() {
           const base = dyeColor(event.timeStamp / 1000);
           pending.push({
             x, y,
-            dx: Math.max(-0.3, Math.min(0.3, dx)),
-            dy: Math.max(-0.3, Math.min(0.3, dy)),
-            color: [base[0] * (0.35 + speed * 0.5), base[1] * (0.35 + speed * 0.5), base[2] * (0.35 + speed * 0.5)],
+            dx: Math.max(-0.2, Math.min(0.2, dx)),
+            dy: Math.max(-0.2, Math.min(0.2, dy)),
+            color: [base[0] * (0.25 + speed * 0.4), base[1] * (0.25 + speed * 0.4), base[2] * (0.25 + speed * 0.4)],
           });
           if (pending.length > 20) pending.shift();
         }

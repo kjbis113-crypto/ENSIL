@@ -260,10 +260,14 @@ export class FluidSim {
   private linearFiltering: boolean;
   private ownedTextures: WebGLTexture[] = [];
   private ownedFramebuffers: WebGLFramebuffer[] = [];
+  private edgeLow = EDGE_LOW;
+  private edgeHigh = EDGE_HIGH;
   readonly supported: boolean;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, opts: { edgeLow?: number; edgeHigh?: number } = {}) {
     this.canvas = canvas;
+    this.edgeLow = opts.edgeLow ?? EDGE_LOW;
+    this.edgeHigh = opts.edgeHigh ?? EDGE_HIGH;
     const gl = canvas.getContext('webgl2', {
       alpha: true,
       depth: false,
@@ -535,7 +539,7 @@ export class FluidSim {
     gl.useProgram(display.program);
     gl.uniform1i(display.uniforms.uTexture, this.dye.read.attach(gl, 0));
     gl.uniform2f(display.uniforms.uTexelSize, this.dye.texelX, this.dye.texelY);
-    gl.uniform2f(display.uniforms.uEdge, EDGE_LOW, EDGE_HIGH);
+    gl.uniform2f(display.uniforms.uEdge, this.edgeLow, this.edgeHigh);
     gl.uniform1i(display.uniforms.uBloom, (bloom ?? this.dye.read).attach(gl, 1));
     gl.uniform1f(display.uniforms.uBloomIntensity, bloom ? BLOOM_INTENSITY : 0);
     this.blit(null);
