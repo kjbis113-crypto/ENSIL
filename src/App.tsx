@@ -11,7 +11,6 @@ const Landing = lazy(() => import('./routes/Landing').then((module) => ({ defaul
 const Field = lazy(() => import('./routes/Field').then((module) => ({ default: module.Field })));
 const Stage = lazy(() => import('./routes/Stage').then((module) => ({ default: module.Stage })));
 const Habitat = lazy(() => import('./routes/Habitat').then((module) => ({ default: module.Habitat })));
-const Archive = lazy(() => import('./routes/Archive').then((module) => ({ default: module.Archive })));
 const CreatureRecordPage = lazy(() => import('./routes/CreatureRecord').then((module) => ({ default: module.CreatureRecordPage })));
 
 export default function App() {
@@ -33,7 +32,6 @@ export default function App() {
         {route.name === 'field' && <Field />}
         {route.name === 'stage' && <Stage />}
         {route.name === 'habitat' && <Habitat id={route.id} />}
-        {route.name === 'archive' && <Archive />}
         {route.name === 'creature' && <CreatureRecordPage id={route.id} />}
       </Suspense>
       {route.name !== 'stage' && <HardwareSignal signal={hardware.signal} connected={hardware.connected} unitCount={hardware.units.length} />}

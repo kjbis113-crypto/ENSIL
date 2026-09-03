@@ -44,7 +44,7 @@ type InformationDialItem = {
   title: string;
   shortTitle: string;
   description: string;
-  action?: 'about' | 'field' | 'archive';
+  action?: 'about' | 'field';
   theme: DialTheme;
 };
 
@@ -104,7 +104,7 @@ const DIAL_ITEMS: DialItem[] = [
     kind: 'information', key: 'archive', code: '08', eyebrow: 'LIVING RECORDS / 01—04',
     title: 'The archive remains alive.', shortTitle: 'ARCHIVE',
     description: 'Each record combines origin, sensory behaviour, ecological response and a live three-dimensional specimen.',
-    action: 'archive', theme: THEMES.dark,
+    theme: THEMES.dark,
   },
   {
     kind: 'information', key: 'observation', code: '09', eyebrow: 'METHOD / NON-CONTROL',
@@ -243,7 +243,6 @@ export function IndexVideoCarousel() {
     }
     if (item.action === 'about') setAboutOpen(true);
     if (item.action === 'field') window.location.hash = '/field';
-    if (item.action === 'archive') window.location.hash = '/archive';
   };
 
   const onWheel = (event: WheelEvent<HTMLElement>) => {

@@ -1,11 +1,11 @@
 import type { SiteRoute } from '../../state/useSiteRoute';
 
-type Section = 'index' | 'field' | 'archive';
+/** 인덱스 다이얼이 곧 아카이브 — 개체 기록도 아카이브 섹션 */
+type Section = 'archive' | 'field';
 
 function sectionOf(route: SiteRoute): Section {
   if (route.name === 'field' || route.name === 'habitat') return 'field';
-  if (route.name === 'archive' || route.name === 'creature') return 'archive';
-  return 'index';
+  return 'archive';
 }
 
 /**
@@ -22,13 +22,12 @@ export function SiteChrome({ route }: { route: SiteRoute }) {
 
   return (
     <header className="site-chrome">
-      <a className="site-chrome__brand" href="#/" aria-label="ENSIL index">
+      <a className="site-chrome__brand" href="#/" aria-label="ENSIL archive">
         <strong>ENSIL</strong>
       </a>
       <nav className="site-chrome__utility" aria-label="Primary">
-        {link('index', '#/', 'INDEX')}
+        {link('archive', '#/', 'ARCHIVE')}
         {link('field', '#/field', 'FIELD')}
-        {link('archive', '#/archive', 'ARCHIVE')}
       </nav>
     </header>
   );

@@ -112,6 +112,9 @@
    - 검증: 스크래치패드 `hw-test.mjs`(가짜 목업 ws 클라이언트 + puppeteer). 스테이지 창은 브릿지에 붙지 않음(enabled=false)
    - 미해결: 구형 아이맥의 Chrome 버전(116+ 필요) 확인, unit4 무선 LED, 웹→목업 act 버튼 UI
 
+5. **아카이브 페이지 삭제** — 인덱스 다이얼(#/)이 곧 아카이브. `Archive.tsx`·`CircularArchiveCarousel`·`SpecimenGlyph`·
+   `carousel.css`·`archive.css` 제거, 개체 기록 스타일만 `record.css`로 분리. `#/archive`는 랜딩으로 폴백. 크롬은 ARCHIVE / FIELD 두 링크
+
 ## 다음 단계 (우선순위순)
 
 0. **스테이지 전용 연출** — 지금은 3D 공용 필드에서 크롬만 뺀 것. 프로젝터용 씬은 `Stage.tsx`의 캔버스만 교체
