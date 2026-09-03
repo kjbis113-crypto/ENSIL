@@ -23,6 +23,7 @@ function dyeColor(t: number): [number, number, number] {
 export function FluidVeil() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tintRef = useRef<HTMLCanvasElement>(null);
+  const toneRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -44,12 +45,15 @@ export function FluidVeil() {
     if (!sim.supported) return;
     const tintCtx = tint.getContext('2d');
 
-    // 메인 화면(랜딩)에서는 글레이즈 없이 difference 단독 = 흑백 반전 유체
+    // 메인 화면(랜딩): 글레이즈 없이 difference 단독 + 최상단 hue 통일 레이어 —
+    // 반전이 만드는 붉은 기를 브랜드 틸로 정렬하고 허브·포인터·배경의 톤을 맞춘다
     let tintEnabled = true;
     const updateTintEnabled = () => {
       const path = window.location.hash.replace(/^#/, '') || '/';
-      tintEnabled = !(path === '/' || path === '/index');
+      const isLanding = path === '/' || path === '/index';
+      tintEnabled = !isLanding;
       tint.style.display = tintEnabled ? '' : 'none';
+      if (toneRef.current) toneRef.current.style.display = isLanding ? '' : 'none';
     };
     updateTintEnabled();
     window.addEventListener('hashchange', updateTintEnabled);
@@ -147,6 +151,8 @@ export function FluidVeil() {
     <>
       <canvas className="fluid-veil" ref={canvasRef} aria-hidden />
       <canvas className="fluid-veil-tint" ref={tintRef} aria-hidden />
+      {/* 색상 통일 레이어 — 랜딩에서만: hue만 이식되어 붉은 반전을 틸로 정렬, 회색은 그대로 */}
+      <div className="site-tone" ref={toneRef} aria-hidden />
     </>
   );
 }

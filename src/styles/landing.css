@@ -730,6 +730,17 @@
   pointer-events: none;
   mix-blend-mode: difference;
 }
+/* 색상 통일 레이어(랜딩 전용) — hue 블렌드: 명도·채도 유지, 색상만 브랜드 틸로 정렬.
+   difference 반전의 붉은 기 제거 + 허브·포인터·배경 톤 일치 */
+.site-tone {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  pointer-events: none;
+  background: #2f8f80;
+  mix-blend-mode: hue;
+}
+
 /* 민트 글레이즈 — difference 결과의 명암은 두고 색만 키컬러로 바꾼다 */
 .fluid-veil-tint {
   position: fixed;
