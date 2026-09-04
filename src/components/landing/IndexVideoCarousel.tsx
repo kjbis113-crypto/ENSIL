@@ -8,7 +8,6 @@ import {
 } from 'react';
 import { CREATURE_RECORDS, type CreatureRecord } from '../../data/creatureRecords';
 import { InteractiveFrameBackground } from './InteractiveFrameBackground';
-import { FluidHub } from './FluidHub';
 import { consumeDialEnter, restoreDialEnter, DIAL_ENTER_EVENT } from '../../state/dialEnter';
 
 /** 진입 시퀀스 타이밍 — 회전(offset-distance 790ms)이 끝난 뒤 활성 원이 화면을 덮고(720ms) 페이지 전환 */
@@ -423,9 +422,7 @@ export function IndexVideoCarousel() {
         <a href="#/field">ENTER FIELD ↗</a>
       </nav>
 
-      <div className="index-dial__hub" aria-hidden data-fluid-window>
-        <FluidHub />
-      </div>
+      <div className="index-dial__hub" aria-hidden data-fluid-window />
 
       <div className="index-dial__nodes">
         {DIAL_ITEMS.map((item, index) => {

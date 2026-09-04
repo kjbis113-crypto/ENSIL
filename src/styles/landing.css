@@ -251,15 +251,12 @@
   z-index: 3;
   width: var(--hub-size);
   aspect-ratio: 1;
-  /* 솔리드 원판 제거 — 허브는 FluidHub 유체 덩어리 자체다 (경계는 시뮬레이션이 만든다) */
-  overflow: visible;
+  /* 중앙 회전축 — 흰색 솔리드 원 (허브 유체 실험은 폐기, 유체는 전면 베일과 커서만) */
+  overflow: hidden;
   border: 0;
   border-radius: 50%;
-  background: transparent;
+  background: #FFFFFF;
   box-shadow: none;
-  backdrop-filter: none;
-  -webkit-mask-image: none;
-  mask-image: none;
   transform: translate(-50%, -50%);
   transition: background-color 620ms ease;
 }
@@ -728,17 +725,6 @@
 
 /* 허브(회전축) 유체 — 베일과 같은 흑백 difference. 덩어리 일렁임이 잘리지 않게 여유 영역.
    넓은 방사 페이드 마스크로 캔버스 사각 경계를 지운다 (52→74% 그라데이션 — 원 경계로 안 읽힘) */
-.fluid-hub {
-  position: absolute;
-  inset: -35%;
-  width: 170%;
-  height: 170%;
-  pointer-events: none;
-  mix-blend-mode: difference;
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 56%, transparent 70%);
-  mask-image: radial-gradient(circle at 50% 50%, black 56%, transparent 70%);
-}
-
 /* 전면 유체 베일 — difference라 어느 면 위에서든 모노톤 반전으로 읽힌다 */
 .fluid-veil {
   position: fixed;
