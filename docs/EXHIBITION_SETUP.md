@@ -87,14 +87,14 @@ GPU 부하는 랜딩(유체+영상 스크럽)과 3D 필드가 동시에 도는 �
 
 ## 6. 하드웨어 목업(ESP32) 연동 — 2026-09-04 개정
 
-현장 제약: 아이맥은 구형(Chrome만), 공유기·핫스팟 반입 불가, 학교 와이파이는 5GHz(ESP32 불가), 인터넷 없음.
+현장 제약: 아이맥은 구형 순정(설치는 미리 인터넷 있는 곳에서), 공유기·핫스팟 반입 불가, 학교 와이파이는 5GHz(ESP32 불가), 인터넷 없음.
 목업 셋은 **각자 AP + 조작 웹페이지**를 띄운다 (No.1 CROSS-LED ch6 cross.local / No.2 TENDON ch1 tendon.local /
 No.3 BADANABI ch11 badanabi.local, 암호 12345678, 각자 192.168.4.1).
 
 한 컴퓨터는 와이파이 하나에만 붙으므로 **전원만 넣은 전용 ESP32 한 대가 허브 AP `archive`** 를 띄운다
 (`firmware/esp32-unit` env:hub, 192.168.4.1, 인터넷 없음). 목업 셋은 자기 AP·조작 페이지를 유지한 채 AP+STA 로
 `archive` 에 추가 접속하고(한 라디오라 자기 AP 채널이 허브 채널로 따라감 — 트래픽이 작아 문제없음),
-노트북(브릿지 + 사이트 서버)과 아이맥도 `archive` 에 붙는다.
+아이맥(브릿지 + 사이트 서버 + 브라우저, 고정 IP 192.168.4.100)도 `archive` 에 붙는다. 노트북은 필요 없다.
 
 ```
  허브 ESP32 ── AP "archive" 192.168.4.1 (전원만) ◀──────────────────────┐
@@ -102,9 +102,8 @@ No.3 BADANABI ch11 badanabi.local, 암호 12345678, 각자 192.168.4.1).
  No.2 TENDON     ── 자기 AP 유지 + STA→archive ─────────────────────────┤
  No.3 BADANABI   ── 자기 AP 유지 + STA→archive (소리 깨지면 링크 끔) ─────┤
                                                                         ▼
- 노트북 (archive 접속, 고정 IP 192.168.4.100)  node bridge/index.js  ── ws :7777  +  사이트 http :8080
-                                                                        ▲
- 아이맥 (archive 접속, Chrome)  http://192.168.4.100:8080  ───────────────┘   ← 창 2개(#/ 와 #/stage)
+ 아이맥 (archive 접속, 고정 IP 192.168.4.100)                                 ← 창 2개(#/ 와 #/stage)
+   START-MAC.command → node bridge/index.js  ── ws :7777  +  사이트 http :8080 → Chrome http://localhost:8080
 ```
 
 - 목업 → 브릿지 → 웹: `{"type":"trigger","unit":2,"level":2,"intensity":0.66}` → 아이맥이 **메인 다이얼로 → 그 개체로 회전 → 활성 원이 화면을 덮으며 개체 페이지**, 스테이지엔 pulse
@@ -118,36 +117,42 @@ No.3 BADANABI ch11 badanabi.local, 암호 12345678, 각자 192.168.4.1).
 - 이동 후 90초 유휴면 랜딩으로 복귀. 같은 목업의 재감지는 8초에 한 번만 반영. 상단 중앙 `BRIDGE / 02 UNITS`가 접속 목업 수
 - 키보드 `Shift+1~4`로 목업 없이 시험 가능
 
-### 로컬 실행 세팅 순서 (깃헙 → 노트북)
+### 아이맥 한 대로 전부 (기본 구성) — 순정 아이맥 기준 세팅 순서
 
-빌드는 Node 22가 필요하고 노트북이 구형이라, **빌드는 개발 PC에서 하고 결과물만 노트북에 넣는다.**
+브릿지·사이트 서버·브라우저·스테이지 창을 전부 아이맥에서 돌린다. 노트북은 필요 없다.
+아래 1~3 은 **인터넷 되는 곳에서 미리 한 번**, 4~6 은 전시장에서.
 
-개발 PC (Node 22):
-```
-git clone https://github.com/kjbis113-crypto/ENSIL.git
-cd ENSIL
-npm ci
-npm run build                 # → dist/  (Node 24면 크래시, debug.md #1)
-```
-`ENSIL` 폴더 전체(`dist/` 포함, `node_modules/`는 제외해도 됨)를 USB로 노트북에 복사.
+1. **프로그램 두 개 설치** (순정 아이맥엔 아무것도 없다)
+   - Chrome: https://www.google.com/chrome
+   - Node 22 LTS: https://nodejs.org → "macOS Installer (.pkg)" → 설치. (23 이상은 빌드가 크래시하므로 반드시 22)
+   - 설치 확인: 터미널(Launchpad → 기타 → 터미널)에서 `node -v` → `v22.x`
+2. **깃허브에서 main 내려받기**
+   - https://github.com/kjbis113-crypto/ENSIL → 초록 `Code` 버튼 → `Download ZIP`
+   - 다운로드된 `ENSIL-main.zip` 더블클릭으로 압축 해제 → `ENSIL-main` 폴더를 **바탕화면**으로 옮긴다
+3. **최초 세팅** — `ENSIL-main` 폴더의 `SETUP-MAC.command` 더블클릭
+   - "확인되지 않은 개발자" 경고가 뜨면: 파일을 **우클릭 → 열기 → 열기**
+   - 터미널이 열리며 의존성 설치 → 빌드(dist/) → 브릿지 설치가 돌아간다 (몇 분). `== 완료 ==` 가 뜨면 끝
+   - 이후로는 인터넷이 없어도 된다
+4. **전시장 네트워크** (목업을 쓸 때만. 사이트 자체는 와이파이 없이도 뜬다)
+   - 허브 ESP32(`archive`)를 먼저 켠다
+   - 메뉴 막대 Wi‑Fi → `archive` 접속 → Wi‑Fi 설정 → `archive` 옆 "세부사항" → TCP/IP → IPv4 구성 **수동**:
+     IP `192.168.4.100` / 서브넷 `255.255.255.0` / 라우터 `192.168.4.1` → 확인
+   - "인터넷 연결 없음" 표시는 정상. 학교 와이파이가 자동 접속으로 바꿔 채가지 않게 학교 와이파이의 "자동 연결"을 끈다
+5. **매일 시작** — `START-MAC.command` 더블클릭
+   - 터미널 창에 `ws://0.0.0.0:7777 대기 중`, `사이트 서빙: http://0.0.0.0:8080` 이 뜨고 Chrome 이 `http://localhost:8080` 을 연다
+   - macOS 방화벽이 "node 가 연결을 받도록 허용?" 하고 물으면 **허용** (목업이 접속하는 문이다)
+   - **이 터미널 창은 닫지 않는다** — 닫으면 브릿지와 사이트가 꺼진다. Dock 에 두고 뒤로 보내면 된다
+   - Chrome 전체화면: `control+command+F`. 스테이지(빔프) 창: `control+option+shift+O` → 프로젝터로 옮기고 한 번 클릭
+   - 목업 셋을 켠다 → 터미널에 `목업 unit 2 tendon 접속` 등 세 줄, 화면 상단 중앙 `BRIDGE / 03 UNITS`
+6. **끝낼 때** — 터미널 창을 닫으면(또는 `control+C`) 브릿지가 꺼진다. 허브 보드는 마지막에 끈다
 
-노트북 (Node 18 이상이면 됨, https://nodejs.org LTS):
-```
-cd ENSIL/bridge
-npm install                   # ws 만 필수. serialport 네이티브 빌드가 실패해도 무방
-cd ..
-node bridge/index.js --no-serial
-```
-`ws://0.0.0.0:7777 대기 중` 과 `사이트 서빙: http://0.0.0.0:8080` 두 줄이 뜨면 준비 끝. 방화벽이 물으면 **허용**.
+아이맥 시스템 설정: 잠자기 안 함, 화면 보호기 끔, 알림 방해금지 켬, 소프트웨어 자동 업데이트 끔.
 
-네트워크:
-1. 허브 ESP32(`archive`)를 먼저 켠다 — 이 보드가 곧 망이다
-2. 노트북 와이파이를 `archive`에 붙이고, 어댑터 IPv4를 수동 `192.168.4.100 / 255.255.255.0 / 게이트웨이 192.168.4.1`
-3. 아이맥도 `archive`에 붙인다 (DHCP 그대로). Chrome에서 `http://192.168.4.100:8080` → 브릿지 주소는 자동 유도
-4. 목업 셋을 켠다 → 브릿지 로그에 `목업 unit 2 tendon 접속` 등, 아이맥 상단 중앙 `BRIDGE / 03 UNITS`
-5. 아이맥에서 Ctrl+Alt+Shift+O 로 스테이지 창(§2)
+### 노트북을 따로 쓰는 변형 (아이맥이 너무 구형이라 Node 22 가 안 깔릴 때)
+위 1~3 을 노트북(Windows 든 맥이든)에서 하고, 노트북이 `archive` 에 붙어 `192.168.4.100` 을 잡은 뒤 `node bridge/index.js --no-serial`.
+아이맥은 Chrome 만 있으면 되고 `archive` 에 붙어 `http://192.168.4.100:8080` 을 연다 (브릿지 주소는 페이지 호스트에서 자동 유도).
 
-사이트를 다른 곳에서 열 땐 주소 뒤에 `?bridge=192.168.4.100:7777` 한 번(이후 기억됨). 개발 중엔 `npm run dev` + `node bridge/index.js --demo`.
+개발 중엔 `npm run dev` + `node bridge/index.js --demo` (15초마다 가짜 trigger). 사이트를 다른 곳에서 열 땐 주소 뒤에 `?bridge=호스트:7777` 한 번(이후 기억됨).
 
 ### 펌웨어 (`firmware/esp32-unit`)
 기존 PlatformIO 프로젝트에 `include/ensil_link.h` 하나를 넣고 네 줄만 부른다 (README 참조):

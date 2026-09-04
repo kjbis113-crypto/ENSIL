@@ -2,14 +2,16 @@
   "name": "ensil-bridge",
   "private": true,
   "version": "0.1.0",
-  "description": "시리얼(아두이노 IMU) ↔ WebSocket 브릿지. 웹 빌드와 무관한 독립 프로세스.",
+  "description": "하드웨어(ESP32 목업·아두이노) ↔ 웹 허브 + 사이트 정적 서빙. serialport 는 선택(설치 실패해도 동작).",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "demo": "node index.js --demo"
   },
   "dependencies": {
-    "serialport": "^12.0.0",
     "ws": "^8.18.0"
+  },
+  "optionalDependencies": {
+    "serialport": "^12.0.0"
   }
 }
