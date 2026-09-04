@@ -9,6 +9,11 @@ import {
 import { CREATURE_RECORDS, type CreatureRecord } from '../../data/creatureRecords';
 import { InteractiveFrameBackground } from './InteractiveFrameBackground';
 import { FluidHub } from './FluidHub';
+import { consumeDialEnter, restoreDialEnter, DIAL_ENTER_EVENT } from '../../state/dialEnter';
+
+/** 진입 시퀀스 타이밍 — 회전(offset-distance 790ms)이 끝난 뒤 활성 원이 화면을 덮고(720ms) 페이지 전환 */
+const ENTER_ROTATE_MS = 900;
+const ENTER_COVER_MS = 760;
 
 const VIDEO_SOURCES = [
   '/media/index/no-01.mp4',
@@ -147,7 +152,9 @@ export function IndexVideoCarousel() {
   const [motionLevel, setMotionLevel] = useState(0);
   const [pointerSize, setPointerSize] = useState(124);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [entering, setEntering] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+  const enterTimersRef = useRef<number[]>([]);
   const rootRef = useRef<HTMLElement>(null);
   const dragRef = useRef<DragState | null>(null);
   const wheelAtRef = useRef(0);
@@ -225,6 +232,46 @@ export function IndexVideoCarousel() {
     if (delta < -DIAL_ITEMS.length / 2) delta += DIAL_ITEMS.length;
     pulseAndMove(delta);
   };
+
+  // 목업 작동 → 진입 시퀀스: 그 개체 노드로 회전 → 활성 원이 화면을 덮음 → 개체 페이지
+  // (src/state/dialEnter.ts — 훅이 랜딩으로 보낸 뒤 요청, 마운트 전이면 pending 으로 대기)
+  useEffect(() => {
+    let inProgress: string | null = null;
+    const run = (id: string) => {
+      const index = DIAL_ITEMS.findIndex((item) => item.kind === 'creature' && item.record.id === id);
+      if (index < 0) return;
+      enterTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      inProgress = id;
+      setAboutOpen(false);
+      setEntering(false);
+      // 절대 목표로 회전 — 같은 요청이 두 번 와도(StrictMode) 같은 자리에 선다
+      setStep((current) => {
+        let delta = index - wrapIndex(current);
+        if (delta > DIAL_ITEMS.length / 2) delta -= DIAL_ITEMS.length;
+        if (delta < -DIAL_ITEMS.length / 2) delta += DIAL_ITEMS.length;
+        return current + delta;
+      });
+      setDragOffset(0);
+      pulseMotion(.6);
+      enterTimersRef.current = [
+        window.setTimeout(() => setEntering(true), ENTER_ROTATE_MS),
+        window.setTimeout(() => {
+          inProgress = null;
+          window.location.hash = `/creature/${id}`;
+        }, ENTER_ROTATE_MS + ENTER_COVER_MS),
+      ];
+    };
+    const onEvent = (event: Event) => run((event as CustomEvent<string>).detail);
+    window.addEventListener(DIAL_ENTER_EVENT, onEvent);
+    const pending = consumeDialEnter();
+    if (pending) run(pending);
+    return () => {
+      window.removeEventListener(DIAL_ENTER_EVENT, onEvent);
+      enterTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      // 도중에 내려가면(StrictMode 재마운트 포함) 다음 마운트가 이어받는다
+      if (inProgress) restoreDialEnter(inProgress);
+    };
+  }, []);
 
   const updatePointerPosition = (clientX: number, clientY: number) => {
     const root = rootRef.current;
@@ -325,7 +372,7 @@ export function IndexVideoCarousel() {
   return (
     <section
       ref={rootRef}
-      className={`index-dial${isDragging ? ' is-dragging' : ''}${motionLevel ? ' is-spinning' : ''}`}
+      className={`index-dial${isDragging ? ' is-dragging' : ''}${motionLevel ? ' is-spinning' : ''}${entering ? ' is-entering' : ''}`}
       style={sceneStyle}
       aria-roledescription="carousel"
       aria-label="ENSIL circular archive"

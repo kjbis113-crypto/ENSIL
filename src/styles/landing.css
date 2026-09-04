@@ -509,6 +509,25 @@
   background: rgba(255, 255, 255, .94);
 }
 
+/* ── 진입 시퀀스: 목업 작동 → 다이얼이 그 개체로 돌아간 뒤 활성 원이 화면을 덮으며 개체 페이지로 ──
+   (src/state/dialEnter.ts · useHardwareLink) 활성 원은 부풀고 나머지는 가라앉는다 */
+.index-dial.is-entering { cursor: default; pointer-events: none; }
+.index-dial.is-entering .index-dial__node.is-active {
+  --node-scale: 16;
+  z-index: 30;
+  transition: transform 720ms cubic-bezier(.7, 0, .84, 0), box-shadow 320ms ease;
+}
+.index-dial.is-entering .index-dial__node.is-active .index-dial__node-label,
+.index-dial.is-entering .index-dial__node.is-active > span,
+.index-dial.is-entering .index-dial__node.is-active > strong { opacity: 0; transition: opacity 200ms ease; }
+.index-dial.is-entering .index-dial__node:not(.is-active),
+.index-dial.is-entering .index-dial__hub,
+.index-dial.is-entering .index-dial__identity,
+.index-dial.is-entering .index-dial__utility { opacity: 0; transition: opacity 420ms ease; }
+@media (prefers-reduced-motion: reduce) {
+  .index-dial.is-entering .index-dial__node.is-active { transition: none; }
+}
+
 .index-about {
   position: absolute;
   inset: 0;

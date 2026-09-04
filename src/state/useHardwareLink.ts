@@ -3,13 +3,15 @@ import type { CreatureRecord } from '../data/creatureRecords';
 import { useInput } from '../input/useInput';
 import { resolveUnit, unitSlot } from '../input/units';
 import { useFieldLink } from './fieldLink';
+import { requestDialEnter } from './dialEnter';
 
 /**
  * 목업 trigger → 아이맥 화면 반응 (docs/EXHIBITION_SETUP.md §6).
  *
  *  - 관람객이 조작 중(포인터/키 입력 후 ACTIVE_MS 이내)이면 화면을 뺏지 않고 신호 칩만 띄운 뒤,
- *    조작이 멈추면 그때 그 개체의 아카이브(#/creature/:id)로 이동
- *  - 유휴 상태면 즉시 이동
+ *    조작이 멈추면 그때 시퀀스 시작
+ *  - 유휴 상태면 즉시 시퀀스: 메인 다이얼(#/)로 → 다이얼이 그 개체로 회전 → 활성 원이 화면을 덮으며
+ *    개체 페이지(#/creature/:id)로 진입 (IndexVideoCarousel 이 dialEnter 요청을 받아 수행)
  *  - trigger 로 이동한 뒤 RETURN_MS 동안 아무 조작이 없으면 랜딩(#/)으로 복귀
  *  - 같은 목업의 연속 trigger 는 COOLDOWN_MS 안에서 한 번만 (PIR 재감지 등)
  *  - 스테이지(빔프)가 떠 있으면 같은 개체에 pulse 도 흘린다
@@ -34,7 +36,9 @@ export function useHardwareLink(enabled = true) {
   const goToRecord = useCallback((record: CreatureRecord) => {
     pendingRef.current = null;
     navigatedAtRef.current = performance.now();
-    window.location.hash = `/creature/${record.id}`;
+    // 랜딩이 아니면 먼저 랜딩으로 — 다이얼이 마운트되면 pending 요청을 집어 회전→진입을 이어간다
+    if (window.location.hash !== '#/' && window.location.hash !== '') window.location.hash = '/';
+    requestDialEnter(record.id);
     setSignal((current) => (current ? { ...current, pending: false } : current));
   }, []);
 
@@ -52,7 +56,7 @@ export function useHardwareLink(enabled = true) {
       const alreadyThere = window.location.hash === `#/creature/${record.id}`;
       setSignal({ record, at: now, pending: busy && !alreadyThere });
       if (alreadyThere) {
-        navigatedAtRef.current = now;
+        navigatedAtRef.current = now; // 이미 그 개체 페이지 — 복귀 타이머만 연장
         return;
       }
       if (busy) pendingRef.current = record;
@@ -91,9 +95,9 @@ export function useHardwareLink(enabled = true) {
     return () => window.clearInterval(tick);
   }, [goToRecord]);
 
-  /** 웹 → 목업: 해당 개체의 목업을 동작시킨다 */
-  const actUnit = useCallback((record: CreatureRecord, action = 'pulse', intensity = 1) => {
-    act(unitSlot(record), action, intensity);
+  /** 웹 → 목업: 해당 개체의 목업을 동작시킨다 (level = 목업 버튼 단계 1~3) */
+  const actUnit = useCallback((record: CreatureRecord, level = 2, intensity = 1) => {
+    act(unitSlot(record), 'pulse', level, intensity);
   }, [act]);
 
   return { connected, units, signal, actUnit };

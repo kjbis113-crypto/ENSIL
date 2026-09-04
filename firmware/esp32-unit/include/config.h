@@ -1,23 +1,24 @@
 #pragma once
 
-// ── 네트워크 ──────────────────────────────────────────────
-// 전시장 구성 (docs/EXHIBITION_SETUP.md §6): 2.4GHz 와이파이가 없으므로
-// unit1(HOST_AP=1)이 SoftAP 를 띄우고, 나머지 목업·노트북(브릿지)·아이맥이 여기 붙는다.
-// 노트북은 이 AP 안에서 고정 IP 192.168.4.100 을 잡는다 → 브릿지 주소.
-#define WIFI_SSID      "ENSIL-FIELD"
-#define WIFI_PASS      "electro-ferment"   // 8자 이상
-#define WIFI_CHANNEL   6
-#define AP_MAX_CLIENTS 8                   // 목업 3 + 노트북 + 아이맥 + 여유
+// ── 네트워크 (docs/EXHIBITION_SETUP.md §6) ──────────────────
+// 목업 셋은 각자 AP 를 띄운다 (No.1 CROSS-LED / No.2 TENDON / No.3 BADANABI, 암호 12345678, 192.168.4.1).
+// 그중 No.1 CROSS-LED 가 허브: 노트북(브릿지)·아이맥·No.2·No.3(STA) 이 여기 붙는다.
+// 노트북은 CROSS-LED 안에서 고정 IP 192.168.4.100 → 브릿지 주소.
+#define ENSIL_HUB_SSID     "CROSS-LED"
+#define ENSIL_HUB_PASS     "12345678"
+#define ENSIL_BRIDGE_HOST  "192.168.4.100"
+#define ENSIL_BRIDGE_PORT  7777
 
-#define BRIDGE_HOST    "192.168.4.100"
-#define BRIDGE_PORT    7777
-
-// 노트북 핫스팟 등 다른 AP 를 쓰게 되면 위 SSID/PASS 와 BRIDGE_HOST 만 바꾼다
-// (Windows 모바일 핫스팟 게이트웨이는 보통 192.168.137.1)
-
-// ── 동작 파라미터 ──────────────────────────────────────────
-#define TRIGGER_COOLDOWN_MS 8000   // 같은 목업 연속 감지는 이 간격 안에서 한 번만 보고 (PIR 재감지 방지)
-#define RECONNECT_MS        3000
+// 이 스켈레톤(main.cpp)이 띄우는 자기 AP — 기존 펌웨어를 쓰면 무시된다
+#if UNIT == 1
+  #define OWN_AP_SSID "CROSS-LED"
+#elif UNIT == 2
+  #define OWN_AP_SSID "TENDON"
+#elif UNIT == 3
+  #define OWN_AP_SSID "BADANABI"
+#endif
+#define OWN_AP_PASS     "12345678"
+#define AP_MAX_CLIENTS  8   // 허브: 목업 2 + 노트북 + 아이맥 + 폰 여유
 
 // ── 핀 (보드 배선에 맞게) ─────────────────────────────────
 #if UNIT == 1

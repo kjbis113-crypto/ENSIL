@@ -72,9 +72,9 @@ export function useInput(binding: InputBinding = {}, enabled = true) {
     };
   }, [enabled]);
 
-  /** 웹 → 목업 동작 명령 */
-  const act = useCallback((unit: UnitRef, action: string, intensity = 1) => {
-    wsRef.current?.send({ type: 'act', unit, action, intensity } satisfies ActCommand);
+  /** 웹 → 목업 동작 명령. level = 목업 버튼 단계(1~3) */
+  const act = useCallback((unit: UnitRef, action: string, level = 2, intensity = 1) => {
+    wsRef.current?.send({ type: 'act', unit, action, level, intensity } satisfies ActCommand);
   }, []);
 
   return { connected, units, tiltRef, act };

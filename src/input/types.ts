@@ -13,13 +13,13 @@ export type PhysicalEvent =
   | { type: 'release'; slot: number }
   | { type: 'step'; dir: 1 | -1 }
   | { type: 'sensor'; channel: string; value: number }
-  /** 목업이 스스로 감지→동작했음. 웹은 해당 개체 아카이브를 띄운다 */
-  | { type: 'trigger'; unit?: UnitRef; action: string; intensity?: number }
+  /** 목업이 스스로 감지→동작했음 (level = 목업 버튼 단계 1~3). 웹은 해당 개체 아카이브를 띄운다 */
+  | { type: 'trigger'; unit?: UnitRef; action: string; level?: number; intensity?: number }
   /** 브릿지가 알려주는 접속 중인 목업 목록 */
   | { type: 'units'; units: Array<{ unit: UnitRef; name?: string }> };
 
-/** 웹 → 목업 동작 명령 (브릿지가 해당 목업으로 중계) */
-export type ActCommand = { type: 'act'; unit: UnitRef; action: string; intensity?: number };
+/** 웹 → 목업 동작 명령 (브릿지가 해당 목업으로 중계). level = 목업 버튼 단계 1~3 */
+export type ActCommand = { type: 'act'; unit: UnitRef; action: string; level?: number; intensity?: number };
 
 export interface Tilt {
   pitch: number;

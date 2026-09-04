@@ -115,6 +115,11 @@
 5. **아카이브 페이지 삭제** — 인덱스 다이얼(#/)이 곧 아카이브. `Archive.tsx`·`CircularArchiveCarousel`·`SpecimenGlyph`·
    `carousel.css`·`archive.css` 제거, 개체 기록 스타일만 `record.css`로 분리. `#/archive`는 랜딩으로 폴백. 크롬은 ARCHIVE / FIELD 두 링크
 
+6. **(09-04) 목업 실제 구성 반영 + 진입 시퀀스 + main 통합** — 목업 셋이 각자 AP(CROSS-LED/TENDON/BADANABI)라
+   No.1 CROSS-LED 를 허브로, No.2/3 은 AP+STA 로 합류. 기존 PlatformIO 펌웨어에 끼우는 `firmware/esp32-unit/include/ensil_link.h`.
+   trigger 시 `#/`→다이얼 회전→활성 원 확대→`#/creature/:id` (`src/state/dialEnter.ts`, IndexVideoCarousel `is-entering`;
+   StrictMode 이중 실행 대비 절대 회전 + pending 복원). 로컬 실행 순서는 docs §6. `main` 은 fast-forward 로 통합.
+
 ## 다음 단계 (우선순위순)
 
 0. **스테이지 전용 연출** — 지금은 3D 공용 필드에서 크롬만 뺀 것. 프로젝터용 씬은 `Stage.tsx`의 캔버스만 교체
