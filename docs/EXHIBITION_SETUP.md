@@ -91,18 +91,20 @@ GPU 부하는 랜딩(유체+영상 스크럽)과 3D 필드가 동시에 도는 �
 목업 셋은 **각자 AP + 조작 웹페이지**를 띄운다 (No.1 CROSS-LED ch6 cross.local / No.2 TENDON ch1 tendon.local /
 No.3 BADANABI ch11 badanabi.local, 암호 12345678, 각자 192.168.4.1).
 
-한 컴퓨터는 와이파이 하나에만 붙으므로 **No.1 CROSS-LED 를 허브로 정한다.** No.2·No.3 은 자기 AP 를 유지한 채
-AP+STA 로 CROSS-LED 에 추가 접속하고(한 라디오라 자기 AP 채널이 6으로 따라감 — 트래픽이 작아 문제없음),
-노트북(브릿지 + 사이트 서버)과 아이맥도 CROSS-LED 에 붙는다.
+한 컴퓨터는 와이파이 하나에만 붙으므로 **전원만 넣은 전용 ESP32 한 대가 허브 AP `archive`** 를 띄운다
+(`firmware/esp32-unit` env:hub, 192.168.4.1, 인터넷 없음). 목업 셋은 자기 AP·조작 페이지를 유지한 채 AP+STA 로
+`archive` 에 추가 접속하고(한 라디오라 자기 AP 채널이 허브 채널로 따라감 — 트래픽이 작아 문제없음),
+노트북(브릿지 + 사이트 서버)과 아이맥도 `archive` 에 붙는다.
 
 ```
- No.1 CROSS-LED  ── 허브 AP 192.168.4.1 (자기 망 안의 브릿지에 접속) ──┐
- No.2 TENDON     ── 자기 AP 유지 + STA→CROSS-LED ────────────────────┤
- No.3 BADANABI   ── 자기 AP 유지 + STA→CROSS-LED (소리 깨지면 링크 끔) ┤
-                                                                     ▼
- 노트북 (CROSS-LED 접속, 고정 IP 192.168.4.100)  node bridge/index.js  ── ws :7777  +  사이트 http :8080
-                                                                     ▲
- 아이맥 (CROSS-LED 접속, Chrome)  http://192.168.4.100:8080  ──────────┘   ← 창 2개(#/ 와 #/stage)
+ 허브 ESP32 ── AP "archive" 192.168.4.1 (전원만) ◀──────────────────────┐
+ No.1 CROSS-LED  ── 자기 AP 유지 + STA→archive ─────────────────────────┤
+ No.2 TENDON     ── 자기 AP 유지 + STA→archive ─────────────────────────┤
+ No.3 BADANABI   ── 자기 AP 유지 + STA→archive (소리 깨지면 링크 끔) ─────┤
+                                                                        ▼
+ 노트북 (archive 접속, 고정 IP 192.168.4.100)  node bridge/index.js  ── ws :7777  +  사이트 http :8080
+                                                                        ▲
+ 아이맥 (archive 접속, Chrome)  http://192.168.4.100:8080  ───────────────┘   ← 창 2개(#/ 와 #/stage)
 ```
 
 - 목업 → 브릿지 → 웹: `{"type":"trigger","unit":2,"level":2,"intensity":0.66}` → 아이맥이 **메인 다이얼로 → 그 개체로 회전 → 활성 원이 화면을 덮으며 개체 페이지**, 스테이지엔 pulse
@@ -139,24 +141,24 @@ node bridge/index.js --no-serial
 `ws://0.0.0.0:7777 대기 중` 과 `사이트 서빙: http://0.0.0.0:8080` 두 줄이 뜨면 준비 끝. 방화벽이 물으면 **허용**.
 
 네트워크:
-1. No.1(CROSS-LED)을 먼저 켠다 — 이 보드가 곧 망이다
-2. 노트북 와이파이를 `CROSS-LED`(12345678)에 붙이고, 어댑터 IPv4를 수동 `192.168.4.100 / 255.255.255.0 / 게이트웨이 192.168.4.1`
-3. 아이맥도 `CROSS-LED`에 붙인다 (DHCP 그대로). Chrome에서 `http://192.168.4.100:8080` → 브릿지 주소는 자동 유도
-4. No.2·No.3 을 켠다 → 브릿지 로그에 `목업 unit 2 tendon 접속` 등, 아이맥 상단 중앙 `BRIDGE / 03 UNITS`
+1. 허브 ESP32(`archive`)를 먼저 켠다 — 이 보드가 곧 망이다
+2. 노트북 와이파이를 `archive`에 붙이고, 어댑터 IPv4를 수동 `192.168.4.100 / 255.255.255.0 / 게이트웨이 192.168.4.1`
+3. 아이맥도 `archive`에 붙인다 (DHCP 그대로). Chrome에서 `http://192.168.4.100:8080` → 브릿지 주소는 자동 유도
+4. 목업 셋을 켠다 → 브릿지 로그에 `목업 unit 2 tendon 접속` 등, 아이맥 상단 중앙 `BRIDGE / 03 UNITS`
 5. 아이맥에서 Ctrl+Alt+Shift+O 로 스테이지 창(§2)
 
 사이트를 다른 곳에서 열 땐 주소 뒤에 `?bridge=192.168.4.100:7777` 한 번(이후 기억됨). 개발 중엔 `npm run dev` + `node bridge/index.js --demo`.
 
 ### 펌웨어 (`firmware/esp32-unit`)
 기존 PlatformIO 프로젝트에 `include/ensil_link.h` 하나를 넣고 네 줄만 부른다 (README 참조):
-`ensilLinkBegin(unit, name, hub)` / `ensilLinkTick()` (No.2 는 webTick 안에서도) / `ensilLinkTrigger(level, intensity)` / `ensilLinkOnAct(fn)`.
-No.1 만 `hub=true`. 브릿지 주소 기본 `192.168.4.100:7777`. No.3 소리가 깨지면 `ENSIL_LINK_ENABLED 0`.
+`ensilLinkBegin(unit, name, false)` / `ensilLinkTick()` (No.2 는 webTick 안에서도) / `ensilLinkTrigger(level, intensity)` / `ensilLinkOnAct(fn)`.
+허브 보드는 `pio run -e hub -t upload` (AP만, 암호는 config.h `ENSIL_HUB_PASS` 와 같게). 브릿지 주소 기본 `192.168.4.100:7777`. No.3 소리가 깨지면 `ENSIL_LINK_ENABLED 0`.
 `src/main.cpp` 는 기존 펌웨어가 없을 때의 스켈레톤.
 
 ### 리허설 체크
 - 브릿지 로그에 목업 접속 세 줄 → 아이맥 `BRIDGE / 03 UNITS`
 - 목업을 건드리면 브릿지 로그 `trigger unit n` → 아이맥이 다이얼로 돌아가 회전 후 개체 페이지로, 프로젝터가 민트로 번짐
-- No.1 전원이 곧 망 전체다. 처음에 켜고 마지막에 끈다. No.1 이 재부팅되면 노트북·아이맥 와이파이를 다시 확인
+- 허브 보드 전원이 곧 망 전체다. 처음에 켜고 마지막에 끈다. 허브가 재부팅되면 노트북·아이맥 와이파이를 다시 확인
 - 트래픽이 ESP32 AP를 거치므로 아이맥의 첫 로드(영상·GLB 약 30MB)는 30초 이상 걸릴 수 있다. 개장 전에 모든 화면을 한 번씩 열어 캐시
 - No.2 의 블로킹 sweep 동안 `ensilLinkTick()` 이 불리지 않으면 WS가 끊긴다 — webTick 안에 같이 넣었는지 확인
 

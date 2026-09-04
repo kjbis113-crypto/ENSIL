@@ -2,10 +2,11 @@
 
 // ── 네트워크 (docs/EXHIBITION_SETUP.md §6) ──────────────────
 // 목업 셋은 각자 AP 를 띄운다 (No.1 CROSS-LED / No.2 TENDON / No.3 BADANABI, 암호 12345678, 192.168.4.1).
-// 그중 No.1 CROSS-LED 가 허브: 노트북(브릿지)·아이맥·No.2·No.3(STA) 이 여기 붙는다.
-// 노트북은 CROSS-LED 안에서 고정 IP 192.168.4.100 → 브릿지 주소.
-#define ENSIL_HUB_SSID     "CROSS-LED"
-#define ENSIL_HUB_PASS     "12345678"
+// 허브는 전원만 넣은 전용 ESP32 AP "archive" (env:hub). 노트북(브릿지)·아이맥·목업 셋(STA) 이 여기 붙는다.
+// 노트북은 archive 안에서 고정 IP 192.168.4.100 → 브릿지 주소.
+#define ENSIL_HUB_SSID     "archive"
+#define ENSIL_HUB_PASS     "12345678"   // 허브 보드에 넣은 암호와 같게
+#define ENSIL_HUB_CHANNEL  6
 #define ENSIL_BRIDGE_HOST  "192.168.4.100"
 #define ENSIL_BRIDGE_PORT  7777
 
@@ -18,7 +19,7 @@
   #define OWN_AP_SSID "BADANABI"
 #endif
 #define OWN_AP_PASS     "12345678"
-#define AP_MAX_CLIENTS  8   // 허브: 목업 2 + 노트북 + 아이맥 + 폰 여유
+#define AP_MAX_CLIENTS  8   // 허브: 목업 3 + 노트북 + 아이맥 + 폰 여유
 
 // ── 핀 (보드 배선에 맞게) ─────────────────────────────────
 #if UNIT == 1

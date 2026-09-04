@@ -3,16 +3,15 @@
  * ensil_link.h — 기존 목업 펌웨어에 "끼워 넣는" 브릿지 연결 모듈 (헤더 하나, 의존성: ArduinoWebsockets, ArduinoJson)
  *
  * 목업이 이미 자기 AP + 웹페이지(cross.local 등)를 띄우고 있어도 그대로 두고,
- * STA 로 허브 망(No.1 CROSS-LED)에 추가로 붙어 노트북의 브릿지(ws://192.168.4.100:7777)와 대화한다.
- * No.1 은 자기가 허브(AP)이므로 STA 접속 없이 자기 망 안의 브릿지에 붙는다.
+ * STA 로 허브 망("archive" — 전원만 넣은 전용 ESP32 AP)에 추가로 붙어 노트북의 브릿지(ws://192.168.4.100:7777)와 대화한다.
  *
  *   #include "ensil_link.h"
  *   void setup() { ...기존...; ensilLinkBegin(2, "tendon"); ensilLinkOnAct(myAct); }
  *   void loop()  { ...기존...; ensilLinkTick(); }          // webTick() 안에서도 같이 부른다 (블로킹 sweep 중에도)
  *   ...감지→동작이 일어난 자리에서:  ensilLinkTrigger(n, intensity);   // n = 버튼 단계 1~3
  *
- * ⚠ AP+STA 는 한 라디오라 STA 가 붙은 채널로 자기 AP 채널도 옮겨간다 → 허브(CROSS-LED)가 6이면
- *   TENDON/BADANABI 의 AP 도 6이 된다. 트래픽이 작아 문제없다 (docs/EXHIBITION_SETUP.md §6).
+ * ⚠ AP+STA 는 한 라디오라 STA 가 붙은 채널로 자기 AP 채널도 옮겨간다 → 허브(archive)의 채널로
+ *   세 목업의 AP 채널이 모두 따라간다(1/6/11 분리는 사라짐). 트래픽이 작아 문제없다 (docs/EXHIBITION_SETUP.md §6).
  * ⚠ No.3 에서 소리가 치지직거리면 ENSIL_LINK_ENABLED 를 0 으로 — 소리가 먼저.
  */
 
@@ -25,7 +24,7 @@
 #define ENSIL_LINK_ENABLED 1
 #endif
 #ifndef ENSIL_HUB_SSID
-#define ENSIL_HUB_SSID "CROSS-LED"
+#define ENSIL_HUB_SSID "archive"
 #endif
 #ifndef ENSIL_HUB_PASS
 #define ENSIL_HUB_PASS "12345678"
@@ -90,7 +89,7 @@ namespace ensil {
   }
 }
 
-/** setup() 에서. hub=true 면 이 보드가 허브 AP(No.1) — STA 접속을 하지 않는다 */
+/** setup() 에서. hub=true 는 이 보드가 곧 허브 AP 일 때만(전용 허브 보드) — 목업 셋은 전부 false */
 inline void ensilLinkBegin(int unit, const char* name, bool hub = false) {
 #if ENSIL_LINK_ENABLED
   ensil::unit = unit;

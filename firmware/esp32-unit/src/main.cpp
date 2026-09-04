@@ -11,6 +11,21 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "config.h"
+
+#if defined(HUB)
+// ── 전용 허브 보드: 전원만 넣으면 AP "archive" 를 띄운다. 노트북·아이맥·목업 셋이 여기 붙는다 ──
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ENSIL_HUB_SSID, ENSIL_HUB_PASS, ENSIL_HUB_CHANNEL, 0, AP_MAX_CLIENTS);
+  Serial.printf("ENSIL hub AP %s  ip %s\n", ENSIL_HUB_SSID, WiFi.softAPIP().toString().c_str());
+}
+void loop() {
+  static unsigned long last = 0;
+  if (millis() - last > 10000) { last = millis(); Serial.printf("[hub] stations: %d\n", WiFi.softAPgetStationNum()); }
+  delay(50);
+}
+#else
 #include "ensil_link.h"
 
 #if UNIT == 1
@@ -79,10 +94,10 @@ void setup() {
   delay(200);
   Serial.printf("ENSIL unit %d (%s)\n", UNIT, UNIT_NAME);
   setupUnit();
-  // 자기 AP (기존 펌웨어의 웹페이지용). 허브가 아니면 ensilLinkBegin 이 AP+STA 로 올린다
+  // 자기 AP (기존 펌웨어의 웹페이지용). ensilLinkBegin 이 AP+STA 로 올려 허브 archive 에도 붙는다
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(OWN_AP_SSID, OWN_AP_PASS, 6, 0, AP_MAX_CLIENTS);
-  ensilLinkBegin(UNIT, UNIT_NAME, UNIT == 1);
+  WiFi.softAP(OWN_AP_SSID, OWN_AP_PASS, ENSIL_HUB_CHANNEL, 0, AP_MAX_CLIENTS);
+  ensilLinkBegin(UNIT, UNIT_NAME, false);
   ensilLinkOnAct(onWebAct);
 }
 
@@ -95,3 +110,4 @@ void loop() {
   }
   delay(5);
 }
+#endif // HUB
